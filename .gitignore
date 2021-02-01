@@ -6,9 +6,13 @@
 local.properties
 .settings/
 .project
+.classpath
+
 
 ## JetBrains
 .idea
+*.iml
+
 
 ## VS Code
 .vscode/*
