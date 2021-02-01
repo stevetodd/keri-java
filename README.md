@@ -1,10 +1,14 @@
 # KERI for Java
 
-keri-java is a Java-based implementation of the [Key Event Receipt Infrastructure specification](https://github.com/decentralized-identity/keri).
+keri-java is a Java-based implementation of
+the [Key Event Receipt Infrastructure specification](https://github.com/decentralized-identity/keri)
+.
 
 ## Status
 
-**keri-java is not ready for production usage.** This project is under heavy development and provides no guarantees of a stable API for application developers. Further, the specification is also under heavy development.
+**keri-java is not ready for production usage.** This project is under heavy development and
+provides no guarantees of a stable API for application developers. Further, the specification is
+also under heavy development.
 
 Below describes the current capabilities of keri-java:
 
@@ -24,6 +28,8 @@ Below describes the current capabilities of keri-java:
 
 - [x] Serialization
 - [x] Verification
+  - [ ] Recovery
+  - [ ] Delegation Seals
 - [ ] \(In Progress) Storage
 
 **Private/Direct Mode**
@@ -55,7 +61,8 @@ All builds are 64-bit.
 
 **Lookup Module**
 
-The lookup module provides applications the ability to obtain current verification keys and state information about an identifier.
+The lookup module provides applications the ability to obtain current verification keys and state
+information about an identifier.
 
 ```xml
 <dependency>
