@@ -21,18 +21,6 @@
   <dependencies>
 
     <dependency>
-      <groupId>foundation.identity.keri</groupId>
-      <artifactId>event-storage-in-memory</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>foundation.identity.keri</groupId>
-      <artifactId>key-storage-in-memory</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.11.3</version>
