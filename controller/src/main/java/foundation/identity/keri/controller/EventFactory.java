@@ -93,7 +93,17 @@ public final class EventFactory {
 
   public InteractionEvent interaction(InteractionSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
+    var signatures = new HashSet<EventSignature>();
 
+    if (spec.signer() != null) {
+      var signature = spec.signer().sign(bytes);
+      var eventCoordinates = new ImmutableIdentifierEventCoordinates(spec.identifier(), spec.sequenceNumber());
+      var digest = DigestOperations.BLAKE3_256.digest(bytes);
+      var eventCoordinatesWitDigest = new ImmutableIdentifierEventCoordinatesWithDigest(eventCoordinates, digest);
+      var keyCoordinates = new ImmutableKeyCoordinates(eventCoordinatesWitDigest, 0);
+      var eventSignature = ImmutableEventSignature.of(eventCoordinatesWitDigest, keyCoordinates, signature);
+      signatures.add(eventSignature);
+    }
     return new ImmutableInteractionEvent(
         Version.CURRENT,
         spec.format(),
@@ -102,7 +112,7 @@ public final class EventFactory {
         spec.previous(),
         spec.seals(),
         bytes,
-        Set.of());
+        signatures);
   }
 
   public ReceiptEvent receipt(

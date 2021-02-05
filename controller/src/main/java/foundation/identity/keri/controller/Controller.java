@@ -119,19 +119,19 @@ public final class Controller {
     var state = getIdentifierState(identifier);
 
     if (state == null) {
-      throw new IllegalArgumentException("prefix state not found in event store");
+      throw new IllegalArgumentException("identifier state not found in event store");
     }
 
     // require single keys, nextKeys
     if (state.nextKeyConfigurationDigest().isEmpty()) {
-      throw new IllegalArgumentException("prefix cannot be rotated");
+      throw new IllegalArgumentException("identifier cannot be rotated");
     }
 
     var currentKeyCoordinates = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
     var nextKeyPair = this.keyStore.getNextKey(currentKeyCoordinates);
 
     if (nextKeyPair.isEmpty()) {
-      throw new IllegalArgumentException("next key pair for prefix not found in keystore");
+      throw new IllegalArgumentException("next key pair for identifier not found in keystore");
     }
 
     var newNextKeyPair = this.generateKeyPair(DEFAULT_SIGNATURE_ALGO);
@@ -164,25 +164,20 @@ public final class Controller {
     var state = getIdentifierState(identifier);
 
     if (state == null) {
-      throw new IllegalArgumentException("prefix not found in event store");
-    }
-
-    // require single keys, nextKeys
-    if (state.nextKeyConfigurationDigest().isEmpty()) {
-      throw new IllegalArgumentException("prefix cannot be rotated");
+      throw new IllegalArgumentException("identifier not found in event store");
     }
 
     var currentKeyCoordinates = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
-    var nextKeyPair = this.keyStore.getNextKey(currentKeyCoordinates);
+    var keyPair = this.keyStore.getKey(currentKeyCoordinates);
 
-    if (nextKeyPair.isEmpty()) {
-      throw new IllegalArgumentException("next key pair for prefix not found in keystore");
+    if (keyPair.isEmpty()) {
+      throw new IllegalArgumentException("key pair for identifier not found in keystore");
     }
 
     var spec = InteractionSpec.builder(state)
+        .signer(keyPair.get().getPrivate())
         .seals(seals)
         .build();
-
 
     var event = this.eventFactory.interaction(spec);
     this.eventValidator.validate(state, event);
