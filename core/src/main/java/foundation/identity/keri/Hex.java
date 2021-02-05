@@ -8,7 +8,7 @@ public final class Hex {
   /**
    * Maps nibble values to hex characters
    */
-  private static final byte[] HEX = {
+  private static final char[] HEX = {
       '0', '1', '2', '3', '4', '5', '6', '7',
       '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -26,6 +26,10 @@ public final class Hex {
     for (var i = 'A'; i <= 'F'; i++) {
       NIBBLES[i] = NIBBLES[(i + 'a') - 'A'];
     }
+    System.arraycopy(
+        NIBBLES, 'a',
+        NIBBLES, 'A',
+        'F' - 'A' + 1);
   }
 
   private Hex() {
@@ -33,14 +37,15 @@ public final class Hex {
   }
 
   public static String hex(byte[] bytes) {
-    final var hex = new StringBuilder(2 * bytes.length);
+    var hex = new char[2 * bytes.length];
 
-    for (final byte b : bytes) {
-      hex.append((char) (HEX[(b & 0xff) >>> 4]));
-      hex.append((char) (HEX[b & 0x0f]));
+    for (int i = 0, bytesLength = bytes.length; i < bytesLength; i++) {
+      byte b = bytes[i];
+      hex[i * 2] = HEX[(b & 0xff) >>> 4];
+      hex[i * 2 + 1] = HEX[b & 0x0f];
     }
 
-    return hex.toString();
+    return new String(hex);
   }
 
   public static String hexNoPad(int i) {
@@ -65,14 +70,7 @@ public final class Hex {
     for (var i = 0; i < bytes.length; i++) {
       var b1 = NIBBLES[hex.charAt(i * 2)];
       var b2 = NIBBLES[hex.charAt((i * 2) + 1)];
-
-      var b = (b1 << 4) | b2;
-
-      if (b < 0) {
-        throw new RuntimeException("invalid characters encountered in Hex string");
-      }
-
-      bytes[i] = (byte) b;
+      bytes[i] = (byte) ((b1 << 4) | b2);
     }
 
     return bytes;
