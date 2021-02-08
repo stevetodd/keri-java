@@ -3,6 +3,8 @@ package foundation.identity.keri;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
+import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.internal.crypto.ImmutableDigest;
 import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
@@ -11,11 +13,12 @@ import java.security.PublicKey;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class KeyConfigurationDigester {
 
-  public static KeyConfigurationDigest digest(int signingThreshold, List<PublicKey> nextKeys, DigestAlgorithm algo) {
+  public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<PublicKey> nextKeys, DigestAlgorithm algo) {
     var digOps = DigestOperations.lookup(algo);
 
     var keyDigs = nextKeys.stream()
@@ -27,8 +30,8 @@ public class KeyConfigurationDigester {
     return digest(signingThreshold, keyDigs);
   }
 
-  public static KeyConfigurationDigest digest(int signingThreshold, List<Digest> nextKeyDigests) {
-    var st = Hex.hexNoPad(signingThreshold).getBytes(UTF_8);
+  public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<Digest> nextKeyDigests) {
+    var st = signingThresoldRepresentation(signingThreshold);
     var digestAlgorithm = nextKeyDigests.get(0).algorithm();
     var digOps = DigestOperations.lookup(digestAlgorithm);
 
@@ -42,4 +45,28 @@ public class KeyConfigurationDigester {
 
     return new ImmutableKeyConfigurationDigest(new ImmutableDigest(nextKeyDigests.get(0).algorithm(), digest));
   }
+
+  private static byte[] signingThresoldRepresentation(SigningThreshold threshold) {
+    if (threshold instanceof SigningThreshold.Unweighted) {
+      return Hex.hexNoPad(((SigningThreshold.Unweighted) threshold).threshold()).getBytes(UTF_8);
+    } else if (threshold instanceof SigningThreshold.Weighted) {
+      return ((SigningThreshold.Weighted) threshold).weights().stream()
+          .map(lw -> lw.stream()
+              .map(KeyConfigurationDigester::weight)
+              .collect(joining(",")))
+          .collect(joining(("&")))
+          .getBytes(UTF_8);
+    } else {
+      throw new IllegalArgumentException("Unknown threshold type: " + threshold.getClass());
+    }
+  }
+
+  static String weight(Weight w) {
+    if (w.denominator().isEmpty()) {
+      return "" + w.numerator();
+    }
+
+    return w.numerator() + "/" + w.denominator().get();
+  }
+
 }

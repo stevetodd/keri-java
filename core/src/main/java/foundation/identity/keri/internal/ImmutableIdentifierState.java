@@ -5,6 +5,7 @@ import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 public class ImmutableIdentifierState implements IdentifierState {
 
   private final Identifier identifier;
-  private final int signingThreshold;
+  private final SigningThreshold signingThreshold;
   private final List<PublicKey> keys;
   private final Optional<KeyConfigurationDigest> nextKeyConfigurationDigest;
   private final int witnessThreshold;
@@ -28,7 +29,7 @@ public class ImmutableIdentifierState implements IdentifierState {
 
   public ImmutableIdentifierState(
       Identifier identifier,
-      int signingThreshold,
+      SigningThreshold signingThreshold,
       List<PublicKey> keys,
       KeyConfigurationDigest nextKeyConfigurationDigest,
       int witnessThreshold,
@@ -55,7 +56,7 @@ public class ImmutableIdentifierState implements IdentifierState {
   }
 
   @Override
-  public int signingThreshold() {
+  public SigningThreshold signingThreshold() {
     return this.signingThreshold;
   }
 

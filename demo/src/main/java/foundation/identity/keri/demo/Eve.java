@@ -81,7 +81,7 @@ public class Eve {
         var ie = (IdentifierEvent) event;
 
         var state = this.controller.getIdentifierState(ie.identifier());
-        this.eventValidator.validate(state, (IdentifierEvent) event);
+        this.eventValidator.validate(state, event);
         System.out.println("--- VALID");
         this.eventStore.store(ie);
         System.out.println("--- STORED");

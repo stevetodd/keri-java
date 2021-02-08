@@ -13,6 +13,8 @@ import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
 import foundation.identity.keri.api.event.EventType;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
+import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
@@ -29,6 +31,7 @@ import foundation.identity.keri.controller.spec.RotationSpec;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static foundation.identity.keri.Hex.hex;
 import static foundation.identity.keri.Hex.hexNoPad;
@@ -123,6 +126,38 @@ public final class EventSerializer {
     return obj;
   }
 
+  static JsonNode signingThreshold(SigningThreshold t, ObjectMapper mapper) {
+    if (t instanceof SigningThreshold.Unweighted) {
+      return mapper.getNodeFactory().textNode(((SigningThreshold.Unweighted) t).threshold() + "");
+    } else if (t instanceof SigningThreshold.Weighted) {
+      var wt = (SigningThreshold.Weighted) t;
+      var stNode = mapper.getNodeFactory().arrayNode();
+      var groupArrayNodes = wt.weights().stream()
+          .map(lw -> {
+                var textNodes = lw.stream()
+                    .map(EventSerializer::weight)
+                    .map(str -> mapper.getNodeFactory().textNode(str))
+                    .collect(Collectors.toList());
+                return mapper.getNodeFactory().arrayNode()
+                    .addAll(textNodes);
+          })
+          .collect(Collectors.toList());
+
+      return mapper.getNodeFactory().arrayNode()
+          .addAll(groupArrayNodes);
+    } else {
+      throw new IllegalArgumentException("Unknown SigningThreshold type: " + t.getClass());
+    }
+  }
+
+  static String weight(Weight w) {
+    if (w.denominator().isEmpty()) {
+      return "" + w.numerator();
+    }
+
+    return w.numerator() + "/" + w.denominator().get();
+  }
+
   static void writeSize(byte[] bytes) {
     // version string is "KERIVVFFFFSSSSSS_"
     // VV = version
@@ -181,7 +216,7 @@ public final class EventSerializer {
     rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(0));
     rootNode.put(EVENT_TYPE.label(), type(EventType.INCEPTION));
 
-    rootNode.put(SIGNING_THRESHOLD.label(), hexNoPad(spec.signingThreshold()));
+    rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
 
     var keysNode = mapper.createArrayNode();
     spec.keys().forEach(k -> keysNode.add(qb64(k)));
@@ -222,7 +257,7 @@ public final class EventSerializer {
     rootNode.put(EVENT_TYPE.label(), type(EventType.ROTATION));
     rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
 
-    rootNode.put(SIGNING_THRESHOLD.label(), hexNoPad(spec.signingThreshold()));
+    rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
 
     var keysNode = mapper.createArrayNode();
     spec.keys().forEach(k -> keysNode.add(qb64(k)));

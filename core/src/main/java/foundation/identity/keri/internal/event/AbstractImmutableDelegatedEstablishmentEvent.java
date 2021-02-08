@@ -7,6 +7,7 @@ import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.Identifier;
 
 import java.math.BigInteger;
@@ -25,7 +26,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
       Identifier identifier,
       BigInteger sequenceNumber,
       IdentifierEventCoordinatesWithDigest previous,
-      int signingThreshold,
+      SigningThreshold signingThreshold,
       List<PublicKey> keys,
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,
