@@ -21,7 +21,7 @@ Below describes the current capabilities of keri-java:
 - [x] Record interactions in the event log
 - [x] Simple signing thresholds
 - [x] Multi-signature identifiers
-- [ ] Weighted signing threshold
+- [x] Weighted signing threshold
 - [ ] Delegation
 
 **Logs**
