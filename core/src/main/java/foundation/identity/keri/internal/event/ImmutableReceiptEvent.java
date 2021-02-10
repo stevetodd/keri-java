@@ -30,8 +30,8 @@ public class ImmutableReceiptEvent extends AbstractImmutableEvent
         if (!r.event().equals(event)) {
           throw new IllegalArgumentException("receipts are not all for the same event");
         }
-        if (!(r.key().identifier() instanceof BasicIdentifier)) {
-          throw new IllegalArgumentException("only BasicPrefixes permitted as signers");
+        if (!(r.key().establishmentEvent().identifier() instanceof BasicIdentifier)) {
+          throw new IllegalArgumentException("only BasicIdentifiers permitted as signers");
         }
       });
     }

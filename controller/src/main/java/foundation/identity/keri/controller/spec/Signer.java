@@ -5,6 +5,8 @@ import foundation.identity.keri.api.crypto.SignatureAlgorithm;
 
 public interface Signer {
 
+  int keyIndex();
+
   SignatureAlgorithm algorithm();
 
   Signature sign(byte[] bytes);

@@ -23,7 +23,7 @@ import foundation.identity.keri.api.seal.MerkleTreeRootSeal;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.InteractionSpec;
-import foundation.identity.keri.controller.spec.ReceiptFromTransferrableIdentifierSpec;
+import foundation.identity.keri.controller.spec.ReceiptFromTransferableIdentifierSpec;
 import foundation.identity.keri.controller.spec.ReceiptSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
@@ -83,7 +83,7 @@ public final class EventSerializer {
   }
 
   static String version(Version v, Format f, long size) {
-    return String.format("KERI%x%x%s%06x_", v.minor(), v.major(), format(f), size);
+    return String.format("KERI%x%x%s%06x_", v.major(), v.minor(), format(f), size);
   }
 
   static String format(Format f) {
@@ -280,20 +280,21 @@ public final class EventSerializer {
     }
   }
 
-  public byte[] serialize(ReceiptFromTransferrableIdentifierSpec spec) {
+  public byte[] serialize(ReceiptFromTransferableIdentifierSpec spec) {
     var mapper = mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
+    var eventSignature = spec.signatures().stream().findFirst().get();
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
-    rootNode.put(IDENTIFIER.label(), qb64(spec.receipt().event().identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hex(spec.receipt().event().sequenceNumber()));
+    rootNode.put(IDENTIFIER.label(), qb64(eventSignature.event().identifier()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hex(eventSignature.event().sequenceNumber()));
     rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT_FROM_TRANSFERRABLE));
-    rootNode.put(EVENT_DIGEST.label(), qb64(spec.receipt().event().digest()));
+    rootNode.put(EVENT_DIGEST.label(), qb64(eventSignature.event().digest()));
 
     var anchorNode = mapper.createObjectNode();
-    anchorNode.put(IDENTIFIER.label(), qb64(spec.receipt().key().identifier()));
-    anchorNode.put(SEQUENCE_NUMBER.label(), hex(spec.receipt().key().sequenceNumber()));
-    anchorNode.put(EVENT_DIGEST.label(), qb64(spec.receipt().key().digest()));
+    anchorNode.put(IDENTIFIER.label(), qb64(eventSignature.key().establishmentEvent().identifier()));
+    anchorNode.put(SEQUENCE_NUMBER.label(), hex(eventSignature.key().establishmentEvent().sequenceNumber()));
+    anchorNode.put(EVENT_DIGEST.label(), qb64(eventSignature.key().establishmentEvent().digest()));
     rootNode.set(ANCHORS.label(), anchorNode);
 
     try {

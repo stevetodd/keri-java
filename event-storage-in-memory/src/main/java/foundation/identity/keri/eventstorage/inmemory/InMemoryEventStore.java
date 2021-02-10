@@ -2,6 +2,7 @@ package foundation.identity.keri.eventstorage.inmemory;
 
 import foundation.identity.keri.EventStore;
 import foundation.identity.keri.QualifiedBase64;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.identifier.Identifier;
@@ -21,8 +22,8 @@ public class InMemoryEventStore implements EventStore {
       .qb64(e.identifier()));
 
   private final ArrayList<IdentifierEvent> events = new ArrayList<>();
-  private final ArrayList<EventSignature> signatures = new ArrayList<>();
-
+  private final ArrayList<AttachedEventSignature> signatures = new ArrayList<>();
+  private final ArrayList<EventSignature> receipts = new ArrayList<>();
 
   @Override
   public void store(IdentifierEvent event) {
@@ -47,32 +48,48 @@ public class InMemoryEventStore implements EventStore {
   @Override
   public Optional<EventSignature> findLatestReceipt(
       Identifier forIdentifier, Identifier byIdentifier) {
-    return this.signatures.stream()
+    System.out.println("findLatestReceipt for:" + forIdentifier + " by:" + byIdentifier);
+    printContents();
+    return this.receipts.stream()
         .filter(es -> es.event().identifier().equals(forIdentifier))
-        .filter(es -> es.key().identifier().equals(byIdentifier))
+        .filter(es -> es.key().establishmentEvent().identifier().equals(byIdentifier))
         .max(comparing(es -> es.event().sequenceNumber()));
   }
 
   @Override
+  public void store(AttachedEventSignature signature) {
+    this.signatures.add(signature);
+  }
+
+  @Override
   public void store(EventSignature eventSignature) {
-    this.signatures.add(eventSignature);
+    this.receipts.add(eventSignature);
   }
 
   public void printContents() {
     System.out.println();
     System.out.println("====== EVENT STORE ======");
     System.out.println("EVENTS:");
-    events.stream()
+    this.events.stream()
         .sorted(eventsByIdentifier.thenComparing(eventsBySequenceNumber))
         .forEachOrdered(e -> System.out.println(new String(e.bytes())));
 
     System.out.println("SIGNATURES:");
-    signatures.stream()
+    this.signatures.stream()
+        .sorted(
+            comparing((AttachedEventSignature s) -> QualifiedBase64.qb64(s.event().identifier()))
+                .thenComparing((AttachedEventSignature s) -> s.event().sequenceNumber())
+                .thenComparing((AttachedEventSignature s) -> QualifiedBase64.qb64(s.event().digest()))
+                .thenComparingInt((AttachedEventSignature s) -> s.keyIndex()))
+        .forEachOrdered(System.out::println);
+
+    System.out.println("RECEIPTS:");
+    this.receipts.stream()
         .sorted(
             comparing((EventSignature s) -> QualifiedBase64.qb64(s.event().identifier()))
                 .thenComparing((EventSignature s) -> s.event().sequenceNumber())
                 .thenComparing((EventSignature s) -> QualifiedBase64.qb64(s.event().digest()))
-                .thenComparingInt((EventSignature s) -> s.key().index()))
+                .thenComparingInt((EventSignature s) -> s.key().keyIndex()))
         .forEachOrdered(System.out::println);
 
     System.out.println("=========================");

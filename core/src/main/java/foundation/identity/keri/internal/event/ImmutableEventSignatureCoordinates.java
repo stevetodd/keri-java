@@ -1,6 +1,5 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.EventSignatureCoordinates;
@@ -11,27 +10,38 @@ import foundation.identity.keri.api.identifier.Identifier;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import static foundation.identity.keri.QualifiedBase64.qb64;
+import static java.util.Objects.requireNonNull;
+
 public class ImmutableEventSignatureCoordinates implements EventSignatureCoordinates {
 
   private final Identifier identifier;
   private final BigInteger sequenceNumber;
   private final Digest digest;
-  private final int index;
+  private final int keyIndex;
 
-  public ImmutableEventSignatureCoordinates(Identifier identifier, BigInteger sequenceNumber, Digest digest, int index) {
-    this.identifier = identifier;
-    this.sequenceNumber = sequenceNumber;
-    this.digest = digest;
-    this.index = index;
+  public ImmutableEventSignatureCoordinates(Identifier identifier, BigInteger sequenceNumber, Digest digest, int keyIndex) {
+    if (sequenceNumber.compareTo(BigInteger.ZERO) < 0) {
+      throw new IllegalArgumentException("sequenceNumber must be >= 0");
+    }
+
+    if (keyIndex < 0) {
+      throw new IllegalArgumentException("keyIndex must be >= 0");
+    }
+
+    this.identifier = requireNonNull(identifier, "identifier");
+    this.sequenceNumber = requireNonNull(sequenceNumber, "sequenceNumber");
+    this.digest = requireNonNull(digest, "digest");
+    this.keyIndex = requireNonNull(keyIndex, "keyIndex");
   }
 
-  public static ImmutableEventSignatureCoordinates of(IdentifierEventCoordinatesWithDigest eventCoordinates,
-                                                      KeyCoordinates keyCoordinates) {
+  public static ImmutableEventSignatureCoordinates of(IdentifierEventCoordinatesWithDigest event,
+                                                      KeyCoordinates key) {
     return new ImmutableEventSignatureCoordinates(
-        eventCoordinates.identifier(),
-        eventCoordinates.sequenceNumber(),
-        eventCoordinates.digest(),
-        keyCoordinates.index()
+        event.identifier(),
+        event.sequenceNumber(),
+        event.digest(),
+        key.keyIndex()
     );
   }
 
@@ -40,7 +50,7 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
         eventSignature.event().identifier(),
         eventSignature.event().sequenceNumber(),
         eventSignature.event().digest(),
-        eventSignature.key().index());
+        eventSignature.key().keyIndex());
   }
 
   @Override
@@ -59,13 +69,13 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
   }
 
   @Override
-  public int index() {
-    return this.index;
+  public int keyIndex() {
+    return this.keyIndex;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.digest, this.identifier, this.index, this.sequenceNumber);
+    return Objects.hash(this.digest, this.identifier, this.keyIndex, this.sequenceNumber);
   }
 
   @Override
@@ -74,24 +84,24 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
       return true;
     }
 
-    if (!(obj instanceof ImmutableEventSignatureCoordinates)) {
+    if (!(obj instanceof EventSignatureCoordinates)) {
       return false;
     }
 
-    var other = (ImmutableEventSignatureCoordinates) obj;
-    return Objects.equals(this.digest, other.digest)
-        && Objects.equals(this.identifier, other.identifier)
-        && (this.index == other.index)
-        && Objects.equals(this.sequenceNumber, other.sequenceNumber);
+    var other = (EventSignatureCoordinates) obj;
+    return Objects.equals(this.digest, other.digest())
+        && Objects.equals(this.identifier, other.identifier())
+        && (this.keyIndex == other.keyIndex())
+        && Objects.equals(this.sequenceNumber, other.sequenceNumber());
   }
 
   @Override
   public String toString() {
     return String.join(":",
-        QualifiedBase64.qb64(this.identifier),
+        qb64(this.identifier),
         this.sequenceNumber.toString(),
-        QualifiedBase64.qb64(this.digest),
-        Integer.toString(this.index)
+        qb64(this.digest),
+        Integer.toString(this.keyIndex)
     );
   }
 

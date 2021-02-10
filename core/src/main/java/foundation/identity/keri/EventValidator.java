@@ -223,12 +223,12 @@ public final class EventValidator {
     for (var signature : event.signatures()) {
       var ops = SignatureOperations.lookup(signature.signature().algorithm());
       var eventCoords = signature.event();
-      var publicKey = lastEstablishmentEvent.keys().get(signature.key().index());
+      var publicKey = lastEstablishmentEvent.keys().get(signature.keyIndex());
 
       require(ops.verify(event.bytes(), signature.signature(), publicKey),
           "event signatures must validate (i: %s, s: %s, d: %s, index: %s)",
           event.identifier(), event.sequenceNumber(), eventCoords.digest(),
-          signature.key().index());
+          signature.keyIndex());
     }
   }
 

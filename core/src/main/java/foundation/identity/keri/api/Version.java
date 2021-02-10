@@ -5,12 +5,12 @@ public interface Version {
   Version CURRENT = new Version() {
 
     @Override
-    public int minor() {
+    public int major() {
       return 1;
     }
 
     @Override
-    public int major() {
+    public int minor() {
       return 0;
     }
 

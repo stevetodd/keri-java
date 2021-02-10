@@ -11,16 +11,21 @@ import static java.util.Objects.requireNonNull;
 
 public class PrivateKeySigner implements Signer {
 
+  private final int keyIndex;
   private final PrivateKey privateKey;
   private final SignatureAlgorithm algorithm;
   private final SignatureOperations ops;
 
-  public PrivateKeySigner(PrivateKey privateKey) {
-    requireNonNull(privateKey);
-
-    this.privateKey = privateKey;
+  public PrivateKeySigner(int keyIndex, PrivateKey privateKey) {
+    this.keyIndex = keyIndex;
+    this.privateKey = requireNonNull(privateKey);
     this.algorithm = StandardSignatureAlgorithms.lookup(privateKey);
     this.ops = SignatureOperations.lookup(this.algorithm);
+  }
+
+  @Override
+  public int keyIndex() {
+    return keyIndex;
   }
 
   @Override

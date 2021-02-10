@@ -1,26 +1,26 @@
 package foundation.identity.keri.demo;
 
 import foundation.identity.keri.QualifiedBase64;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
-import foundation.identity.keri.api.event.ReceiptFromTransferrableIdentifierEvent;
+import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Comparator.comparingInt;
 
 public final class EventUtils {
 
   public static void printEvent(Event e) {
-    System.out.printf("KERI %s %s %s\n", e.version(), e.format(), e.type());
+    System.out.printf("%s (KERI %s %s)\n", e.type(), e.version(), e.format());
 
     if (e instanceof IdentifierEvent) {
       var ie = (IdentifierEvent) e;
@@ -54,10 +54,12 @@ public final class EventUtils {
       }
 
       System.out.println("--- SIGNATURES");
-      ie.signatures().stream().sorted(Comparator.comparingInt(es -> es.key().index())).forEachOrdered(es -> {
-        System.out.print(es.key().index());
-        System.out.println(": " + es.signature());
-      });
+      ie.signatures().stream()
+          .sorted(comparingInt(AttachedEventSignature::keyIndex))
+          .forEachOrdered(es -> {
+            System.out.print(es.keyIndex());
+            System.out.println(": " + es.signature());
+          });
 
     }
 
@@ -70,26 +72,31 @@ public final class EventUtils {
       System.out.println("d: " + re.event().digest());
 
       System.out.println("--- SIGNATURES");
-      r.receipts().stream().sorted(Comparator.comparingInt(es -> es.key().index())).forEachOrdered(es -> {
-        System.out.print(es.key().identifier());
-        System.out.println(": " + es.signature());
-      });
+      r.receipts().stream()
+          .sorted(comparingInt(es -> es.key().keyIndex()))
+          .forEachOrdered(es -> {
+            System.out.print(es.key().establishmentEvent().identifier());
+            System.out.println(": " + es.signature());
+          });
     }
 
-    if (e instanceof ReceiptFromTransferrableIdentifierEvent) {
-      var vrc = (ReceiptFromTransferrableIdentifierEvent) e;
-      System.out.println("i: " + vrc.receipt().event().identifier());
-      System.out.println("s: " + vrc.receipt().event().sequenceNumber());
-      System.out.println("d: " + vrc.receipt().event().digest());
+    if (e instanceof ReceiptFromTransferableIdentifierEvent) {
+      var vrc = (ReceiptFromTransferableIdentifierEvent) e;
+      System.out.println("i: " + vrc.event().identifier());
+      System.out.println("s: " + vrc.event().sequenceNumber());
+      System.out.println("d: " + vrc.event().digest());
 
       System.out.println("--- SIGNATURES");
-      var es = vrc.receipt();
-      System.out.print(es.key().index());
-      System.out.println(": " + es.signature());
+      vrc.signatures().stream()
+          .sorted(comparingInt(AttachedEventSignature::keyIndex))
+          .forEachOrdered(es -> {
+            System.out.print(es.keyIndex());
+            System.out.println(": " + es.signature());
+          });
     }
 
-    System.out.println("--- RAW");
-    System.out.println(new String(e.bytes(), UTF_8));
+    //System.out.println("--- RAW");
+    //System.out.println(new String(e.bytes(), UTF_8));
   }
 
   private static <T> String listToString(List<T> list, Function<T, String> toString) {

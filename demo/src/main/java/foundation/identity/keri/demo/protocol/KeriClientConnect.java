@@ -9,11 +9,8 @@ import java.util.Collections;
 
 final class KeriClientConnect extends KeriClient {
 
-	/**
-	 * The default port for reactor-netty servers. Defaults to 12012 but can be tuned via
-	 * the {@code PORT} <b>environment variable</b>.
-	 */
-	static final int DEFAULT_PORT = System.getenv("PORT") != null ? Integer.parseInt(System.getenv("PORT")) : 12012;
+	static final int DEFAULT_PORT = System.getenv("PORT") != null ? Integer.parseInt(System.getenv("PORT")) : 5621;
+
 	final KeriClientConfig config;
 
 	KeriClientConnect(ConnectionProvider provider) {

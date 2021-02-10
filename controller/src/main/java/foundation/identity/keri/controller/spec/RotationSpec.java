@@ -180,10 +180,14 @@ public class RotationSpec {
       return this;
     }
 
-    public Builder signer(PrivateKey privateKey) {
+    public Builder signer(int keyIndex, PrivateKey privateKey) {
+      if (keyIndex < 0) {
+        throw new IllegalArgumentException("keyIndex must be >= 0");
+      }
+
       requireNonNull(privateKey);
 
-      this.signer = new PrivateKeySigner(privateKey);
+      this.signer = new PrivateKeySigner(keyIndex, privateKey);
 
       return this;
     }

@@ -1,38 +1,53 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.IdentifierEventCoordinates;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.crypto.DigestOperations;
 
 import java.math.BigInteger;
+import java.util.Objects;
+
+import static foundation.identity.keri.QualifiedBase64.qb64;
+import static java.util.Objects.requireNonNull;
 
 public class ImmutableIdentifierEventCoordinatesWithDigest extends ImmutableIdentifierEventCoordinates
     implements IdentifierEventCoordinatesWithDigest {
 
   private final Digest digest;
 
-  public ImmutableIdentifierEventCoordinatesWithDigest(IdentifierEventCoordinates coordinates, Digest digest) {
-    super(coordinates);
-    this.digest = digest;
-  }
-
   public ImmutableIdentifierEventCoordinatesWithDigest(Identifier identifier, BigInteger sequenceNumber, Digest digest) {
-    super(new ImmutableIdentifierEventCoordinates(identifier, sequenceNumber));
-    this.digest = digest;
+    super(identifier, sequenceNumber);
+
+    if ((!(identifier instanceof BasicIdentifier) || !sequenceNumber.equals(BigInteger.ZERO))
+        && Digest.NONE.equals(digest)){
+      // Digest isn't required for BasicIdentifiers or for inception events
+      throw new IllegalArgumentException("digest is required");
+    }
+
+    this.digest = requireNonNull(digest, "digest");
   }
 
-  public ImmutableIdentifierEventCoordinatesWithDigest(IdentifierEventCoordinatesWithDigest coordinates) {
-    super(coordinates);
-    this.digest = coordinates.digest();
+  public static ImmutableIdentifierEventCoordinatesWithDigest convert(IdentifierEventCoordinatesWithDigest coordinates) {
+    requireNonNull(coordinates, "coordinates");
+    if (coordinates instanceof ImmutableIdentifierEventCoordinatesWithDigest) {
+      return (ImmutableIdentifierEventCoordinatesWithDigest) coordinates;
+    }
+
+    return new ImmutableIdentifierEventCoordinatesWithDigest(
+        coordinates.identifier(),
+        coordinates.sequenceNumber(),
+        coordinates.digest()
+    );
   }
 
   public static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEvent event) {
+    requireNonNull(event, "event");
     var algorithm = event.previous().equals(IdentifierEventCoordinatesWithDigest.NONE)
                     ? StandardDigestAlgorithms.DEFAULT
                     : event.previous().digest().algorithm();
@@ -40,14 +55,27 @@ public class ImmutableIdentifierEventCoordinatesWithDigest extends ImmutableIden
     return of(event, algorithm);
   }
 
-  public static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEvent event, DigestAlgorithm algo) {
-    return of(event, DigestOperations.lookup(algo));
+  public static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEvent event, DigestAlgorithm algorithm) {
+    requireNonNull(event, "event");
+    requireNonNull(algorithm, "algorithm");
+    return of(event, DigestOperations.lookup(algorithm));
   }
 
-  public static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEvent event, DigestOperations ops) {
-    var coordinates = ImmutableIdentifierEventCoordinates.of(event);
+  private static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEvent event, DigestOperations ops) {
     var digest = ops.digest(event.bytes());
-    return new ImmutableIdentifierEventCoordinatesWithDigest(coordinates, digest);
+    return of(event, digest);
+  }
+
+  public static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEvent event, Digest digest) {
+    return new ImmutableIdentifierEventCoordinatesWithDigest(event.identifier(), event.sequenceNumber(), digest);
+  }
+
+  public static ImmutableIdentifierEventCoordinatesWithDigest of(IdentifierEventCoordinates event, Digest digest) {
+    return new ImmutableIdentifierEventCoordinatesWithDigest(event.identifier(), event.sequenceNumber(), digest);
+  }
+
+  public static ImmutableIdentifierEventCoordinatesWithDigest of(BasicIdentifier identifier) {
+    return new ImmutableIdentifierEventCoordinatesWithDigest(identifier, BigInteger.ZERO, Digest.NONE);
   }
 
   @Override
@@ -56,12 +84,28 @@ public class ImmutableIdentifierEventCoordinatesWithDigest extends ImmutableIden
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof IdentifierEventCoordinatesWithDigest)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    IdentifierEventCoordinatesWithDigest that = (ImmutableIdentifierEventCoordinatesWithDigest) o;
+    return Objects.equals(digest, that.digest());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), digest);
+  }
+
+  @Override
   public String toString() {
-    return String.join(":",
-        QualifiedBase64.qb64(identifier()),
-        sequenceNumber().toString(),
-        QualifiedBase64.qb64(digest())
-    );
+    return super.toString() + ":" + qb64(digest());
   }
 
 }
