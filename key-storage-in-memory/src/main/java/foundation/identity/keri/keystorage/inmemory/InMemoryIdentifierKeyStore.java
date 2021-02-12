@@ -14,6 +14,9 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.Map.Entry.comparingByKey;
 
+/**
+ * Unsafe. For use in testing only.
+ */
 public class InMemoryIdentifierKeyStore implements IdentifierKeyStore {
 
   private final Map<ImmutableKeyCoordinates, KeyPair> keys = new HashMap<>();
