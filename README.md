@@ -30,6 +30,7 @@ Below describes the current capabilities of keri-java:
 - [x] Verification
   - [ ] Recovery
   - [ ] Delegation Seals
+  - [ ] Out of Order Events
 - [ ] \(In Progress) Storage
 
 **Private/Direct Mode**
