@@ -1,11 +1,14 @@
 package foundation.identity.keri.demo.protocol;
 
 import foundation.identity.keri.api.event.Event;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.logging.LoggingHandler;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.netty.ChannelPipelineConfigurer;
+import reactor.netty.ConnectionObserver;
+import reactor.netty.NettyPipeline;
 import reactor.netty.channel.ChannelMetricsRecorder;
 import reactor.netty.channel.ChannelOperations;
 import reactor.netty.channel.MicrometerChannelMetricsRecorder;
@@ -57,7 +60,8 @@ public final class KeriClientConfig extends ClientTransportConfig<KeriClientConf
 
   @Override
   protected ChannelPipelineConfigurer defaultOnChannelInit() {
-    return super.defaultOnChannelInit();
+    return super.defaultOnChannelInit()
+        .then(new KeriClientChannelInitializer());
   }
 
   static final class MicrometerKeriClientMetricsRecorder extends MicrometerChannelMetricsRecorder {
@@ -66,6 +70,15 @@ public final class KeriClientConfig extends ClientTransportConfig<KeriClientConf
 
     MicrometerKeriClientMetricsRecorder() {
       super("keri.client", "tcp");
+    }
+  }
+
+  static final class KeriClientChannelInitializer implements ChannelPipelineConfigurer {
+    @Override
+    public void onChannelInit(ConnectionObserver connectionObserver, Channel channel, SocketAddress remoteAddress) {
+      channel.pipeline()
+          .addBefore(NettyPipeline.ReactiveBridge, "keri-decoder", new KeriEventDecoder())
+          .addBefore(NettyPipeline.ReactiveBridge, "keri-encoder", new KeriEventEncoder());
     }
   }
 

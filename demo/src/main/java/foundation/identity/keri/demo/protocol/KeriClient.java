@@ -96,11 +96,12 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return super.doOnDisconnected(doOnDisconnected);
 	}
 
-	public KeriClient sendEvent(Publisher<Event> events) {
-		Objects.requireNonNull(events, "events");
-		KeriClient dup = duplicate();
-		dup.configuration().eventsToSend = Flux.concat(dup.configuration().eventsToSend, events);
-		return dup;
+	public KeriClient sendEvent(Publisher<? extends Event> events) {
+//		Objects.requireNonNull(events, "events");
+//		KeriClient dup = duplicate();
+//		dup.configuration().eventsToSend = Flux.concat(dup.configuration().eventsToSend, events);
+//		return dup;
+		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(events).then().subscribe());
 	}
 
 	public KeriClient sendEvent(Event event) {
@@ -110,16 +111,7 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return dup;
 	}
 
-	/**
-	 * Attach an IO handler to react on connected client
-	 *
-	 * @param handler
-	 *     an IO handler that can dispose underlying connection when {@link
-	 *     Publisher} terminates.
-	 *
-	 * @return a new {@link KeriClient}
-	 */
-	public KeriClient handle(BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> handler) {
+	public KeriClient handle(BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler) {
 		requireNonNull(handler, "handler");
 		return doOnConnected(new OnConnectedHandle(handler));
 	}
@@ -196,15 +188,15 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 
 	static final class OnConnectedHandle implements Consumer<Connection> {
 
-		final BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> handler;
+		final BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler;
 
-		OnConnectedHandle(BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> handler) {
+		OnConnectedHandle(BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler) {
 			this.handler = handler;
 		}
 
 		@Override
 		public void accept(Connection c) {
-			Mono.fromDirect(handler.apply((NettyInbound) c, (NettyOutbound) c))
+			Mono.fromDirect(handler.apply((EventInbound) c, (EventOutbound) c))
 					.subscribe(c.disposeSubscriber());
 		}
 	}

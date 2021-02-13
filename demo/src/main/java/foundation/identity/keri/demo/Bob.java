@@ -23,22 +23,10 @@ public class Bob {
     identifier.rotate();
     identifier.seal(List.of());
 
-    var node = new DirectModeNode(identifier, eventStore)
+    new DirectModeNode(identifier, eventStore)
         .connect(new InetSocketAddress("localhost", 5621))
-        .block();
-
-//    KeriClient.create()
-//        .remoteAddress(() -> new InetSocketAddress("localhost", 5621))
-//        .sendEvent(Flux.<Event> fromStream(eventStore.find(identifier.identifier())))
-//        .handle((in, out) -> {
-//          return in.receiveObject()
-//              // process
-//              .then();
-//        })
-//        .connectNow();
-
-    // block until the server is disposed
-    node.onDispose()
+        .block()
+        .onDispose()
         .block();
   }
 

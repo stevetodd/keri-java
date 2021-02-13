@@ -24,6 +24,7 @@ import io.netty.handler.logging.LogLevel;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.Connection;
 import reactor.netty.DisposableServer;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
@@ -31,6 +32,8 @@ import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.stream.Stream;
 
 public class DirectModeNode {
 
@@ -40,8 +43,6 @@ public class DirectModeNode {
   private final EventValidator eventValidator = new EventValidator();
   private final EventFactory eventFactory = new EventFactory();
   private final EventProcessor eventProcessor = new EventProcessor();
-
-  private int port; // FIXME -- breaks if bind is called more than once
 
 //  private final KeriClient client = KeriClient.create(
 //          ConnectionProvider.builder("keri-client-receipts")
@@ -57,67 +58,56 @@ public class DirectModeNode {
     this.eventStore = eventStore;
   }
 
-  public Mono<? extends DisposableServer> bind(int port) {
-    this.port = port;
+  public Mono<? extends DisposableServer> bind(InetSocketAddress address) {
     return KeriServer.create()
-        .bindAddress(() -> new InetSocketAddress("127.0.0.1", port))
+        .bindAddress(() -> address)
         .wiretap("keri-server", LogLevel.INFO, AdvancedByteBufFormat.TEXTUAL, StandardCharsets.UTF_8)
-        .doOnBound(disposableServer -> {
-          System.out.println("[KeriServer] STARTED on " + disposableServer.channel().localAddress());
-        })
-        .doOnConnection(connection -> {
-          System.out.println("[KeriServer] <<< CONNECT <<< " + connection.channel().remoteAddress());
-        })
+        .doOnBound(disposableServer
+            -> System.out.println("[Node] LISTENING on " + disposableServer.channel().localAddress()))
+        .doOnConnection(connection
+            -> System.out.println("[Node] <<< CONNECT <<< " + connection.channel().remoteAddress()))
         .handle(this::handleEvents)
-        .doOnUnbound(disposableServer -> {
-          System.out.println("[KeriServer] STOPPED");
-        })
+        .doOnUnbound(disposableServer
+            -> System.out.println("[Node] STOPPED"))
         .bind();
   }
 
   public Mono<? extends Connection> connect(InetSocketAddress address) {
     return KeriClient.create()
         .remoteAddress(() -> address)
-        .doOnConnect(c -> System.out.println("[KeriClient] CONNECTING to " + address))
-        .doOnConnected(c -> System.out.println("[KeriClient] CONNECTED to " + address))
-        .doOnDisconnected(c -> System.out.println("[KeriClient] CONNECTED to " + address))
+        .doOnConnect(c -> System.out.println("[Node] CONNECTING to " + address))
+        .doOnConnected(c -> System.out.println("[Node] CONNECTED to " + address))
+        .sendEvent(retrieveIdentifierEvents(address))
+        .handle(this::handleEvents)
+        .doOnDisconnected(c -> System.out.println("[Node] DISCONNECTED from " + address))
         .connect();
+  }
+
+  private Publisher<? extends Event> retrieveIdentifierEvents(InetSocketAddress address) {
+    return Flux.fromStream(this.eventStore.find(this.identifier.identifier()))
+        .delayElements(Duration.ofMillis(250), Schedulers.single())
+        .doOnNext(e-> {
+          System.out.println("\n[Node] >>> EVENT >>> " + address);
+          EventUtils.printEvent(e);
+        });
   }
 
   private Publisher<Void> handleEvents(EventInbound in, EventOutbound out) {
     return in.receiveEvents()
         .doOnNext(e -> {
-          System.out.println("\n[KeriServer] <<< EVENT <<< " + ((Connection) in).channel().remoteAddress());
+          System.out.println("\n[Node] <<< EVENT <<< " + ((Connection) in).channel().remoteAddress());
           EventUtils.printEvent(e);
         })
         .flatMap(e ->
             out.sendEvent(
               process(e)
                 .doOnNext(e2 -> {
-                  System.out.println("\n[KeriServer] >>> EVENT >>> " + ((Connection) in).channel().remoteAddress());
+                  System.out.println("\n[Node] >>> EVENT >>> " + ((Connection) in).channel().remoteAddress());
                   EventUtils.printEvent(e2);
                 })
             )
             .then(),
             1);
-//        .doOnNext(e -> {
-//          System.out.println("\n[KeriServer] >>> EVENT >>> " + ((Connection) in).channel().remoteAddress());
-//          EventUtils.printEvent(e);
-//        });
-
-
-//    return out.sendEvent(
-//        in.receiveEvents()
-//          .doOnNext(e -> {
-//            System.out.println("\n[KeriServer] <<< EVENT <<< " + ((Connection) in).channel().remoteAddress());
-//            EventUtils.printEvent(e);
-//          })
-//          .flatMap(this::process, 1)
-//          .doOnNext(e -> {
-//            System.out.println("\n[KeriServer] >>> EVENT >>> " + ((Connection) in).channel().remoteAddress());
-//            EventUtils.printEvent(e);
-//          })
-//    );
   }
 
   private Flux<Event> process(Event event) {
@@ -157,11 +147,11 @@ public class DirectModeNode {
     var events = Flux.<Event> empty();
     if (!lastEventSequenceNumber.equals(this.identifier.lastEvent().sequenceNumber())) {
       // make sure we've sent our log so they can verify the chit
-      System.out.println("[KeriServer] WILL SEND LOG >>> ");
+      System.out.println("[Node] WILL SEND LOG >>> ");
       events = produceOwnLog(lastEventSequenceNumber);
     }
 
-    System.out.println("[KeriServer] WILL SEND VRC >>> ");
+    System.out.println("[Node] WILL SEND VRC >>> ");
     return Flux.concat(events, Mono.just(receiptEvent(ie)));
   }
 
@@ -170,29 +160,6 @@ public class DirectModeNode {
         .find(this.identifier.identifier(), fromSequenceNumber.add(BigInteger.ONE));
 
     return Flux.fromStream(events);
-  }
-
-  /// ----
-  private Mono<Void> processEvent(Event event, EventOutbound out) {
-    if (event instanceof IdentifierEvent) {
-      try {
-        var ie = (IdentifierEvent) event;
-        // TODO these should all be reactive -- eventStore will eventually block!
-        var state = getState(ie.identifier());
-        this.eventValidator.validate(state, ie);
-        this.eventStore.store(ie); // stator
-
-        return sendChitForEvent(ie, out);
-      } catch (EventValidationException e) {
-        System.err.println("Event is invalid: " + e.getMessage());
-        return Mono.error(e);
-      }
-    } else if (event instanceof ReceiptFromTransferableIdentifierEvent) {
-      // TODO verify
-      // this.eventValidator.validate(null, re);
-      //this.eventStore.store(((ReceiptFromTransferrableIdentifierEvent) event).receipt());
-    }
-    return null;
   }
 
   private IdentifierState getState(Identifier identifier) {
@@ -206,21 +173,6 @@ public class DirectModeNode {
     return state;
   }
 
-  private Mono<Void> sendChitForEvent(IdentifierEvent ie, EventOutbound out) {
-    var lastReceipt = this.eventStore.findLatestReceipt(this.identifier.identifier(), ie.identifier());
-    var lastEventSequenceNumber = lastReceipt.isPresent()
-                                  ? lastReceipt.get().event().sequenceNumber()
-                                  : BigInteger.valueOf(-1);
-    var mono = Mono.<Void> empty();
-    if (!lastEventSequenceNumber.equals(this.identifier.lastEvent().sequenceNumber())) {
-      // make sure we've sent our log so they can verify the chit
-      mono = sendOwnLog(lastEventSequenceNumber, out);
-    }
-
-    System.out.println("[KeriServer] SEND VRC >>> " + ((KeriChannelOperations) out).channel().remoteAddress());
-    return Mono.zip(mono, sendEvent(Mono.just(receiptEvent(ie)), out)).then();
-  }
-
   private ReceiptFromTransferableIdentifierEvent receiptEvent(IdentifierEvent event) {
     var receipt = this.identifier.sign(event);
 
@@ -228,48 +180,8 @@ public class DirectModeNode {
         .signature(receipt)
         .build();
 
+    this.eventStore.store(receipt);
     return this.eventFactory.receipt(spec);
-  }
-
-  private Mono<Void> sendOwnLog(BigInteger fromSequenceNumber, EventOutbound out) {
-    System.out.println("[KeriServer] SEND OWN LOG >>> " + ((KeriChannelOperations) out).channel().remoteAddress());
-    var events = this.eventStore
-        .find(this.identifier.identifier(), fromSequenceNumber.add(BigInteger.ONE));
-
-    return sendEvent(Flux.fromStream(events), out);
-  }
-
-  private Mono<Void> sendEvent(Publisher<Event> events, EventOutbound out) {
-    return out.sendEvent(events).then();
-
-     //KeriClient.create()
-//    this.client
-//        .remoteAddress(() -> this.resolveAddress(to))
-//        //.wiretap("client", LogLevel.INFO)
-//        .send(events)
-//        .subscribe();
-
-//        .sendEvent(Flux.from(events)
-//            .doOnNext(e -> {
-//              System.out.println("[KeriServer] >>> EVENT >>> " + ((Connection) out).channel().remoteAddress());
-//              EventUtils.printEvent(e);
-//            }))
-//        .then()
-//        .subscribe()
-//        .dispose();
-//
-//    out.sendEvent(
-//          Flux.from(events)
-//            .doOnNext(e -> {
-//              System.out.println("[KeriServer] >>> EVENT >>> " + ((Connection) out).channel().remoteAddress());
-//              EventUtils.printEvent(e);
-//            })
-//        )
-//        .then().subscribe();
-  }
-
-  private InetSocketAddress resolveAddress(Identifier identifier) {
-    return new InetSocketAddress("localhost", this.port == 5621 ? 5620 : 5621);
   }
 
 }

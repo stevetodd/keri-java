@@ -4,6 +4,7 @@ import foundation.identity.keri.controller.Controller;
 import foundation.identity.keri.eventstorage.inmemory.InMemoryEventStore;
 import foundation.identity.keri.keystorage.inmemory.InMemoryIdentifierKeyStore;
 
+import java.net.InetSocketAddress;
 import java.security.SecureRandom;
 
 public class Eve {
@@ -19,7 +20,7 @@ public class Eve {
     var identifier = controller.newPrivateIdentifier();
 
     var node = new DirectModeNode(identifier, eventStore)
-        .bind(5621)
+        .bind(new InetSocketAddress("localhost", 5621))
         .block();
 
     // block until the server is disposed
