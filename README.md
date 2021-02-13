@@ -34,10 +34,10 @@ Below describes the current capabilities of keri-java:
 
 **Private/Direct Mode**
 
-- [ ] \(In Progress) Keri Protocol Server and Client
-- [ ] \(In Progress) keripy/eve interoperability
-- [ ] keripy/bob interoperability
-- [ ] keripy/sam interoperability
+- [x] Keri Protocol Server and Client
+- [x] keripy/eve interoperability
+- [x] keripy/bob interoperability
+- [x] keripy/sam interoperability
 
 **Public/Indirect Mode**
 
