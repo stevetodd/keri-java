@@ -8,7 +8,7 @@ import java.util.List;
 import static foundation.identity.keri.SigningThresholds.*;
 import static org.junit.Assert.*;
 
-public class SigningThresholdTests {
+public class SigningThresholdsTests {
 
   @Test
   public void test__weight__int_int() {
