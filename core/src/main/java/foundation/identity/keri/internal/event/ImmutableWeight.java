@@ -38,10 +38,10 @@ public class ImmutableWeight implements Weight {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ImmutableWeight)) {
+    if (!(o instanceof Weight)) {
       return false;
     }
-    Weight that = (Weight) o;
+    var that = (Weight) o;
     return this.numerator == that.numerator()
         && Objects.equals(this.denominator, that.denominator().orElseGet(() -> null));
   }
