@@ -18,10 +18,10 @@ import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -165,6 +165,11 @@ public class IdentifierSpec {
       return this;
     }
 
+    public Builder signingThreshold(SigningThreshold signingThreshold) {
+      this.signingThreshold = requireNonNull(signingThreshold);
+      return this;
+    }
+
     public Builder format(Format format) {
       requireNonNull(format);
 
@@ -209,11 +214,6 @@ public class IdentifierSpec {
       return this;
     }
 
-    public Builder nextSigningThreshold(SigningThreshold nextSigningThreshold) {
-      this.nextSigningThreshold = requireNonNull(nextSigningThreshold);
-      return this;
-    }
-
     public Builder nextSigningThreshold(int nextSigningThreshold) {
       if (nextSigningThreshold < 1) {
         throw new IllegalArgumentException("nextSigningThreshold must be 1 or greater");
@@ -221,6 +221,11 @@ public class IdentifierSpec {
 
       this.nextSigningThreshold = SigningThresholds.unweighted(nextSigningThreshold);
 
+      return this;
+    }
+
+    public Builder nextSigningThreshold(SigningThreshold nextSigningThreshold) {
+      this.nextSigningThreshold = requireNonNull(nextSigningThreshold);
       return this;
     }
 
@@ -294,8 +299,8 @@ public class IdentifierSpec {
         }
       } else if (this.signingThreshold instanceof SigningThreshold.Weighted) {
         var w = (SigningThreshold.Weighted) this.signingThreshold;
-        var countOfWeights = w.weights().stream()
-            .mapToLong(Collection::size)
+        var countOfWeights = Stream.of(w.weights())
+            .mapToLong(wts -> wts.length)
             .sum();
         if (countOfWeights != this.keys.size()) {
           throw new IllegalArgumentException(
@@ -329,8 +334,8 @@ public class IdentifierSpec {
           }
         } else if (this.nextSigningThreshold instanceof SigningThreshold.Weighted) {
           var w = (SigningThreshold.Weighted) this.nextSigningThreshold;
-          var countOfWeights = w.weights().stream()
-              .mapToLong(Collection::size)
+          var countOfWeights = Stream.of(w.weights())
+              .mapToLong(wts -> wts.length)
               .sum();
           if (countOfWeights != this.keys.size()) {
             throw new IllegalArgumentException(

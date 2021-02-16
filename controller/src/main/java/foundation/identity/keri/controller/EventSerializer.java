@@ -3,7 +3,6 @@ package foundation.identity.keri.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import foundation.identity.keri.QualifiedBase64;
@@ -32,6 +31,7 @@ import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static foundation.identity.keri.Hex.hex;
 import static foundation.identity.keri.Hex.hexNoPad;
@@ -59,29 +59,6 @@ public final class EventSerializer {
       return QualifiedBase64.selfSigningIdentifierPlaceholder(spec.signer().algorithm());
     } else {
       throw new IllegalArgumentException("unknown prefix type: " + derivation.getCanonicalName());
-    }
-  }
-
-  static void gatherInceptionValues(StringBuilder b, JsonNode jsonNode, boolean root) {
-    if (jsonNode.isValueNode() && jsonNode.isTextual()) {
-      b.append(jsonNode.asText());
-    } else if (jsonNode.isObject()) {
-      for (var iter = jsonNode.fields(); iter.hasNext(); ) {
-        var entry = iter.next();
-
-        if (root && entry.getKey().equals(IDENTIFIER.label())) {
-          continue;
-        }
-
-        gatherInceptionValues(b, entry.getValue(), false);
-      }
-    } else if (jsonNode.isArray()) {
-      var arrayNode = (ArrayNode) jsonNode;
-      for (var i : arrayNode) {
-        gatherInceptionValues(b, i, false);
-      }
-    } else {
-      throw new IllegalStateException("Should not have non-text values");
     }
   }
 
@@ -131,10 +108,9 @@ public final class EventSerializer {
       return mapper.getNodeFactory().textNode(((SigningThreshold.Unweighted) t).threshold() + "");
     } else if (t instanceof SigningThreshold.Weighted) {
       var wt = (SigningThreshold.Weighted) t;
-      var stNode = mapper.getNodeFactory().arrayNode();
-      var groupArrayNodes = wt.weights().stream()
+      var groupArrayNodes = Stream.of(wt.weights())
           .map(lw -> {
-                var textNodes = lw.stream()
+                var textNodes = Stream.of(lw)
                     .map(EventSerializer::weight)
                     .map(str -> mapper.getNodeFactory().textNode(str))
                     .collect(Collectors.toList());
@@ -194,13 +170,6 @@ public final class EventSerializer {
 
   public byte[] inceptionStatement(IdentifierSpec spec) {
     return serialize(null, spec);
-  }
-
-  // TODO delete
-  public byte[] inceptionStatement(JsonNode rootNode) {
-    var b = new StringBuilder();
-    gatherInceptionValues(b, rootNode, true);
-    return b.toString().getBytes(UTF_8);
   }
 
   public byte[] serialize(Identifier identifier, IdentifierSpec spec) {

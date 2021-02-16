@@ -1,6 +1,5 @@
 package foundation.identity.keri.api.event;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface SigningThreshold {
@@ -13,7 +12,7 @@ public interface SigningThreshold {
 
   interface Weighted extends SigningThreshold {
 
-    List<List<Weight>> weights();
+    Weight[][] weights();
 
     interface Weight {
       int numerator();

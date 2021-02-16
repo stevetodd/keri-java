@@ -7,7 +7,7 @@ import static foundation.identity.keri.SigningThresholds.*;
 import static foundation.identity.keri.controller.EventSerializer.signingThreshold;
 import static org.junit.Assert.assertEquals;
 
-public class EventSerializerTest {
+public class EventSerializerTests {
 
   ObjectMapper mapper = new ObjectMapper();
 
@@ -27,7 +27,6 @@ public class EventSerializerTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void signingThreshold__weighted() {
 
     // ["1/2", "1/2", "1/4", "1/4", "1/4"]
@@ -42,7 +41,7 @@ public class EventSerializerTest {
     assertEquals(
         "[[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"]]",
         signingThreshold(
-            weightedWithGroups(
+            weighted(
                 group("1/2", "1/2", "1/4", "1/4", "1/4")),
             this.mapper)
             .toString());
@@ -51,7 +50,7 @@ public class EventSerializerTest {
     assertEquals(
         "[[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"],[\"1\",\"1\"]]",
         signingThreshold(
-            weightedWithGroups(
+            weighted(
                 group("1/2", "1/2", "1/4", "1/4", "1/4"),
                 group("1", "1")),
             this.mapper)

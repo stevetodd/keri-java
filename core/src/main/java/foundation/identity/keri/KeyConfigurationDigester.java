@@ -11,6 +11,7 @@ import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
 
 import java.security.PublicKey;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
@@ -31,7 +32,7 @@ public class KeyConfigurationDigester {
   }
 
   public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<Digest> nextKeyDigests) {
-    var st = signingThresoldRepresentation(signingThreshold);
+    var st = signingThresholdRepresentation(signingThreshold);
     var digestAlgorithm = nextKeyDigests.get(0).algorithm();
     var digOps = DigestOperations.lookup(digestAlgorithm);
 
@@ -46,12 +47,12 @@ public class KeyConfigurationDigester {
     return new ImmutableKeyConfigurationDigest(new ImmutableDigest(nextKeyDigests.get(0).algorithm(), digest));
   }
 
-  private static byte[] signingThresoldRepresentation(SigningThreshold threshold) {
+  static byte[] signingThresholdRepresentation(SigningThreshold threshold) {
     if (threshold instanceof SigningThreshold.Unweighted) {
       return Hex.hexNoPad(((SigningThreshold.Unweighted) threshold).threshold()).getBytes(UTF_8);
     } else if (threshold instanceof SigningThreshold.Weighted) {
-      return ((SigningThreshold.Weighted) threshold).weights().stream()
-          .map(lw -> lw.stream()
+      return Stream.of(((SigningThreshold.Weighted) threshold).weights())
+          .map(lw -> Stream.of(lw)
               .map(KeyConfigurationDigester::weight)
               .collect(joining(",")))
           .collect(joining(("&")))

@@ -8,11 +8,8 @@ import foundation.identity.keri.internal.event.ImmutableWeightedSigningThreshold
 import org.apache.commons.math3.fraction.Fraction;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 public class SigningThresholds {
 
@@ -25,38 +22,31 @@ public class SigningThresholds {
   }
 
   public static SigningThreshold.Weighted weighted(Weight... weights) {
-    return weightedWithGroups(List.of(List.of(weights)));
+    return weighted(new Weight[][] {weights});
   }
 
-  public static SigningThreshold.Weighted weighted(List<Weight> weights) {
-    return weightedWithGroups(List.of(weights));
-  }
-
-  public static SigningThreshold.Weighted weighted(String ... weights) {
-    var w = Stream.of(weights)
+  public static SigningThreshold.Weighted weighted(String ... weightsAsStrings) {
+    var weights = Stream.of(weightsAsStrings)
         .map(SigningThresholds::weight)
-        .collect(toList());
+        .toArray(Weight[]::new);
 
-    return weightedWithGroups(List.of(w));
+    return weighted(weights);
   }
 
-  public static SigningThreshold.Weighted weightedWithGroups(List<Weight> ... weightGroups) {
-    return weightedWithGroups(List.of(weightGroups));
-  }
-
-  public static SigningThreshold.Weighted weightedWithGroups(List<List<Weight>> weightGroups) {
+  public static SigningThreshold.Weighted weighted(Weight[] ... weightGroups) {
     for (var group : weightGroups) {
       if (!sumGreaterThanOrEqualToOne(group)) {
-        throw new IllegalArgumentException("group sum is less than 1: " + group);
+        throw new IllegalArgumentException("group sum is less than 1: " + Arrays.deepToString(group));
       }
     }
 
     return new ImmutableWeightedSigningThreshold(weightGroups);
   }
 
-  private static boolean sumGreaterThanOrEqualToOne(List<Weight> weights) {
+  private static boolean sumGreaterThanOrEqualToOne(Weight[] weights) {
     var sum = Fraction.ZERO;
     for (var w : weights) {
+      //noinspection ObjectAllocationInLoop
       sum = sum.add(fraction(w));
     }
 
@@ -90,24 +80,14 @@ public class SigningThresholds {
     return new ImmutableWeight(numerator, denominator);
   }
 
-  public static List<Weight> group(Weight ... weights) {
-    return List.of(weights);
+  public static Weight[] group(Weight ... weights) {
+    return weights;
   }
 
-  public static List<Weight> group(String ... weights) {
+  public static Weight[] group(String ... weights) {
     return Stream.of(weights)
         .map(SigningThresholds::weight)
-        .collect(toList());
-  }
-
-  public static boolean thresholdMet(SigningThreshold threshold, List<Integer> indexes) {
-    if (threshold instanceof SigningThreshold.Unweighted) {
-      return thresholdMet((SigningThreshold.Unweighted) threshold, indexes);
-    } else if (threshold instanceof SigningThreshold.Weighted) {
-      return thresholdMet((SigningThreshold.Weighted) threshold, indexes);
-    } else {
-      throw new IllegalArgumentException("unknown threshold type: " + threshold.getClass());
-    }
+        .toArray(Weight[]::new);
   }
 
   public static boolean thresholdMet(SigningThreshold.Unweighted threshold, List<Integer> indexes) {
@@ -123,12 +103,11 @@ public class SigningThresholds {
         .mapToInt(Integer::intValue)
         .max()
         .getAsInt();
-    var countWeights = (int) threshold.weights()
-        .stream()
-        .mapToLong(Collection::size)
+    var countWeights = (int) Stream.of(threshold.weights())
+        .mapToLong(w -> w.length)
         .sum();
 
-    boolean[] sats = prefillSats(Integer.max(maxIndex + 1, countWeights));
+    var sats = prefillSats(Integer.max(maxIndex + 1, countWeights));
     for (var i : indexes) {
       sats[i] = true;
     }
@@ -138,6 +117,7 @@ public class SigningThresholds {
       var accumulator = Fraction.ZERO;
       for (var weight : clause) {
         if (sats[index]) {
+          //noinspection ObjectAllocationInLoop
           accumulator = accumulator.add(fraction(weight));
         }
         index++;

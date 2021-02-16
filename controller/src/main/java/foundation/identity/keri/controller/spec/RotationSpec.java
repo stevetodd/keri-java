@@ -20,8 +20,8 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -168,6 +168,15 @@ public class RotationSpec {
       return this;
     }
 
+    public Builder signingThreshold(int signingThreshold) {
+      if (signingThreshold < 1) {
+        throw new IllegalArgumentException("signingThreshold must be 1 or greater");
+      }
+
+      this.signingThreshold = SigningThresholds.unweighted(signingThreshold);
+      return this;
+    }
+
     public Builder signingThreshold(SigningThreshold signingThreshold) {
       this.signingThreshold = signingThreshold;
       return this;
@@ -201,11 +210,6 @@ public class RotationSpec {
       return this;
     }
 
-    public Builder nextSigningThreshold(SigningThreshold nextSigningThreshold) {
-      this.nextSigningThreshold = requireNonNull(nextSigningThreshold);
-      return this;
-    }
-
     public Builder nextSigningThreshold(int nextSigningThreshold) {
       if (nextSigningThreshold < 1) {
         throw new IllegalArgumentException("nextSigningThreshold must be 1 or greater");
@@ -213,6 +217,11 @@ public class RotationSpec {
 
       this.nextSigningThreshold = SigningThresholds.unweighted(nextSigningThreshold);
 
+      return this;
+    }
+
+    public Builder nextSigningThreshold(SigningThreshold nextSigningThreshold) {
+      this.nextSigningThreshold = requireNonNull(nextSigningThreshold);
       return this;
     }
 
@@ -299,8 +308,8 @@ public class RotationSpec {
         }
       } else if (this.signingThreshold instanceof SigningThreshold.Weighted) {
         var w = (SigningThreshold.Weighted) this.signingThreshold;
-        var countOfWeights = w.weights().stream()
-            .mapToLong(Collection::size)
+        var countOfWeights = Stream.of(w.weights())
+            .mapToLong(wts -> wts.length)
             .sum();
         if (countOfWeights != this.keys.size()) {
           throw new IllegalArgumentException(
@@ -334,8 +343,8 @@ public class RotationSpec {
           }
         } else if (this.nextSigningThreshold instanceof SigningThreshold.Weighted) {
           var w = (SigningThreshold.Weighted) this.nextSigningThreshold;
-          var countOfWeights = w.weights().stream()
-              .mapToLong(Collection::size)
+          var countOfWeights = Stream.of(w.weights())
+              .mapToLong(wts -> wts.length)
               .sum();
           if (countOfWeights != this.keys.size()) {
             throw new IllegalArgumentException(
