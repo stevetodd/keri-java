@@ -1,31 +1,32 @@
 package foundation.identity.keri.controller;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.EventSignature;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
-import foundation.identity.keri.api.event.ReceiptFromTransferrableIdentifierEvent;
+import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.InteractionSpec;
-import foundation.identity.keri.controller.spec.ReceiptFromTransferrableIdentifierSpec;
+import foundation.identity.keri.controller.spec.ReceiptFromTransferableIdentifierSpec;
 import foundation.identity.keri.controller.spec.ReceiptSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
 import foundation.identity.keri.crypto.DigestOperations;
-import foundation.identity.keri.internal.event.ImmutableEventSignature;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinates;
+import foundation.identity.keri.internal.event.ImmutableAttachedEventSignature;
 import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
-import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
 import foundation.identity.keri.internal.event.ImmutableReceiptEvent;
-import foundation.identity.keri.internal.event.ImmutableReceiptFromTransferrableIdentifierEvent;
+import foundation.identity.keri.internal.event.ImmutableReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
 
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author stephen
@@ -38,12 +39,11 @@ public final class EventFactory {
     var inceptionStatement = this.eventSerializer.inceptionStatement(spec);
     var prefix = IdentifierFactory.identifier(spec, inceptionStatement);
     var bytes = this.eventSerializer.serialize(prefix, spec);
-    var signature = spec.signer().sign(bytes);
-    var eventCoordinates = new ImmutableIdentifierEventCoordinates(prefix, BigInteger.ZERO);
+
     var digest = DigestOperations.BLAKE3_256.digest(bytes);
-    var eventCoordinatesWitDigest = new ImmutableIdentifierEventCoordinatesWithDigest(eventCoordinates, digest);
-    var keyCoordinates = new ImmutableKeyCoordinates(eventCoordinatesWitDigest, 0);
-    var eventSignature = ImmutableEventSignature.of(eventCoordinatesWitDigest, keyCoordinates, signature);
+    var event = new ImmutableIdentifierEventCoordinatesWithDigest(prefix, BigInteger.ZERO, digest);
+    var signature = spec.signer().sign(bytes);
+    var eventSignature = new ImmutableAttachedEventSignature(event, 0, signature);
 
     return new ImmutableInceptionEvent(
         bytes,
@@ -62,15 +62,13 @@ public final class EventFactory {
 
   public RotationEvent rotation(RotationSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
-    var signatures = new HashSet<EventSignature>();
+    var signatures = new HashSet<AttachedEventSignature>();
 
     if (spec.signer() != null) {
-      var signature = spec.signer().sign(bytes);
-      var eventCoordinates = new ImmutableIdentifierEventCoordinates(spec.identifier(), spec.sequenceNumber());
       var digest = DigestOperations.BLAKE3_256.digest(bytes);
-      var eventCoordinatesWitDigest = new ImmutableIdentifierEventCoordinatesWithDigest(eventCoordinates, digest);
-      var keyCoordinates = new ImmutableKeyCoordinates(eventCoordinatesWitDigest, 0);
-      var eventSignature = ImmutableEventSignature.of(eventCoordinatesWitDigest, keyCoordinates, signature);
+      var event = new ImmutableIdentifierEventCoordinatesWithDigest(spec.identifier(), spec.sequenceNumber(), digest);
+      var signature = spec.signer().sign(bytes);
+      var eventSignature = new ImmutableAttachedEventSignature(event, spec.signer().keyIndex(), signature);
       signatures.add(eventSignature);
     }
 
@@ -93,17 +91,16 @@ public final class EventFactory {
 
   public InteractionEvent interaction(InteractionSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
-    var signatures = new HashSet<EventSignature>();
+    var signatures = new HashSet<AttachedEventSignature>();
 
     if (spec.signer() != null) {
-      var signature = spec.signer().sign(bytes);
-      var eventCoordinates = new ImmutableIdentifierEventCoordinates(spec.identifier(), spec.sequenceNumber());
       var digest = DigestOperations.BLAKE3_256.digest(bytes);
-      var eventCoordinatesWitDigest = new ImmutableIdentifierEventCoordinatesWithDigest(eventCoordinates, digest);
-      var keyCoordinates = new ImmutableKeyCoordinates(eventCoordinatesWitDigest, 0);
-      var eventSignature = ImmutableEventSignature.of(eventCoordinatesWitDigest, keyCoordinates, signature);
+      var event = new ImmutableIdentifierEventCoordinatesWithDigest(spec.identifier(), spec.sequenceNumber(), digest);
+      var signature = spec.signer().sign(bytes);
+      var eventSignature = new ImmutableAttachedEventSignature(event, spec.signer().keyIndex(), signature);
       signatures.add(eventSignature);
     }
+
     return new ImmutableInteractionEvent(
         Version.CURRENT,
         spec.format(),
@@ -126,14 +123,21 @@ public final class EventFactory {
     );
   }
 
-  public ReceiptFromTransferrableIdentifierEvent receipt(ReceiptFromTransferrableIdentifierSpec spec) {
+  public ReceiptFromTransferableIdentifierEvent receipt(ReceiptFromTransferableIdentifierSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
+    var keyEstablishmentEvent = spec.signatures().stream().findFirst().get().key().establishmentEvent();
+    var attachedSignatures = spec.signatures().stream()
+        .map(ImmutableAttachedEventSignature::convert)
+        .map(as -> (AttachedEventSignature) as)
+        .collect(toSet());
 
-    return new ImmutableReceiptFromTransferrableIdentifierEvent(
+    return new ImmutableReceiptFromTransferableIdentifierEvent(
         bytes,
         Version.CURRENT,
         spec.format(),
-        spec.receipt()
+        spec.event(),
+        keyEstablishmentEvent,
+        attachedSignatures
     );
   }
 

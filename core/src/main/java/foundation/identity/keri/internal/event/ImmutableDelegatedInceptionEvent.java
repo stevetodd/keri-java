@@ -1,10 +1,10 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.DelegatedInceptionEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -40,7 +40,7 @@ public class ImmutableDelegatedInceptionEvent extends AbstractImmutableDelegated
       List<BasicIdentifier> witnesses,
       EnumSet<ConfigurationTrait> configurationTraits,
       DelegatingEventCoordinates delegatingEvent,
-      Set<EventSignature> signatures) {
+      Set<AttachedEventSignature> signatures) {
     super(
         version,
         format,

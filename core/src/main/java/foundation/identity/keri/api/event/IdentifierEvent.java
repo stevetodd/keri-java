@@ -13,6 +13,6 @@ public interface IdentifierEvent extends Event {
 
   IdentifierEventCoordinatesWithDigest previous();
 
-  Set<EventSignature> signatures();
+  Set<AttachedEventSignature> signatures();
 
 }

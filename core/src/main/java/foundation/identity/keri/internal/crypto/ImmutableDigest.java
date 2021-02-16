@@ -3,7 +3,7 @@ package foundation.identity.keri.internal.crypto;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 
-import static foundation.identity.keri.QualifiedBase64.base64;
+import static foundation.identity.keri.QualifiedBase64.qb64;
 import static java.util.Objects.requireNonNull;
 
 public class ImmutableDigest implements Digest {
@@ -41,7 +41,7 @@ public class ImmutableDigest implements Digest {
 
   @Override
   public String toString() {
-    return "ImmutableDigest [algorithm=" + algorithm + ", bytes=" + base64(bytes) + "]";
+    return qb64(this);
   }
 
 }

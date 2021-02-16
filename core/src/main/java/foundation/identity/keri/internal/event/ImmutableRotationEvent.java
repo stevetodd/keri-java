@@ -1,7 +1,7 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.EventSignature;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -40,7 +40,7 @@ public final class ImmutableRotationEvent extends AbstractImmutableEstablishment
       List<BasicIdentifier> addedWitnesses,
       List<Seal> seals,
       byte[] bytes,
-      Set<EventSignature> signatures) {
+      Set<AttachedEventSignature> signatures) {
     super(
         version,
         format,
@@ -53,14 +53,9 @@ public final class ImmutableRotationEvent extends AbstractImmutableEstablishment
         witnessThreshold,
         bytes,
         signatures);
-
-    requireNonNull(removedWitnesses);
-    requireNonNull(addedWitnesses);
-    requireNonNull(seals);
-
-    this.removedWitnesses = List.copyOf(removedWitnesses);
-    this.addedWitnesses = List.copyOf(addedWitnesses);
-    this.seals = List.copyOf(seals);
+    this.removedWitnesses = List.copyOf(requireNonNull(removedWitnesses));
+    this.addedWitnesses = List.copyOf(requireNonNull(addedWitnesses));
+    this.seals = List.copyOf(requireNonNull(seals));
   }
 
   @Override

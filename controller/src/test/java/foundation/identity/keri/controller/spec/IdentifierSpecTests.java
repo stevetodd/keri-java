@@ -36,10 +36,10 @@ public class IdentifierSpecTests {
     this.deterministicRandom.setSeed(new byte[]{0});
 
     this.keyPair = SignatureOperations.ED_25519.generateKeyPair();
-    this.signer = new PrivateKeySigner(this.keyPair.getPrivate());
+    this.signer = new PrivateKeySigner(1, this.keyPair.getPrivate());
 
     this.keyPair2 = SignatureOperations.ED_25519.generateKeyPair();
-    this.signer2 = new PrivateKeySigner(this.keyPair2.getPrivate());
+    this.signer2 = new PrivateKeySigner(2, this.keyPair2.getPrivate());
 
   }
 

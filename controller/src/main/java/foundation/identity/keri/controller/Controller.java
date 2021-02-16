@@ -69,7 +69,7 @@ public final class Controller {
         .selfAddressing(DEFAULT_DIGEST_ALGO)
         .key(initialKeyPair.getPublic())
         .nextKeys(nextKeys)
-        .signer(initialKeyPair.getPrivate())
+        .signer(0, initialKeyPair.getPrivate())
         .build();
 
     var event = this.eventFactory.inception(spec);
@@ -142,7 +142,7 @@ public final class Controller {
     var spec = RotationSpec.builder(state)
         .key(nextKeyPair.get().getPublic())
         .nextKeys(nextKeys)
-        .signer(nextKeyPair.get().getPrivate())
+        .signer(0, nextKeyPair.get().getPrivate())
         .seals(seals)
         .build();
 
@@ -177,7 +177,7 @@ public final class Controller {
     }
 
     var spec = InteractionSpec.builder(state)
-        .signer(keyPair.get().getPrivate())
+        .signer(0, keyPair.get().getPrivate())
         .seals(seals)
         .build();
 

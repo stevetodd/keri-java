@@ -1,7 +1,7 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.EventSignature;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.InteractionEvent;
@@ -18,14 +18,15 @@ public final class ImmutableInteractionEvent extends AbstractImmutableIdentifier
 
   private final List<Seal> seals;
 
-  public ImmutableInteractionEvent(Version version,
-                                   Format format,
-                                   Identifier identifier,
-                                   BigInteger sequenceNumber,
-                                   IdentifierEventCoordinatesWithDigest previous,
-                                   List<Seal> seals,
-                                   byte[] bytes,
-                                   Set<EventSignature> signatures) {
+  public ImmutableInteractionEvent(
+      Version version,
+      Format format,
+      Identifier identifier,
+      BigInteger sequenceNumber,
+      IdentifierEventCoordinatesWithDigest previous,
+      List<Seal> seals,
+      byte[] bytes,
+      Set<AttachedEventSignature> signatures) {
     super(version,
         format,
         identifier,
@@ -33,10 +34,7 @@ public final class ImmutableInteractionEvent extends AbstractImmutableIdentifier
         previous,
         bytes,
         signatures);
-
-    requireNonNull(seals);
-
-    this.seals = List.copyOf(seals);
+    this.seals = List.copyOf(requireNonNull(seals, "seals"));
   }
 
   @Override

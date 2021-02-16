@@ -1,7 +1,6 @@
-package foundation.identity.keri.demo;
+package foundation.identity.keri.demo.protocol;
 
 import foundation.identity.keri.EventDeserializer;
-import foundation.identity.keri.Hex;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.crypto.SignatureAlgorithm;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -17,16 +16,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static foundation.identity.keri.Hex.unhexInt;
 import static foundation.identity.keri.QualifiedBase64.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class KeriMessageDecoder extends ReplayingDecoder<Void> {
+public class KeriEventDecoder extends ReplayingDecoder<Void> {
 
   private static final ByteBuf KERI = Unpooled.wrappedBuffer("KERI".getBytes(UTF_8));
   private static final int MAX_PEEK = 10;
   private static final int VERSION_STRING_LENGTH = "KERIVVFFFSSSSSS_".length();
 
   EventDeserializer deserializer = new EventDeserializer();
+
+  @Override
+  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    var messageBytes = readMessage(in);
+    var signatures = readSignatures(in);
+    // var receipts = readReceipts(in); // Pending keri#91
+
+    var event = this.deserializer.deserialize(messageBytes, signatures);
+
+    out.add(event);
+  }
 
   static byte[] readMessage(ByteBuf in) {
     var length = peekMessageLength(in);
@@ -55,7 +66,7 @@ public class KeriMessageDecoder extends ReplayingDecoder<Void> {
     var sizeBytes = new byte[6];
     in.getBytes(versionStart + 10, sizeBytes);
     var sizeHex = new String(sizeBytes, UTF_8);
-    return Hex.unhexInt(sizeHex);
+    return unhexInt(sizeHex);
   }
 
   static Map<Integer, Signature> readSignatures(ByteBuf in) {
@@ -166,14 +177,4 @@ public class KeriMessageDecoder extends ReplayingDecoder<Void> {
     };
   }
 
-  @Override
-  protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-    var messageBytes = readMessage(in);
-    var signatures = readSignatures(in);
-    // var receipts = readReceipts(in); // Pending keri#91
-
-    var event = deserializer.deserialize(messageBytes, signatures);
-
-    out.add(event);
-  }
 }

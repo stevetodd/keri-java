@@ -1,7 +1,14 @@
 package foundation.identity.keri.api.event;
 
-public interface KeyCoordinates extends IdentifierEventCoordinatesWithDigest {
+import foundation.identity.keri.api.crypto.Digest;
+import foundation.identity.keri.api.identifier.Identifier;
 
-  int index();
+import java.math.BigInteger;
+
+public interface KeyCoordinates {
+
+  IdentifierEventCoordinatesWithDigest establishmentEvent();
+
+  int keyIndex();
 
 }

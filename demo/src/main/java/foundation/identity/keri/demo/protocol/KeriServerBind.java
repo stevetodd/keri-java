@@ -1,9 +1,6 @@
 package foundation.identity.keri.demo.protocol;
 
 import io.netty.channel.ChannelOption;
-import reactor.core.publisher.Mono;
-import reactor.netty.DisposableServer;
-import reactor.netty.tcp.SslProvider;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
@@ -27,14 +24,6 @@ final class KeriServerBind extends KeriServer {
 
 	KeriServerBind(KeriServerConfig config) {
 		this.config = config;
-	}
-
-	@Override
-	public Mono<? extends DisposableServer> bind() {
-		if (config.sslProvider != null && config.sslProvider.getDefaultConfigurationType() == null) {
-			config.sslProvider = SslProvider.updateDefaultConfiguration(config.sslProvider, SslProvider.DefaultConfigurationType.TCP);
-		}
-		return super.bind();
 	}
 
 	@Override

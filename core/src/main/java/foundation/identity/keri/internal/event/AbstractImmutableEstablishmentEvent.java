@@ -1,8 +1,8 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EstablishmentEvent;
-import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -38,12 +38,11 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,
       byte[] bytes,
-      Set<EventSignature> signatures) {
+      Set<AttachedEventSignature> signatures) {
     super(version, format, identifier, sequenceNumber, previous, bytes, signatures);
-    requireNonNull(keys);
 
     this.signingThreshold = signingThreshold;
-    this.keys = List.copyOf(keys);
+    this.keys = List.copyOf(requireNonNull(keys, "keys"));
     this.nextKeys = Optional.ofNullable(nextKeys);
     this.witnessThreshold = witnessThreshold;
   }

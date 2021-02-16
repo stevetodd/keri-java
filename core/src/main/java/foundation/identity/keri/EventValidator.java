@@ -57,7 +57,7 @@ public final class EventValidator {
 
       // sequence number
       require(ide.sequenceNumber().compareTo(BigInteger.ZERO) >= 0,
-          "non-inception events must have a sequence number greater than 0 (given: %s)",
+          "identifier events must have a sequence number greater than or equal to 0 (given: %s)",
           ide.sequenceNumber());
 
       if (!(ide instanceof InceptionEvent)) {
@@ -68,6 +68,7 @@ public final class EventValidator {
         // previous (digest)
         require(requireMatchingPreviousEventDigest(state.lastEvent(), ide.previous()),
             "previous event digest must match digest of the last event in state");
+
       }
 
       if (event instanceof EstablishmentEvent) {
@@ -82,14 +83,14 @@ public final class EventValidator {
         if (event instanceof DelegatedEstablishmentEvent) {
           var dee = (DelegatedEstablishmentEvent) ee;
           requireNonNull(dee.delegatingEvent(),
-              "delegated establishment events must have delegating event location");
+              "delegating event location required for delegated establishment events");
 
           require(state.delegatingIdentifier().isPresent(),
               "delegated establishment events only permitted for delegated identifiers");
 
           require(dee.delegatingEvent().identifier().equals(state.delegatingIdentifier().get()),
               "delegated rotation seal identifier must be the same as the delegator in state "
-                  + "(given: state.delegator: %s, rotation.seal.identity: %s)",
+              + "(given: state.delegator: %s, rotation.seal.identity: %s)",
               () -> qb64(state.delegatingIdentifier().get()), () -> qb64(dee.delegatingEvent().identifier()));
 
           // TODO validate delegating seal
@@ -105,7 +106,8 @@ public final class EventValidator {
 
           // sequence number
           require(ie.sequenceNumber().equals(BigInteger.ZERO),
-              "sequence number for inception event must be 0 (given: %s)", ie.sequenceNumber());
+              "sequence number for inception event must be 0 (given: %s)",
+              ie.sequenceNumber());
 
           // witness configuration
           if (ie.witnesses().isEmpty()) {
@@ -170,12 +172,12 @@ public final class EventValidator {
           } else {
             require(re.witnessThreshold() > 0,
                 "witness threshold must be greater than 0 if witnesses are provided " +
-                    "(given: threshold: %s, witnesses: %s",
+                "(given: threshold: %s, witnesses: %s",
                 re.witnessThreshold(), newWitnesses.size());
 
             require(re.witnessThreshold() <= newWitnesses.size(),
                 "witness threshold must be less than or equal to the number of witnesses " +
-                    "(given: threshold: %s, witnesses: %s",
+                "(given: threshold: %s, witnesses: %s",
                 re.witnessThreshold(), newWitnesses.size());
           }
 
@@ -239,12 +241,12 @@ public final class EventValidator {
     for (var signature : event.signatures()) {
       var ops = SignatureOperations.lookup(signature.signature().algorithm());
       var eventCoords = signature.event();
-      var publicKey = lastEstablishmentEvent.keys().get(signature.key().index());
+      var publicKey = lastEstablishmentEvent.keys().get(signature.keyIndex());
 
       require(ops.verify(event.bytes(), signature.signature(), publicKey),
           "event signatures must validate (i: %s, s: %s, d: %s, index: %s)",
           event.identifier(), event.sequenceNumber(), eventCoords.digest(),
-          signature.key().index());
+          signature.keyIndex());
     }
   }
 
@@ -259,7 +261,7 @@ public final class EventValidator {
     } else if (signingThreshold instanceof SigningThreshold.Weighted) {
       var w = (SigningThreshold.Weighted) signingThreshold;
       var indexes = event.signatures().stream()
-          .map(es -> es.key().index())
+          .map(es -> es.keyIndex())
           .sorted()
           .collect(toList());
 

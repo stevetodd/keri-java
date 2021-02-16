@@ -1,7 +1,7 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.EventSignature;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
@@ -16,12 +16,9 @@ public abstract class AbstractImmutableIdentifierEvent extends AbstractImmutable
     implements IdentifierEvent {
 
   private final Identifier identifier;
-
   private final BigInteger sequenceNumber;
-
   private final IdentifierEventCoordinatesWithDigest previous;
-
-  private final Set<EventSignature> signatures;
+  private final Set<AttachedEventSignature> signatures;
 
   public AbstractImmutableIdentifierEvent(
       Version version,
@@ -30,17 +27,12 @@ public abstract class AbstractImmutableIdentifierEvent extends AbstractImmutable
       BigInteger sequenceNumber,
       IdentifierEventCoordinatesWithDigest previous,
       byte[] bytes,
-      Set<EventSignature> signatures) {
+      Set<AttachedEventSignature> signatures) {
     super(bytes, version, format);
-    requireNonNull(identifier);
-    requireNonNull(sequenceNumber);
-    requireNonNull(bytes);
-    requireNonNull(signatures);
-
-    this.identifier = identifier;
-    this.sequenceNumber = sequenceNumber;
-    this.previous = previous;
-    this.signatures = Set.copyOf(signatures);
+    this.identifier = requireNonNull(identifier, "identifier");
+    this.sequenceNumber = requireNonNull(sequenceNumber, "sequenceNumber");
+    this.previous = requireNonNull(previous, "previous");
+    this.signatures = Set.copyOf(requireNonNull(signatures, "signatures"));
   }
 
   @Override
@@ -59,7 +51,7 @@ public abstract class AbstractImmutableIdentifierEvent extends AbstractImmutable
   }
 
   @Override
-  public Set<EventSignature> signatures() {
+  public Set<AttachedEventSignature> signatures() {
     return this.signatures;
   }
 

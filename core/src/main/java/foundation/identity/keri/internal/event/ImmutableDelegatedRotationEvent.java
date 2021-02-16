@@ -1,9 +1,9 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -43,7 +43,7 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
       List<Seal> seals,
       DelegatingEventCoordinates delegatingEvent,
       byte[] bytes,
-      Set<EventSignature> signatures) {
+      Set<AttachedEventSignature> signatures) {
     super(
         version,
         format,

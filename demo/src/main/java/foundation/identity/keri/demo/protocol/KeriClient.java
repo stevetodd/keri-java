@@ -1,27 +1,20 @@
 package foundation.identity.keri.demo.protocol;
 
+import foundation.identity.keri.api.event.Event;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.logging.LogLevel;
-import io.netty.handler.ssl.JdkSslContext;
-import io.netty.handler.ssl.OpenSsl;
-import io.netty.handler.ssl.SslContext;
 import io.netty.resolver.AddressResolverGroup;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.netty.Connection;
 import reactor.netty.ConnectionObserver;
-import reactor.netty.NettyInbound;
-import reactor.netty.NettyOutbound;
 import reactor.netty.channel.ChannelMetricsRecorder;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
-import reactor.netty.tcp.SslProvider;
 import reactor.netty.tcp.TcpResources;
 import reactor.netty.transport.ClientTransport;
-import reactor.netty.transport.ProxyProvider;
 
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.time.Duration;
 import java.util.function.BiFunction;
@@ -64,18 +57,6 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return create(ConnectionProvider.newConnection());
 	}
 
-	public static void main(String[] args) throws InterruptedException {
-		var client = KeriClient.create()
-				.remoteAddress(() -> new InetSocketAddress("127.0.0.1", 5620))
-				.wiretap("client", LogLevel.INFO)
-				.connectNow()
-				.outbound()
-				.sendString(Mono.just("hello"))
-				.then()
-				.subscribe();
-		Thread.sleep(10 * 1000);
-	}
-
 	@Override
 	public KeriClient bindAddress(Supplier<? extends SocketAddress> bindAddressSupplier) {
 		return super.bindAddress(bindAddressSupplier);
@@ -111,16 +92,17 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return super.doOnDisconnected(doOnDisconnected);
 	}
 
-	/**
-	 * Attach an IO handler to react on connected client
-	 *
-	 * @param handler
-	 *     an IO handler that can dispose underlying connection when {@link
-	 *     Publisher} terminates.
-	 *
-	 * @return a new {@link KeriClient}
-	 */
-	public KeriClient handle(BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> handler) {
+	public KeriClient sendEvent(Publisher<? extends Event> events) {
+		requireNonNull(events, "events");
+		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(events).then().subscribe());
+	}
+
+	public KeriClient sendEvent(Event event) {
+		requireNonNull(event, "event");
+		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(Mono.just(event)).then().subscribe());
+	}
+
+	public KeriClient handle(BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler) {
 		requireNonNull(handler, "handler");
 		return doOnConnected(new OnConnectedHandle(handler));
 	}
@@ -141,25 +123,6 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 	}
 
 	@Override
-	public KeriClient noProxy() {
-		return super.noProxy();
-	}
-
-	/**
-	 * Remove any previously applied SSL configuration customization
-	 *
-	 * @return a new {@link KeriClient}
-	 */
-	public KeriClient noSSL() {
-		if (configuration().isSecure()) {
-			KeriClient dup = duplicate();
-			dup.configuration().sslProvider = null;
-			return dup;
-		}
-		return this;
-	}
-
-	@Override
 	public KeriClient observe(ConnectionObserver observer) {
 		return super.observe(observer);
 	}
@@ -172,11 +135,6 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 	@Override
 	public KeriClient port(int port) {
 		return super.port(port);
-	}
-
-	@Override
-	public KeriClient proxy(Consumer<? super ProxyProvider.TypeSpec> proxyOptions) {
-		return super.proxy(proxyOptions);
 	}
 
 	@Override
@@ -204,81 +162,6 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return super.runOn(loopResources, preferNative);
 	}
 
-	/**
-	 * Enable default sslContext support. The default {@link SslContext} will be
-	 * assigned to
-	 * with a default value of {@code 10} seconds handshake timeout unless
-	 * the environment property {@code reactor.netty.tcp.sslHandshakeTimeout} is set.
-	 *
-	 * @return a new {@link KeriClient}
-	 */
-	public KeriClient secure() {
-		KeriClient dup = duplicate();
-		dup.configuration().sslProvider = SslProvider.defaultClientProvider();
-		return dup;
-	}
-
-	/**
-	 * Apply an SSL configuration customization via the passed builder. The builder
-	 * will produce the {@link SslContext} to be passed to with a default value of
-	 * {@code 10} seconds handshake timeout unless the environment property {@code
-	 * reactor.netty.tcp.sslHandshakeTimeout} is set.
-	 *
-	 * @param sslProviderBuilder
-	 *     builder callback for further customization of SslContext.
-	 *
-	 * @return a new {@link KeriClient}
-	 */
-	public KeriClient secure(Consumer<? super SslProvider.SslContextSpec> sslProviderBuilder) {
-		requireNonNull(sslProviderBuilder, "sslProviderBuilder");
-		KeriClient dup = duplicate();
-		SslProvider.SslContextSpec builder = SslProvider.builder();
-		sslProviderBuilder.accept(builder);
-		dup.configuration().sslProvider = ((SslProvider.Builder) builder).build();
-		return dup;
-	}
-
-	/**
-	 * Apply an SSL configuration via the passed {@link SslProvider}.
-	 *
-	 * @param sslProvider
-	 *     The provider to set when configuring SSL
-	 *
-	 * @return a new {@link KeriClient}
-	 */
-	public KeriClient secure(SslProvider sslProvider) {
-		requireNonNull(sslProvider, "sslProvider");
-		KeriClient dup = duplicate();
-		dup.configuration().sslProvider = sslProvider;
-		return dup;
-	}
-
-	/**
-	 * Based on the actual configuration, returns a {@link Mono} that triggers:
-	 * <ul>
-	 *     <li>an initialization of the event loop group</li>
-	 *     <li>an initialization of the host name resolver</li>
-	 *     <li>loads the necessary native libraries for the transport</li>
-	 *     <li>loads the necessary native libraries for the security if there is such</li>
-	 * </ul>
-	 * By default, when method is not used, the {@code connect operation} absorbs the extra time needed to load resources.
-	 *
-	 * @return a {@link Mono} representing the completion of the warmup
-	 *
-	 * @since 1.0.3
-	 */
-	@Override
-	public Mono<Void> warmup() {
-		return Mono.when(
-				super.warmup(),
-				Mono.fromRunnable(() -> {
-					SslProvider provider = configuration().sslProvider();
-					if (provider != null && !(provider.getSslContext() instanceof JdkSslContext)) {
-						OpenSsl.version();
-					}
-				}));
-	}
-
 	@Override
 	public KeriClient wiretap(boolean enable) {
 		return super.wiretap(enable);
@@ -289,8 +172,6 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return super.wiretap(category);
 	}
 
-	//static final Logger log = Loggers.getLogger(KeriClient.class);
-
 	@Override
 	public KeriClient wiretap(String category, LogLevel level) {
 		return super.wiretap(category, level);
@@ -298,22 +179,18 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 
 	static final class OnConnectedHandle implements Consumer<Connection> {
 
-		final BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> handler;
+		final BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler;
 
-		OnConnectedHandle(BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> handler) {
+		OnConnectedHandle(BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler) {
 			this.handler = handler;
 		}
 
 		@Override
 		public void accept(Connection c) {
-			//if (log.isDebugEnabled()) {
-			//	log.debug(format(c.channel(), "Handler is being applied: {}"), handler);
-			//}
-
-			Mono.fromDirect(handler.apply((NettyInbound) c, (NettyOutbound) c))
+			Mono.fromDirect(this.handler.apply((EventInbound) c, (EventOutbound) c))
 					.subscribe(c.disposeSubscriber());
 		}
-	}
 
+	}
 
 }

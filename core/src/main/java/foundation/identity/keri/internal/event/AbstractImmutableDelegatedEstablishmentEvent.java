@@ -1,9 +1,9 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -13,6 +13,7 @@ import foundation.identity.keri.api.identifier.Identifier;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class AbstractImmutableDelegatedEstablishmentEvent extends AbstractImmutableEstablishmentEvent
@@ -32,7 +33,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
       int witnessThreshold,
       DelegatingEventCoordinates delegatingEvent,
       byte[] bytes,
-      Set<EventSignature> signatures) {
+      Set<AttachedEventSignature> signatures) {
     super(
         version,
         format,
@@ -45,7 +46,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
         witnessThreshold,
         bytes,
         signatures);
-    this.delegatingEvent = delegatingEvent;
+    this.delegatingEvent = Objects.requireNonNull(delegatingEvent, "delegatingEvent");
   }
 
   @Override

@@ -20,13 +20,9 @@ public abstract class AbstractImmutableEvent implements Event {
       byte[] bytes,
       Version version,
       Format format) {
-    requireNonNull(version);
-    requireNonNull(format);
-    requireNonNull(bytes);
-
-    this.version = version;
-    this.format = format;
-    this.bytes = bytes;
+    this.version = requireNonNull(version, "version");
+    this.format = requireNonNull(format, "format");
+    this.bytes = requireNonNull(bytes, "bytes");
   }
 
   @Override
