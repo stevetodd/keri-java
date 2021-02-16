@@ -2,6 +2,7 @@ package foundation.identity.keri.controller;
 
 import foundation.identity.keri.Hex;
 import foundation.identity.keri.KeyConfigurationDigester;
+import foundation.identity.keri.api.event.SigningThreshold.Unweighted;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.eventstorage.inmemory.InMemoryEventStore;
@@ -20,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
 
+import static foundation.identity.keri.SigningThresholds.unweighted;
 import static org.junit.Assert.*;
 
 public class ControllerTests {
@@ -40,8 +42,8 @@ public class ControllerTests {
     this.secureRandom = SecureRandom.getInstance("SHA1PRNG");
     this.secureRandom.setSeed(new byte[]{0});
 
-    // this.testEventStore.clear();
-    // this.testKeyStore.clear();
+    //this.testEventStore.clear();
+    //this.testKeyStore.clear();
   }
 
   @Test
@@ -58,7 +60,7 @@ public class ControllerTests {
         Hex.unhex("c72586fae3ac9f3542dc6349f892072a4cfa4d63bb6e23d32935e239e2ace741"),
         sap.digest().bytes());
 
-    assertEquals(1, i.signingThreshold());
+    assertEquals(1, ((Unweighted)i.signingThreshold()).threshold());
 
     // keys
     assertEquals(1, i.keys().size());
@@ -76,7 +78,7 @@ public class ControllerTests {
     var keyStoreNextKeyPair = this.testKeyStore.getNextKey(keyCoordinates);
     assertTrue(keyStoreNextKeyPair.isPresent());
     var expectedNextKeys = KeyConfigurationDigester.digest(
-        1,
+        unweighted(1),
         List.of(keyStoreNextKeyPair.get().getPublic()),
         i.nextKeyConfigurationDigest().get().algorithm());
     assertEquals(expectedNextKeys, i.nextKeyConfigurationDigest().get());

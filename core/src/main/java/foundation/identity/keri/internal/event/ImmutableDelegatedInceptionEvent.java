@@ -8,6 +8,7 @@ import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 
@@ -32,8 +33,7 @@ public class ImmutableDelegatedInceptionEvent extends AbstractImmutableDelegated
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
-      int signingThreshold,
+      SigningThreshold signingThreshold,
       List<PublicKey> keys,
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,

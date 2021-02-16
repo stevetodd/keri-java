@@ -4,6 +4,7 @@ import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 
@@ -16,7 +17,7 @@ public interface IdentifierState {
 
   Identifier identifier();
 
-  int signingThreshold();
+  SigningThreshold signingThreshold();
 
   List<PublicKey> keys();
 

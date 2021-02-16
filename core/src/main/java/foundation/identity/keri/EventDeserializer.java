@@ -20,6 +20,8 @@ import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
+import foundation.identity.keri.api.event.SigningThreshold;
+import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.EventCoordinatesWithDigestSeal;
@@ -51,6 +53,7 @@ import java.util.Map;
 import static foundation.identity.keri.Hex.unhexBigInteger;
 import static foundation.identity.keri.Hex.unhexInt;
 import static foundation.identity.keri.QualifiedBase64.*;
+import static foundation.identity.keri.SigningThresholds.*;
 import static foundation.identity.keri.api.event.EventFieldNames.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toSet;
@@ -100,7 +103,7 @@ public class EventDeserializer {
     return format(new String(format, UTF_8));
   }
 
-  private int indexOf(byte[] a, byte[] b, int limit) {
+  private static int indexOf(byte[] a, byte[] b, int limit) {
     for (var i = 0; (i < a.length) && (i < limit) && ((i + b.length) <= a.length); i++) {
       if (Arrays.equals(a, i, i + b.length, b, 0, b.length)) {
         return i;
@@ -112,7 +115,7 @@ public class EventDeserializer {
   byte[] inceptionStatement(Format format, Identifier identifier, JsonNode rootNode) {
     var mapper = mapper(format);
     var copy = (ObjectNode) rootNode.deepCopy();
-    copy.put(IDENTIFIER.label(), QualifiedBase64.identifierPlaceholder(identifier));
+    copy.put(IDENTIFIER.label(), identifierPlaceholder(identifier));
 
     try {
       return mapper.writeValueAsBytes(copy);
@@ -126,7 +129,7 @@ public class EventDeserializer {
     var version = version(versionString.substring(4, 6));
     var format = format(versionString.substring(6, 10));
     var prefix = identifier(rootNode.get(IDENTIFIER.label()).textValue());
-    var signingThreshold = unhexInt(rootNode.get(SIGNING_THRESHOLD.label()).textValue());
+    var signingThreshold = readSigningThreshold(rootNode.get(SIGNING_THRESHOLD.label()));
 
     var keys = new ArrayList<PublicKey>();
     var keyIterator = rootNode.get(KEYS.label()).elements();
@@ -205,7 +208,7 @@ public class EventDeserializer {
     var sequenceNumber = unhexBigInteger(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
     var previousDigest = digest(rootNode.get(PRIOR_EVENT_DIGEST.label()).textValue());
     var previous = new ImmutableIdentifierEventCoordinatesWithDigest(prefix, sequenceNumber.subtract(BigInteger.ONE), previousDigest);
-    var signingThreshold = unhexInt(rootNode.get(SIGNING_THRESHOLD.label()).textValue());
+    var signingThreshold = readSigningThreshold(rootNode.get(SIGNING_THRESHOLD.label()));
 
     var keys = new ArrayList<PublicKey>();
     var keyIterator = rootNode.get(KEYS.label()).elements();
@@ -219,12 +222,12 @@ public class EventDeserializer {
 
     var witnessThreshold = unhexInt(rootNode.get(WITNESS_THRESHOLD.label()).textValue());
 
-    var removedWitneses = new ArrayList<BasicIdentifier>();
-    var removedWitnesesIterator = rootNode.get(WITNESSES_REMOVED.label()).elements();
-    while (removedWitnesesIterator.hasNext()) {
+    var removedWitnesses = new ArrayList<BasicIdentifier>();
+    var removedWitnessesIterator = rootNode.get(WITNESSES_REMOVED.label()).elements();
+    while (removedWitnessesIterator.hasNext()) {
       // TODO send to specialized QualifierBase64.basicPrefix()
-      var basicPrefix = (BasicIdentifier) identifier(removedWitnesesIterator.next().textValue());
-      removedWitneses.add(basicPrefix);
+      var basicPrefix = (BasicIdentifier) identifier(removedWitnessesIterator.next().textValue());
+      removedWitnesses.add(basicPrefix);
     }
 
     var addedWitnesses = new ArrayList<BasicIdentifier>();
@@ -258,11 +261,43 @@ public class EventDeserializer {
         keys,
         nextKeyConfiguration,
         witnessThreshold,
-        removedWitneses,
+        removedWitnesses,
         addedWitnesses,
         seals,
         bytes,
         attachedSignatures);
+  }
+
+  static SigningThreshold readSigningThreshold(JsonNode jsonNode) {
+    if (jsonNode.isTextual()) {
+      return unweighted(unhexInt(jsonNode.textValue()));
+    } else if (jsonNode.isArray()) {
+      if (jsonNode.get(0).isTextual()) {
+        var i = jsonNode.iterator();
+        var weights = new ArrayList<Weight>();
+        while (i.hasNext()) {
+          weights.add(weight(i.next().textValue()));
+        }
+        return weighted(weights.toArray(Weight[]::new));
+      } else if (jsonNode.get(0).isArray()) {
+        var groups = new Weight[jsonNode.size()][];
+
+        var groupsIter = jsonNode.iterator();
+        for (var i = 0; groupsIter.hasNext(); i++) {
+          var weights = groupsIter.next();
+          groups[i] = new Weight[weights.size()];
+          var weightsIter = weights.iterator();
+          for (var j = 0; weightsIter.hasNext(); j++) {
+            groups[i][j] = weight(weightsIter.next().textValue());
+          }
+        }
+        return weighted(groups);
+      } else {
+        throw new IllegalArgumentException("unknown threshold structure: " + jsonNode.toString());
+      }
+    } else {
+      throw new IllegalArgumentException("unknown threshold type: " + jsonNode.toString());
+    }
   }
 
   private Seal readSeal(JsonNode jsonNode) {

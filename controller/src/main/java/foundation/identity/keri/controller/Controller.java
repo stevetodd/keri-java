@@ -29,6 +29,8 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 
+import static foundation.identity.keri.SigningThresholds.unweighted;
+
 public final class Controller {
 
   private static final DigestAlgorithm DEFAULT_DIGEST_ALGO = StandardDigestAlgorithms.BLAKE3_256;
@@ -61,7 +63,7 @@ public final class Controller {
   public ControllableIdentifier newPrivateIdentifier() {
     var initialKeyPair = this.generateKeyPair(DEFAULT_SIGNATURE_ALGO);
     var nextKeyPair = this.generateKeyPair(DEFAULT_SIGNATURE_ALGO);
-    var nextKeys = KeyConfigurationDigester.digest(1, List.of(nextKeyPair.getPublic()), DEFAULT_DIGEST_ALGO);
+    var nextKeys = KeyConfigurationDigester.digest(unweighted(1), List.of(nextKeyPair.getPublic()), DEFAULT_DIGEST_ALGO);
 
     var spec = IdentifierSpec.builder()
         .selfAddressing(DEFAULT_DIGEST_ALGO)
@@ -86,7 +88,7 @@ public final class Controller {
   public ControllableIdentifier newPublicIdentifier(BasicIdentifier... witnesses) {
     var initialKeyPair = this.generateKeyPair(DEFAULT_SIGNATURE_ALGO);
     var nextKeyPair = this.generateKeyPair(DEFAULT_SIGNATURE_ALGO);
-    var nextKeys = KeyConfigurationDigester.digest(1, List.of(nextKeyPair.getPublic()), DEFAULT_DIGEST_ALGO);
+    var nextKeys = KeyConfigurationDigester.digest(unweighted(1), List.of(nextKeyPair.getPublic()), DEFAULT_DIGEST_ALGO);
 
     var spec = IdentifierSpec.builder()
         .selfAddressing(DEFAULT_DIGEST_ALGO)
@@ -135,7 +137,7 @@ public final class Controller {
     }
 
     var newNextKeyPair = this.generateKeyPair(DEFAULT_SIGNATURE_ALGO);
-    var nextKeys = KeyConfigurationDigester.digest(1, List.of(newNextKeyPair.getPublic()), DEFAULT_DIGEST_ALGO);
+    var nextKeys = KeyConfigurationDigester.digest(unweighted(1), List.of(newNextKeyPair.getPublic()), DEFAULT_DIGEST_ALGO);
 
     var spec = RotationSpec.builder(state)
         .key(nextKeyPair.get().getPublic())

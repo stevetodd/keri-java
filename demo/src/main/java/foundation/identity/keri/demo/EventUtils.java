@@ -13,9 +13,10 @@ import foundation.identity.keri.api.event.RotationEvent;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
 
 public final class EventUtils {
 
@@ -26,7 +27,7 @@ public final class EventUtils {
       var ie = (IdentifierEvent) e;
       System.out.println("i:  " + ie.identifier());
       System.out.println("s:  " + ie.sequenceNumber());
-      System.out.println("p:  " + ie.previous());
+      System.out.println("p:  " + ie.previous().digest());
 
       if (e instanceof EstablishmentEvent) {
         var ee = (EstablishmentEvent) e;
@@ -95,12 +96,14 @@ public final class EventUtils {
           });
     }
 
-    //System.out.println("--- RAW");
-    //System.out.println(new String(e.bytes(), UTF_8));
+    System.out.println("--- RAW");
+    System.out.println(new String(e.bytes(), UTF_8));
   }
 
   private static <T> String listToString(List<T> list, Function<T, String> toString) {
-    return list.stream().map(toString).collect(Collectors.joining(",", "[", "]"));
+    return list.stream()
+        .map(toString)
+        .collect(joining(",", "[", "]"));
   }
 
 }

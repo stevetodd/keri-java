@@ -112,8 +112,7 @@ public final class EventFactory {
         signatures);
   }
 
-  public ReceiptEvent receipt(
-      ReceiptSpec spec) {
+  public ReceiptEvent receipt(ReceiptSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
 
     return new ImmutableReceiptEvent(

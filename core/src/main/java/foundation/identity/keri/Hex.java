@@ -23,9 +23,6 @@ public final class Hex {
     for (var i = 0; i < HEX.length; i++) {
       NIBBLES[HEX[i]] = (byte) i;
     }
-    for (var i = 'A'; i <= 'F'; i++) {
-      NIBBLES[i] = NIBBLES[(i + 'a') - 'A'];
-    }
     System.arraycopy(
         NIBBLES, 'a',
         NIBBLES, 'A',

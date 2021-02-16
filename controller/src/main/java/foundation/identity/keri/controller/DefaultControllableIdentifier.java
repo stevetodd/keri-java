@@ -6,6 +6,7 @@ import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
@@ -31,7 +32,7 @@ public class DefaultControllableIdentifier implements ControllableIdentifier {
   }
 
   @Override
-  public int signingThreshold() {
+  public SigningThreshold signingThreshold() {
     return state.signingThreshold();
   }
 
