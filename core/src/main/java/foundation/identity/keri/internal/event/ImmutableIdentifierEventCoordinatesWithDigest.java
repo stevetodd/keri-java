@@ -94,13 +94,13 @@ public class ImmutableIdentifierEventCoordinatesWithDigest extends ImmutableIden
     if (!super.equals(o)) {
       return false;
     }
-    IdentifierEventCoordinatesWithDigest that = (ImmutableIdentifierEventCoordinatesWithDigest) o;
-    return Objects.equals(digest, that.digest());
+    var that = (IdentifierEventCoordinatesWithDigest) o;
+    return Objects.equals(this.digest, that.digest());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), digest);
+    return Objects.hash(super.hashCode(), this.digest);
   }
 
   @Override

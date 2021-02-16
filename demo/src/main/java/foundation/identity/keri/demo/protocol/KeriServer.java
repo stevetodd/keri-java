@@ -127,7 +127,7 @@ public abstract class KeriServer extends ServerTransport<KeriServer, KeriServerC
 
 		@Override
 		public void accept(Connection c) {
-			Mono.fromDirect(handler.apply((EventInbound) c.inbound(), (EventOutbound) c.outbound()))
+			Mono.fromDirect(this.handler.apply((EventInbound) c.inbound(), (EventOutbound) c.outbound()))
 					.subscribe(c.disposeSubscriber());
 		}
 	}

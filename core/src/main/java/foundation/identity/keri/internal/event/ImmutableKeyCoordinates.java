@@ -68,7 +68,7 @@ public class ImmutableKeyCoordinates implements KeyCoordinates {
       return false;
     }
 
-    KeyCoordinates that = (KeyCoordinates) o;
+    var that = (KeyCoordinates) o;
     return Objects.equals(this.establishmentEvent, that.establishmentEvent())
         && this.keyIndex == that.keyIndex();
   }

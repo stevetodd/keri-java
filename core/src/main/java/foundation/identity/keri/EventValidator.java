@@ -261,7 +261,7 @@ public final class EventValidator {
     } else if (signingThreshold instanceof SigningThreshold.Weighted) {
       var w = (SigningThreshold.Weighted) signingThreshold;
       var indexes = event.signatures().stream()
-          .map(es -> es.key().index())
+          .map(es -> es.keyIndex())
           .sorted()
           .collect(toList());
 

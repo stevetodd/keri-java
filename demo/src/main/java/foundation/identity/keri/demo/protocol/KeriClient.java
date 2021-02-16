@@ -6,12 +6,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.logging.LogLevel;
 import io.netty.resolver.AddressResolverGroup;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.Connection;
 import reactor.netty.ConnectionObserver;
-import reactor.netty.NettyInbound;
-import reactor.netty.NettyOutbound;
 import reactor.netty.channel.ChannelMetricsRecorder;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
@@ -20,7 +17,6 @@ import reactor.netty.transport.ClientTransport;
 
 import java.net.SocketAddress;
 import java.time.Duration;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -97,18 +93,13 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 	}
 
 	public KeriClient sendEvent(Publisher<? extends Event> events) {
-//		Objects.requireNonNull(events, "events");
-//		KeriClient dup = duplicate();
-//		dup.configuration().eventsToSend = Flux.concat(dup.configuration().eventsToSend, events);
-//		return dup;
+		requireNonNull(events, "events");
 		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(events).then().subscribe());
 	}
 
 	public KeriClient sendEvent(Event event) {
-		Objects.requireNonNull(event, "event");
-		KeriClient dup = duplicate();
-		dup.configuration().eventsToSend = Flux.concat(dup.configuration().eventsToSend, Mono.just(event));
-		return dup;
+		requireNonNull(event, "event");
+		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(Mono.just(event)).then().subscribe());
 	}
 
 	public KeriClient handle(BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler) {
@@ -196,18 +187,9 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 
 		@Override
 		public void accept(Connection c) {
-			Mono.fromDirect(handler.apply((EventInbound) c, (EventOutbound) c))
+			Mono.fromDirect(this.handler.apply((EventInbound) c, (EventOutbound) c))
 					.subscribe(c.disposeSubscriber());
 		}
-	}
-
-	public interface EventSender extends EventReceiver<EventSender> {
-
-
-
-	}
-
-	public interface EventReceiver<S extends EventReceiver<S>> {
 
 	}
 

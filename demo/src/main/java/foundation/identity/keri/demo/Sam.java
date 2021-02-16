@@ -31,22 +31,6 @@ public class Sam {
         .block()
         .onDispose()
         .block();
-
-
-    new DirectModeNode(identifier, eventStore)
-        .connect(new InetSocketAddress("localhost", 5621))
-        .retryWhen(Retry.fixedDelay(Long.MAX_VALUE, Duration.ofSeconds(1)))
-        .block()
-        .onDispose()
-        .block();
-
-
-    new DirectModeNode(identifier, eventStore)
-        .connect(new InetSocketAddress("localhost", 5621))
-        .retryWhen(Retry.fixedDelay(Long.MAX_VALUE, Duration.ofSeconds(1)))
-        .block()
-        .onDispose()
-        .block();
   }
 
 }

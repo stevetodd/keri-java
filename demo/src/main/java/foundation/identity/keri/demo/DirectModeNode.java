@@ -15,10 +15,8 @@ import foundation.identity.keri.controller.EventFactory;
 import foundation.identity.keri.controller.spec.ReceiptFromTransferableIdentifierSpec;
 import foundation.identity.keri.demo.protocol.EventInbound;
 import foundation.identity.keri.demo.protocol.EventOutbound;
-import foundation.identity.keri.demo.protocol.KeriChannelOperations;
 import foundation.identity.keri.demo.protocol.KeriClient;
 import foundation.identity.keri.demo.protocol.KeriServer;
-import foundation.identity.keri.eventstorage.inmemory.InMemoryEventStore;
 import foundation.identity.keri.internal.event.ImmutableEventSignature;
 import io.netty.handler.logging.LogLevel;
 import org.reactivestreams.Publisher;
@@ -33,7 +31,6 @@ import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.stream.Stream;
 
 public class DirectModeNode {
 
@@ -43,15 +40,6 @@ public class DirectModeNode {
   private final EventValidator eventValidator = new EventValidator();
   private final EventFactory eventFactory = new EventFactory();
   private final EventProcessor eventProcessor = new EventProcessor();
-
-//  private final KeriClient client = KeriClient.create(
-//          ConnectionProvider.builder("keri-client-receipts")
-//              .maxConnections(1)
-//              .pendingAcquireTimeout(Duration.ofSeconds(1))
-//              .pendingAcquireMaxCount(100)
-//              .maxIdleTime(Duration.ofSeconds(10))
-//              .build())
-//      .wiretap("keri-client", LogLevel.INFO, AdvancedByteBufFormat.TEXTUAL, StandardCharsets.UTF_8);
 
   public DirectModeNode(ControllableIdentifier identifier, EventStore eventStore) {
     this.identifier = identifier;
@@ -129,8 +117,7 @@ public class DirectModeNode {
       } else if (event instanceof ReceiptEvent) {
         var rct = (ReceiptEvent) event;
         //TODO this.eventValidator.validate(event);
-        rct.receipts().stream()
-            .forEach(this.eventStore::store);
+        rct.receipts().forEach(this.eventStore::store);
       }
       return Flux.empty();
     } catch (EventValidationException e) {
