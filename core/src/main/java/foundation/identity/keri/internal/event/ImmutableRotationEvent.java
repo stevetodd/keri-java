@@ -6,6 +6,7 @@ import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.RotationEvent;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
@@ -31,7 +32,7 @@ public final class ImmutableRotationEvent extends AbstractImmutableEstablishment
       Identifier identifier,
       BigInteger sequenceNumber,
       IdentifierEventCoordinatesWithDigest previous,
-      int signingThreshold,
+      SigningThreshold signingThreshold,
       List<PublicKey> keys,
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,

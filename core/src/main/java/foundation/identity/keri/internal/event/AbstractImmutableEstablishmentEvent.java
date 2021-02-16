@@ -6,6 +6,7 @@ import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.Identifier;
 
 import java.math.BigInteger;
@@ -18,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmutableIdentifierEvent implements EstablishmentEvent {
 
-  final int signingThreshold;
+  final SigningThreshold signingThreshold;
 
   final List<PublicKey> keys;
 
@@ -32,7 +33,7 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
       Identifier identifier,
       BigInteger sequenceNumber,
       IdentifierEventCoordinatesWithDigest previous,
-      int signingThreshold,
+      SigningThreshold signingThreshold,
       List<PublicKey> keys,
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,
@@ -48,7 +49,7 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
   }
 
   @Override
-  public int signingThreshold() {
+  public SigningThreshold signingThreshold() {
     return this.signingThreshold;
   }
 

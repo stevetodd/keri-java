@@ -44,10 +44,14 @@
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>event-storage-in-memory</artifactId>
       <version>0.0.1-SNAPSHOT</version>
-      <type>test-jar</type>
-      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>foundation.identity.keri</groupId>
+      <artifactId>key-storage-in-memory</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>

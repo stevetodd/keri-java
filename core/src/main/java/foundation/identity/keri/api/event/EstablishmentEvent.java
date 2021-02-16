@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface EstablishmentEvent extends IdentifierEvent {
 
-  int signingThreshold();
+  SigningThreshold signingThreshold();
 
   List<PublicKey> keys();
 

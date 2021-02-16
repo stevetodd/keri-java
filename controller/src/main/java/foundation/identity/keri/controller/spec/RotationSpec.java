@@ -1,6 +1,7 @@
 package foundation.identity.keri.controller.spec;
 
 import foundation.identity.keri.KeyConfigurationDigester;
+import foundation.identity.keri.SigningThresholds;
 import foundation.identity.keri.api.IdentifierState;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
@@ -9,6 +10,7 @@ import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
@@ -19,6 +21,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,7 +33,7 @@ public class RotationSpec {
   private final BigInteger sequenceNumber;
   private final IdentifierEventCoordinatesWithDigest previous;
 
-  private final int signingThreshold;
+  private final SigningThreshold signingThreshold;
   private final List<PublicKey> keys;
   private final Signer signer;
 
@@ -47,7 +50,7 @@ public class RotationSpec {
       Identifier identifier,
       BigInteger sequenceNumber,
       IdentifierEventCoordinatesWithDigest previousEvent,
-      int signingThreshold,
+      SigningThreshold signingThreshold,
       List<PublicKey> keys,
       Signer signer,
       KeyConfigurationDigest nextKeys,
@@ -89,7 +92,7 @@ public class RotationSpec {
     return this.format;
   }
 
-  public int signingThreshold() {
+  public SigningThreshold signingThreshold() {
     return this.signingThreshold;
   }
 
@@ -123,18 +126,28 @@ public class RotationSpec {
 
   public static class Builder {
     private final IdentifierState state;
-    private final List<PublicKey> keys = new ArrayList<>();
-    private final List<Digest> nextKeyDigests = new ArrayList<>();
-    private final List<PublicKey> nextKeys = new ArrayList<>();
-    private final List<BasicIdentifier> witnesses = new ArrayList<>();
-    private final List<Seal> seals = new ArrayList<>();
-    private final DigestAlgorithm nextKeysAlgorithm = StandardDigestAlgorithms.BLAKE3_256;
+
     private Format format = StandardFormats.JSON;
-    private int signingThreshold = 0;
+
+    // key configuration
+    private SigningThreshold signingThreshold;
+    private final List<PublicKey> keys = new ArrayList<>();
     private Signer signer;
-    private KeyConfigurationDigest nextKeysDigest = KeyConfigurationDigest.NONE;
-    private int nextSigningThreshold = 0;
+
+
+    // next key configuration
+    private SigningThreshold nextSigningThreshold;
+
+    // provide nextKeys + digest algo, nextKeyDigests + digest algo, or nextKeysDigest
+    private final DigestAlgorithm nextKeysAlgorithm = StandardDigestAlgorithms.BLAKE3_256;
+    private final List<PublicKey> listOfNextKeys = new ArrayList<>();
+    private final List<Digest> listOfNextKeyDigests = new ArrayList<>();
+    private KeyConfigurationDigest nextKeyConfigurationDigest = KeyConfigurationDigest.NONE;
+
+    private final List<Seal> seals = new ArrayList<>();
+
     private int witnessThreshold = 0;
+    private final List<BasicIdentifier> witnesses = new ArrayList<>();
 
     public Builder(IdentifierState state) {
       this.state = state;
@@ -156,6 +169,15 @@ public class RotationSpec {
     }
 
     public Builder signingThreshold(int signingThreshold) {
+      if (signingThreshold < 1) {
+        throw new IllegalArgumentException("signingThreshold must be 1 or greater");
+      }
+
+      this.signingThreshold = SigningThresholds.unweighted(signingThreshold);
+      return this;
+    }
+
+    public Builder signingThreshold(SigningThreshold signingThreshold) {
       this.signingThreshold = signingThreshold;
       return this;
     }
@@ -193,15 +215,20 @@ public class RotationSpec {
         throw new IllegalArgumentException("nextSigningThreshold must be 1 or greater");
       }
 
-      this.nextSigningThreshold = nextSigningThreshold;
+      this.nextSigningThreshold = SigningThresholds.unweighted(nextSigningThreshold);
 
+      return this;
+    }
+
+    public Builder nextSigningThreshold(SigningThreshold nextSigningThreshold) {
+      this.nextSigningThreshold = requireNonNull(nextSigningThreshold);
       return this;
     }
 
     public Builder nextKeys(KeyConfigurationDigest nextKeysDigest) {
       requireNonNull(nextKeysDigest);
 
-      this.nextKeysDigest = nextKeysDigest;
+      this.nextKeyConfigurationDigest = nextKeysDigest;
 
       return this;
     }
@@ -229,7 +256,7 @@ public class RotationSpec {
       return this;
     }
 
-    public Builder removeWitness(Identifier identifier) {
+    public Builder removeWitness(BasicIdentifier identifier) {
       requireNonNull(identifier);
       this.witnesses.remove(identifier);
       return this;
@@ -264,59 +291,80 @@ public class RotationSpec {
       // --- KEYS ---
 
       if (this.keys.isEmpty()) {
-        throw new RuntimeException("No keys provided.");
+        throw new IllegalArgumentException("No keys provided.");
       }
 
-      if (this.signingThreshold == 0) {
-        this.signingThreshold = (this.keys.size() / 2) + 1;
+      if (this.signingThreshold == null) {
+        this.signingThreshold = SigningThresholds.unweighted((this.keys.size() / 2) + 1);
       }
 
-      if ((this.signingThreshold < 1) || (this.signingThreshold > this.keys.size())) {
-        throw new RuntimeException(
-            "Invalid signing threshold:"
-                + " keys: " + this.keys.size()
-                + " threshold: " + this.signingThreshold);
+      if (this.signingThreshold instanceof SigningThreshold.Unweighted) {
+        var unw = (SigningThreshold.Unweighted) this.signingThreshold;
+        if (unw.threshold() > this.keys.size()) {
+          throw new IllegalArgumentException(
+              "Invalid unweighted signing threshold:"
+                  + " keys: " + this.keys.size()
+                  + " threshold: " + unw.threshold());
+        }
+      } else if (this.signingThreshold instanceof SigningThreshold.Weighted) {
+        var w = (SigningThreshold.Weighted) this.signingThreshold;
+        var countOfWeights = Stream.of(w.weights())
+            .mapToLong(wts -> wts.length)
+            .sum();
+        if (countOfWeights != this.keys.size()) {
+          throw new IllegalArgumentException(
+              "Count of weights and count of keys are not equal: "
+                  + " keys: " + this.keys.size()
+                  + " weights: " + countOfWeights);
+        }
+      } else {
+        throw new IllegalArgumentException("Unknown SigningThreshold type: " + this.signingThreshold.getClass());
       }
 
       // --- NEXT KEYS ---
 
-      if ((!this.nextKeys.isEmpty() && (this.nextKeys != null))
-          || (!this.nextKeys.isEmpty() && !this.nextKeyDigests.isEmpty())
-          || (!this.nextKeyDigests.isEmpty() && (this.nextKeys != null))) {
-        throw new RuntimeException("Only provide one of nextKeys, nextKeyDigests, or a nextKeys.");
+      if ((!this.listOfNextKeys.isEmpty() && (this.nextKeyConfigurationDigest != null))
+          || (!this.listOfNextKeys.isEmpty() && !this.listOfNextKeyDigests.isEmpty())
+          || (!this.listOfNextKeyDigests.isEmpty() && (this.nextKeyConfigurationDigest != null))) {
+        throw new IllegalArgumentException("Only provide one of nextKeys, nextKeyDigests, or a nextKeys.");
       }
 
-      if (!this.nextKeyDigests.isEmpty()) {
-
-        if (this.nextSigningThreshold == 0) {
-          this.nextSigningThreshold = (this.nextKeyDigests.size() / 2) + 1;
+      if (this.nextKeyConfigurationDigest == null) {
+        // if we don't have it, we use default of majority nextSigningThreshold
+        if (this.nextSigningThreshold == null) {
+          this.nextSigningThreshold = SigningThresholds.unweighted((this.keys.size() / 2) + 1);
+        } else if (this.nextSigningThreshold instanceof SigningThreshold.Unweighted) {
+          var unw = (SigningThreshold.Unweighted) this.nextSigningThreshold;
+          if (unw.threshold() > this.keys.size()) {
+            throw new IllegalArgumentException(
+                "Invalid unweighted signing threshold:"
+                    + " keys: " + this.keys.size()
+                    + " threshold: " + unw.threshold());
+          }
+        } else if (this.nextSigningThreshold instanceof SigningThreshold.Weighted) {
+          var w = (SigningThreshold.Weighted) this.nextSigningThreshold;
+          var countOfWeights = Stream.of(w.weights())
+              .mapToLong(wts -> wts.length)
+              .sum();
+          if (countOfWeights != this.keys.size()) {
+            throw new IllegalArgumentException(
+                "Count of weights and count of keys are not equal: "
+                    + " keys: " + this.keys.size()
+                    + " weights: " + countOfWeights);
+          }
+        } else {
+          throw new IllegalArgumentException("Unknown SigningThreshold type: " + this.nextSigningThreshold.getClass());
         }
 
-        if ((this.nextSigningThreshold < 1) || (this.nextSigningThreshold > this.nextKeyDigests.size())) {
-          throw new RuntimeException(
-              "Invalid next signing threshold:"
-                  + " keys: " + this.nextKeys.size()
-                  + " threshold: " + this.nextSigningThreshold);
+        if (this.listOfNextKeyDigests.isEmpty()) {
+          if (this.listOfNextKeys.isEmpty()) {
+            throw new IllegalArgumentException("None of nextKeys, digestOfNextKeys, or nextKeyConfigurationDigest provided");
+          }
+
+          this.nextKeyConfigurationDigest = KeyConfigurationDigester.digest(this.nextSigningThreshold, this.listOfNextKeys, this.nextKeysAlgorithm);
+        } else {
+          this.nextKeyConfigurationDigest = KeyConfigurationDigester.digest(this.nextSigningThreshold, this.listOfNextKeyDigests);
         }
-
-        this.nextKeysDigest = KeyConfigurationDigester.digest(this.nextSigningThreshold, this.nextKeyDigests);
-
-      } else if (!this.nextKeys.isEmpty()) {
-
-        if (this.nextSigningThreshold == 0) {
-          this.nextSigningThreshold = (this.nextKeys.size() / 2) + 1;
-        }
-
-        if ((this.nextSigningThreshold < 1) || (this.nextSigningThreshold > this.nextKeys.size())) {
-          throw new RuntimeException(
-              "Invalid next signing threshold:"
-                  + " keys: " + this.nextKeys.size()
-                  + " threshold: " + this.nextSigningThreshold);
-        }
-
-        this.nextKeysDigest = KeyConfigurationDigester.digest(this.nextSigningThreshold, this.nextKeys,
-            this.nextKeysAlgorithm);
-
       }
 
       // --- WITNESSES ---
@@ -334,7 +382,7 @@ public class RotationSpec {
           this.signingThreshold,
           this.keys,
           this.signer,
-          this.nextKeysDigest,
+          this.nextKeyConfigurationDigest,
           this.witnessThreshold,
           removed,
           added,
