@@ -113,7 +113,7 @@ public class QualifiedBase64Tests {
   @Test
   public void test__selfAddressingIdentifierPlaceholder() {
     for (var a : StandardDigestAlgorithms.values()) {
-      var placeholder = QualifiedBase64.selfAddressingIdentifierPlaceholder(a);
+      var placeholder = selfAddressingIdentifierPlaceholder(a);
       assertEquals(
           a.name() + " placeholder length",
           qb64Length(a.digestLength()),
@@ -125,7 +125,7 @@ public class QualifiedBase64Tests {
   @Test
   public void test__selfSigningIdentifierPlaceholder() {
     for (var a : StandardSignatureAlgorithms.values()) {
-      var placeholder = QualifiedBase64.selfSigningIdentifierPlaceholder(a);
+      var placeholder = selfSigningIdentifierPlaceholder(a);
       assertEquals(
           a.name() + " placeholder length",
           qb64Length(a.signatureLength()),

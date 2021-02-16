@@ -61,7 +61,7 @@ public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmen
 
   @Override
   public byte[] inceptionStatement() {
-    return this.inceptionStatement;
+    return this.inceptionStatement.clone();
   }
 
   @Override

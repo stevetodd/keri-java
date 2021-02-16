@@ -4,13 +4,11 @@ import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
-import foundation.identity.keri.crypto.SignatureOperations;
 import foundation.identity.keri.internal.crypto.ImmutableDigest;
 import foundation.identity.keri.internal.identifier.ImmutableBasicIdentifier;
 import foundation.identity.keri.internal.identifier.ImmutableSelfAddressingIdentifier;
@@ -134,7 +132,7 @@ public final class QualifiedBase64 {
   }
 
   public static String digestCode(DigestAlgorithm algorithm) {
-    var stdAlg = StandardDigestAlgorithms.valueOf(algorithm);
+    var stdAlg = valueOf(algorithm);
     return switch (stdAlg) {
       case BLAKE2B_256 -> "F";
       case BLAKE2B_512 -> "0F";
@@ -193,7 +191,7 @@ public final class QualifiedBase64 {
 
   public static String qb64(PublicKey publicKey) {
     var stdAlgo = StandardSignatureAlgorithms.lookup(publicKey);
-    var sigOps = SignatureOperations.lookup(publicKey);
+    var sigOps = lookup(publicKey);
     return publicKeyCode(stdAlgo) + base64(sigOps.encode(publicKey));
   }
 
@@ -343,7 +341,7 @@ public final class QualifiedBase64 {
 
   public static String qb64(BasicIdentifier identifier) {
     var stdAlgo = StandardSignatureAlgorithms.lookup(identifier.publicKey());
-    var sigOps = SignatureOperations.lookup(identifier.publicKey());
+    var sigOps = lookup(identifier.publicKey());
     return nonTransferrableIdentifierCode(stdAlgo) + base64(sigOps.encode(identifier.publicKey()));
   }
 

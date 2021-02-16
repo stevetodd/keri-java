@@ -41,7 +41,7 @@ public class KeriEventEncoder extends MessageToByteEncoder<Event> {
     out.writeCharSequence(base64(signatures.size(), 2), UTF_8);
 
     signatures.stream()
-        .sorted(comparingInt(s -> s.keyIndex()))
+        .sorted(comparingInt(AttachedEventSignature::keyIndex))
         .forEachOrdered(s -> writeSignature(out, s));
   }
 

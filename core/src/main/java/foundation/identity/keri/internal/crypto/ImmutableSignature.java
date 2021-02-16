@@ -22,7 +22,7 @@ public class ImmutableSignature implements Signature {
 
   @Override
   public byte[] bytes() {
-    return this.bytes;
+    return this.bytes.clone();
   }
 
   @Override

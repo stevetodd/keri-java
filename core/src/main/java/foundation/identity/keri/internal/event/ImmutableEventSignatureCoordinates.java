@@ -32,7 +32,7 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
     this.identifier = requireNonNull(identifier, "identifier");
     this.sequenceNumber = requireNonNull(sequenceNumber, "sequenceNumber");
     this.digest = requireNonNull(digest, "digest");
-    this.keyIndex = requireNonNull(keyIndex, "keyIndex");
+    this.keyIndex = keyIndex;
   }
 
   public static ImmutableEventSignatureCoordinates of(IdentifierEventCoordinatesWithDigest event,

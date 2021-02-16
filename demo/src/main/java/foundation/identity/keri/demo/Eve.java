@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 
 public class Eve {
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     // enables secp256k1 -- TODO need to switch to bouncycastle for jdk16
     System.setProperty("jdk.sunec.disableNative", "false");
 

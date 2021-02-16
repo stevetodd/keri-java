@@ -26,7 +26,7 @@ public class ImmutableDigest implements Digest {
 
   @Override
   public byte[] bytes() {
-    return this.bytes;
+    return this.bytes.clone();
   }
 
   @Override

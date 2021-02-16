@@ -14,14 +14,14 @@ public class HexTests {
   public void testHex() {
     var bytes = new byte[]{0x01, 0x09, 0x0a, 0x0f, 0x10, (byte) 0xf0, (byte) 0xff};
 
-    var hex = Hex.hex(bytes);
+    var hex = hex(bytes);
 
     assertEquals("01090a0f10f0ff", hex);
   }
 
   @Test
   public void testUnhex() {
-    var bytes = Hex.unhex("01090a0f10f0ff");
+    var bytes = unhex("01090a0f10f0ff");
 
     var expected = new byte[]{0x01, 0x09, 0x0a, 0x0f, 0x10, (byte) 0xf0, (byte) 0xff};
     assertArrayEquals(expected, bytes);
@@ -31,7 +31,7 @@ public class HexTests {
   public void testHexBigInteger() {
     var i = new BigInteger("75043633293596258117532452589460127027942070164795662430288688224914942555303");
 
-    var result = Hex.hex(i);
+    var result = hex(i);
 
     var expected = "a5e930f5d34c7e4d510dc158b2db4f062549d061dc5188714c980031fbf974a7";
     assertEquals(expected, result);
@@ -39,7 +39,7 @@ public class HexTests {
 
   @Test
   public void testUnhexBigInteger() {
-    var i = Hex.unhexBigInteger("00a5e930f5d34c7e4d510dc158b2db4f062549d061dc5188714c980031fbf974a7");
+    var i = unhexBigInteger("00a5e930f5d34c7e4d510dc158b2db4f062549d061dc5188714c980031fbf974a7");
 
     var expected = new BigInteger("75043633293596258117532452589460127027942070164795662430288688224914942555303");
 

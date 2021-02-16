@@ -24,7 +24,7 @@ public class Blake3Operations implements DigestOperations {
   public Digest digest(byte[] bytes) {
     var digester = Blake3.newInstance();
     digester.update(bytes);
-    return new ImmutableDigest(algorithm, digester.digest(length));
+    return new ImmutableDigest(this.algorithm, digester.digest(this.length));
   }
 
 }

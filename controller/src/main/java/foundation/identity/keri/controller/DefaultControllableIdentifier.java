@@ -28,52 +28,52 @@ public class DefaultControllableIdentifier implements ControllableIdentifier {
 
   @Override
   public Identifier identifier() {
-    return state.identifier();
+    return this.state.identifier();
   }
 
   @Override
   public SigningThreshold signingThreshold() {
-    return state.signingThreshold();
+    return this.state.signingThreshold();
   }
 
   @Override
   public List<PublicKey> keys() {
-    return state.keys();
+    return this.state.keys();
   }
 
   @Override
   public Optional<KeyConfigurationDigest> nextKeyConfigurationDigest() {
-    return state.nextKeyConfigurationDigest();
+    return this.state.nextKeyConfigurationDigest();
   }
 
   @Override
   public int witnessThreshold() {
-    return state.witnessThreshold();
+    return this.state.witnessThreshold();
   }
 
   @Override
   public List<BasicIdentifier> witnesses() {
-    return state.witnesses();
+    return this.state.witnesses();
   }
 
   @Override
   public Set<ConfigurationTrait> configurationTraits() {
-    return state.configurationTraits();
+    return this.state.configurationTraits();
   }
 
   @Override
   public IdentifierEvent lastEvent() {
-    return state.lastEvent();
+    return this.state.lastEvent();
   }
 
   @Override
   public EstablishmentEvent lastEstablishmentEvent() {
-    return state.lastEstablishmentEvent();
+    return this.state.lastEstablishmentEvent();
   }
 
   @Override
   public Optional<Identifier> delegatingIdentifier() {
-    return state.delegatingIdentifier();
+    return this.state.delegatingIdentifier();
   }
 
   @Override

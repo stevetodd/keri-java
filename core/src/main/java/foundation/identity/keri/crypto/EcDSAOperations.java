@@ -46,7 +46,7 @@ public class EcDSAOperations implements SignatureOperations {
       this.parameterSpec = ap.getParameterSpec(ECParameterSpec.class);
 
       this.keyPairGenerator = KeyPairGenerator.getInstance(ECDSA_ALGORITHM_NAME);
-      this.keyPairGenerator.initialize(parameterSpec);
+      this.keyPairGenerator.initialize(this.parameterSpec);
       this.keyFactory = KeyFactory.getInstance(ECDSA_ALGORITHM_NAME);
     } catch (NoSuchAlgorithmException | InvalidParameterSpecException | InvalidAlgorithmParameterException e) {
       throw new RuntimeException(e);
@@ -88,7 +88,7 @@ public class EcDSAOperations implements SignatureOperations {
       var ecPoint = ECPointUtil.decodePoint(this.parameterSpec.getCurve(), bytes);
       var spec = new ECPublicKeySpec(ecPoint, this.parameterSpec);
 
-      return keyFactory.generatePublic(spec);
+      return this.keyFactory.generatePublic(spec);
     } catch (GeneralSecurityException e) {
       // TODO handle better
       throw new RuntimeException(e);
@@ -100,7 +100,7 @@ public class EcDSAOperations implements SignatureOperations {
     try {
       var spec = new ECPrivateKeySpec(new BigInteger(1, bytes), this.parameterSpec);
 
-      return keyFactory.generatePrivate(spec);
+      return this.keyFactory.generatePrivate(spec);
     } catch (InvalidKeySpecException e) {
       throw new RuntimeException(e);
     }
@@ -114,7 +114,7 @@ public class EcDSAOperations implements SignatureOperations {
   @Override
   public Signature sign(byte[] message, PrivateKey privateKey) {
     try {
-      EcDSAParameters parameters = (EcDSAParameters) this.signatureAlgorithm.parameters();
+      var parameters = (EcDSAParameters) this.signatureAlgorithm.parameters();
       var sig = java.security.Signature.getInstance(signatureInstanceName(parameters));
       sig.initSign(privateKey);
       sig.update(message);
@@ -130,7 +130,7 @@ public class EcDSAOperations implements SignatureOperations {
   @Override
   public boolean verify(byte[] message, Signature signature, PublicKey publicKey) {
     try {
-      EcDSAParameters parameters = (EcDSAParameters) this.signatureAlgorithm.parameters();
+      var parameters = (EcDSAParameters) this.signatureAlgorithm.parameters();
       var sig = java.security.Signature.getInstance(signatureInstanceName(parameters));
       sig.initVerify(publicKey);
       sig.update(message);

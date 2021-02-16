@@ -37,7 +37,7 @@ public final class Hex {
     var hex = new char[2 * bytes.length];
 
     for (int i = 0, bytesLength = bytes.length; i < bytesLength; i++) {
-      byte b = bytes[i];
+      var b = bytes[i];
       hex[i * 2] = HEX[(b & 0xff) >>> 4];
       hex[i * 2 + 1] = HEX[b & 0x0f];
     }

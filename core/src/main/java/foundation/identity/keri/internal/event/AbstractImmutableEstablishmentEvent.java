@@ -23,7 +23,7 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
 
   final List<PublicKey> keys;
 
-  final Optional<KeyConfigurationDigest> nextKeys;
+  final KeyConfigurationDigest nextKeys;
 
   final int witnessThreshold;
 
@@ -43,7 +43,7 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
 
     this.signingThreshold = signingThreshold;
     this.keys = List.copyOf(requireNonNull(keys, "keys"));
-    this.nextKeys = Optional.ofNullable(nextKeys);
+    this.nextKeys = nextKeys;
     this.witnessThreshold = witnessThreshold;
   }
 
@@ -59,7 +59,7 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
 
   @Override
   public Optional<KeyConfigurationDigest> nextKeyConfiguration() {
-    return this.nextKeys;
+    return Optional.ofNullable(this.nextKeys);
   }
 
   @Override

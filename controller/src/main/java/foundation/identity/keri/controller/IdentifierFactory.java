@@ -17,7 +17,7 @@ import java.security.PublicKey;
 public class IdentifierFactory {
 
   public static Identifier identifier(IdentifierSpec spec, byte[] inceptionStatement) {
-    Class<? extends Identifier> derivation = spec.derivation();
+    var derivation = spec.derivation();
     if (derivation.isAssignableFrom(BasicIdentifier.class)) {
       return basic(spec.keys().get(0));
     } else if (derivation.isAssignableFrom(SelfAddressingIdentifier.class)) {

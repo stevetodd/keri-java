@@ -5,7 +5,6 @@ import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.identifier.Identifier;
 
-import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import static foundation.identity.keri.QualifiedBase64.qb64;

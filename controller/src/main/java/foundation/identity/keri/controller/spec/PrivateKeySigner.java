@@ -25,7 +25,7 @@ public class PrivateKeySigner implements Signer {
 
   @Override
   public int keyIndex() {
-    return keyIndex;
+    return this.keyIndex;
   }
 
   @Override

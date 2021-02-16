@@ -65,7 +65,7 @@ public class ImmutableDelegatedInceptionEvent extends AbstractImmutableDelegated
 
   @Override
   public byte[] inceptionStatement() {
-    return this.inceptionStatement;
+    return this.inceptionStatement.clone();
   }
 
   @Override

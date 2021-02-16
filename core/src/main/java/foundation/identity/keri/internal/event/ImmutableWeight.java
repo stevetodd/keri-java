@@ -43,7 +43,7 @@ public class ImmutableWeight implements Weight {
     }
     var that = (Weight) o;
     return this.numerator == that.numerator()
-        && Objects.equals(this.denominator, that.denominator().orElseGet(() -> null));
+        && Objects.equals(this.denominator, that.denominator().orElse(null));
   }
 
   @Override

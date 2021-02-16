@@ -44,7 +44,7 @@ public final class EventSerializer {
 
   private static final ObjectMapper JSON = new ObjectMapper();
   private static final ObjectMapper CBOR = new ObjectMapper(new CBORFactory());
-  private static final ObjectMapper MSGP = new ObjectMapper(new MessagePackFactory());
+  private static final ObjectMapper MESSAGE_PACK = new ObjectMapper(new MessagePackFactory());
 
   static String identifierPlaceholder(IdentifierSpec spec) {
     var derivation = spec.derivation();
@@ -82,7 +82,7 @@ public final class EventSerializer {
       case DELEGATED_INCEPTION -> "dip";
       case DELEGATED_ROTATION -> "drt";
       case RECEIPT -> "rct";
-      case RECEIPT_FROM_TRANSFERRABLE -> "vrc";
+      case RECEIPT_FROM_TRANSFERABLE -> "vrc";
     };
   }
 
@@ -164,7 +164,7 @@ public final class EventSerializer {
     return switch (stdFormat) {
       case CBOR -> CBOR;
       case JSON -> JSON;
-      case MESSAGE_PACK -> MSGP;
+      case MESSAGE_PACK -> MESSAGE_PACK;
     };
   }
 
@@ -292,7 +292,7 @@ public final class EventSerializer {
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(eventSignature.event().identifier()));
     rootNode.put(SEQUENCE_NUMBER.label(), hex(eventSignature.event().sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT_FROM_TRANSFERRABLE));
+    rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT_FROM_TRANSFERABLE));
     rootNode.put(EVENT_DIGEST.label(), qb64(eventSignature.event().digest()));
 
     var anchorNode = mapper.createObjectNode();

@@ -12,7 +12,7 @@ public enum EventType {
   DELEGATED_ROTATION,
 
   RECEIPT,
-  RECEIPT_FROM_TRANSFERRABLE;
+  RECEIPT_FROM_TRANSFERABLE;
 
   public static final Set<EventType> DELEGATED_EVENTS = Set.of(DELEGATED_INCEPTION, DELEGATED_ROTATION);
   public static final Set<EventType> ESTABLISHMENT_EVENTS = Set.of(

@@ -27,8 +27,8 @@ public enum EventFieldNames {
   public static final EnumSet<EventFieldNames> DELEGATED_INCEPTION_FIELDS;
   public static final EnumSet<EventFieldNames> DELEGATED_ROTATION_FIELDS;
 
-  public static final EnumSet<EventFieldNames> RECEIPT_NON_TRANSFERRABLE_IDENTIFIER;
-  public static final EnumSet<EventFieldNames> RECEIPT_TRANSFERRABLE_IDENTIFIER;
+  public static final EnumSet<EventFieldNames> RECEIPT_NON_TRANSFERABLE_IDENTIFIER;
+  public static final EnumSet<EventFieldNames> RECEIPT_TRANSFERABLE_IDENTIFIER;
 
   static {
     var headerFields = EnumSet.of(VERSION, IDENTIFIER, SEQUENCE_NUMBER, EVENT_TYPE);
@@ -39,8 +39,8 @@ public enum EventFieldNames {
     INTERACTION_FIELDS = withFields(headerFields, ANCHORS);
     DELEGATED_INCEPTION_FIELDS = withFields(INCEPTION_FIELDS, DELEGATOR_ANCHOR);
     DELEGATED_ROTATION_FIELDS = withFields(ROTATION_FIELDS, DELEGATOR_ANCHOR);
-    RECEIPT_NON_TRANSFERRABLE_IDENTIFIER = withFields(headerFields, EVENT_DIGEST);
-    RECEIPT_TRANSFERRABLE_IDENTIFIER = withFields(headerFields, EVENT_DIGEST, ANCHORS);
+    RECEIPT_NON_TRANSFERABLE_IDENTIFIER = withFields(headerFields, EVENT_DIGEST);
+    RECEIPT_TRANSFERABLE_IDENTIFIER = withFields(headerFields, EVENT_DIGEST, ANCHORS);
   }
 
   private final String label;
@@ -49,9 +49,9 @@ public enum EventFieldNames {
     this.label = label;
   }
 
-  private static EnumSet<EventFieldNames> withFields(EnumSet<EventFieldNames> base, EventFieldNames... additonal) {
+  private static EnumSet<EventFieldNames> withFields(EnumSet<EventFieldNames> base, EventFieldNames... additional) {
     var fields = EnumSet.copyOf(base);
-    fields.addAll(Arrays.asList(additonal));
+    fields.addAll(Arrays.asList(additional));
     return fields;
   }
 

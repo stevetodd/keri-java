@@ -26,12 +26,12 @@ final class KeriClientConnect extends KeriClient {
 
 	@Override
 	public KeriClientConfig configuration() {
-		return config;
+		return this.config;
 	}
 
 	@Override
 	protected KeriClient duplicate() {
-		return new KeriClientConnect(new KeriClientConfig(config));
+		return new KeriClientConnect(new KeriClientConfig(this.config));
 	}
 
 }

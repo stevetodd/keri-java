@@ -29,7 +29,7 @@ public class ImmutableBasicIdentifier implements BasicIdentifier {
 
   @Override
   public String toString() {
-    return "ImmutableBasicPrefix [publicKey=" + publicKey + "]";
+    return "ImmutableBasicPrefix [publicKey=" + this.publicKey + "]";
   }
 
 }

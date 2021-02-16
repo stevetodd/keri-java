@@ -23,7 +23,7 @@ public interface IdentifierState {
 
   Optional<KeyConfigurationDigest> nextKeyConfigurationDigest();
 
-  default boolean transferrable() {
+  default boolean transferable() {
     return identifier().transferable()
         && nextKeyConfigurationDigest().isPresent();
   }

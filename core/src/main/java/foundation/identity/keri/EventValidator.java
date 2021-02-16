@@ -2,6 +2,7 @@ package foundation.identity.keri;
 
 import foundation.identity.keri.api.IdentifierState;
 import foundation.identity.keri.api.crypto.Digest;
+import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
@@ -75,7 +76,7 @@ public final class EventValidator {
         var ee = (EstablishmentEvent) event;
 
         require(ee.identifier().transferable() || (ee.nextKeyConfiguration().isEmpty()),
-            "non-transferrable prefix must not have a next key configuration");
+            "non-transferable prefix must not have a next key configuration");
 
         require(!ee.keys().isEmpty(),
             "establishment events must have at least one key");
@@ -129,8 +130,8 @@ public final class EventValidator {
         } else if (event instanceof RotationEvent) {
           var re = (RotationEvent) event;
 
-          requireNonNull(state.transferrable(),
-              "rotation only permitted when in transferrable state");
+          requireNonNull(state.transferable(),
+              "rotation only permitted when in transferable state");
 
           require(!state.delegated() || (event instanceof DelegatedRotationEvent),
               "delegated identifiers must use delegated rotation event type");
@@ -251,7 +252,7 @@ public final class EventValidator {
   }
 
   private void requireSignatureThresholdMet(EstablishmentEvent lastEstablishmentEvent, IdentifierEvent event) {
-    SigningThreshold signingThreshold = lastEstablishmentEvent.signingThreshold();
+    var signingThreshold = lastEstablishmentEvent.signingThreshold();
     if (signingThreshold instanceof SigningThreshold.Unweighted) {
       var uw = (SigningThreshold.Unweighted) signingThreshold;
       require(event.signatures().size() >= uw.threshold(),
@@ -261,7 +262,7 @@ public final class EventValidator {
     } else if (signingThreshold instanceof SigningThreshold.Weighted) {
       var w = (SigningThreshold.Weighted) signingThreshold;
       var indexes = event.signatures().stream()
-          .map(es -> es.keyIndex())
+          .map(AttachedEventSignature::keyIndex)
           .sorted()
           .collect(toList());
 

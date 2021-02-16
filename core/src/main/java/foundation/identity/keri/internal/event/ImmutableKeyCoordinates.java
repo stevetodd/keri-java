@@ -1,16 +1,12 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyCoordinates;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
-import foundation.identity.keri.api.identifier.Identifier;
 
-import java.math.BigInteger;
 import java.util.Objects;
 
-import static foundation.identity.keri.QualifiedBase64.qb64;
 import static java.util.Objects.requireNonNull;
 
 public class ImmutableKeyCoordinates implements KeyCoordinates {

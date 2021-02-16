@@ -28,11 +28,11 @@ final class KeriServerBind extends KeriServer {
 
 	@Override
 	public KeriServerConfig configuration() {
-		return config;
+		return this.config;
 	}
 
 	@Override
 	protected KeriServer duplicate() {
-		return new KeriServerBind(new KeriServerConfig(config));
+		return new KeriServerBind(new KeriServerConfig(this.config));
 	}
 }

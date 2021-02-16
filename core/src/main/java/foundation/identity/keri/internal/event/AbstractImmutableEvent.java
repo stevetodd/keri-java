@@ -37,7 +37,7 @@ public abstract class AbstractImmutableEvent implements Event {
 
   @Override
   public byte[] bytes() {
-    return this.bytes;
+    return this.bytes.clone();
   }
 
   @Override

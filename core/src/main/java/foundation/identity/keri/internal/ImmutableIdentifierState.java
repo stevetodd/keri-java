@@ -19,13 +19,13 @@ public class ImmutableIdentifierState implements IdentifierState {
   private final Identifier identifier;
   private final SigningThreshold signingThreshold;
   private final List<PublicKey> keys;
-  private final Optional<KeyConfigurationDigest> nextKeyConfigurationDigest;
+  private final KeyConfigurationDigest nextKeyConfigurationDigest;
   private final int witnessThreshold;
   private final List<BasicIdentifier> witnesses;
   private final Set<ConfigurationTrait> configurationTraits;
   private final IdentifierEvent lastEvent;
   private final EstablishmentEvent lastEstablishmentEvent;
-  private final Optional<Identifier> delegatingIdentifier;
+  private final Identifier delegatingIdentifier;
 
   public ImmutableIdentifierState(
       Identifier identifier,
@@ -41,13 +41,13 @@ public class ImmutableIdentifierState implements IdentifierState {
     this.identifier = identifier;
     this.signingThreshold = signingThreshold;
     this.keys = List.copyOf(keys);
-    this.nextKeyConfigurationDigest = Optional.ofNullable(nextKeyConfigurationDigest);
+    this.nextKeyConfigurationDigest = nextKeyConfigurationDigest;
     this.witnessThreshold = witnessThreshold;
     this.witnesses = List.copyOf(witnesses);
     this.configurationTraits = Set.copyOf(configurationTraits);
     this.lastEvent = lastEvent;
     this.lastEstablishmentEvent = lastEstablishmentEvent;
-    this.delegatingIdentifier = Optional.ofNullable(delegatingIdentifier);
+    this.delegatingIdentifier = delegatingIdentifier;
   }
 
   @Override
@@ -67,7 +67,7 @@ public class ImmutableIdentifierState implements IdentifierState {
 
   @Override
   public Optional<KeyConfigurationDigest> nextKeyConfigurationDigest() {
-    return this.nextKeyConfigurationDigest;
+    return Optional.ofNullable(this.nextKeyConfigurationDigest);
   }
 
   @Override
@@ -97,7 +97,7 @@ public class ImmutableIdentifierState implements IdentifierState {
 
   @Override
   public Optional<Identifier> delegatingIdentifier() {
-    return this.delegatingIdentifier;
+    return Optional.ofNullable(this.delegatingIdentifier);
   }
 
 }

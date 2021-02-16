@@ -3,7 +3,6 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.EventSignatureCoordinates;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.KeyCoordinates;
 
@@ -68,7 +67,7 @@ public class ImmutableEventSignature implements EventSignature {
 
   @Override
   public int hashCode() {
-    return Objects.hash(event, key, signature);
+    return Objects.hash(this.event, this.key, this.signature);
   }
 
   @Override

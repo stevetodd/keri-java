@@ -34,7 +34,7 @@ public class InteractionSpec {
     this.sequenceNumber = sequenceNumber;
     this.previous = previous;
     this.signer = signer;
-    this.seals = seals;
+    this.seals = List.copyOf(seals);
   }
 
   public static Builder builder(IdentifierState state) {

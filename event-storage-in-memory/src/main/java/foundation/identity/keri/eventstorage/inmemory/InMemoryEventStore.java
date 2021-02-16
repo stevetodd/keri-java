@@ -3,8 +3,6 @@ package foundation.identity.keri.eventstorage.inmemory;
 import foundation.identity.keri.EventStore;
 import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.ShortQualifiedBase64;
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
@@ -14,27 +12,19 @@ import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
-import foundation.identity.keri.api.event.ReceiptEvent;
-import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.api.identifier.Identifier;
-import foundation.identity.keri.crypto.DigestOperations;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static foundation.identity.keri.ShortQualifiedBase64.shortQb64;
-import static foundation.identity.keri.crypto.DigestOperations.BLAKE3_256;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.Map.Entry.comparingByKey;
@@ -61,7 +51,7 @@ public class InMemoryEventStore implements EventStore {
 
   @Override
   public Stream<IdentifierEvent> find(Identifier identifier) {
-    return events.stream()
+    return this.events.stream()
         .filter(e -> e.identifier().equals(identifier))
         .sorted(eventsBySequenceNumber);
   }

@@ -64,7 +64,7 @@ public class EventDeserializer {
 
   private final static ObjectMapper JSON = new ObjectMapper();
   private final static ObjectMapper CBOR = new ObjectMapper(new CBORFactory());
-  private final static ObjectMapper MSGP = new ObjectMapper(new MessagePackFactory());
+  private final static ObjectMapper MESSAGE_PACK = new ObjectMapper(new MessagePackFactory());
 
   public Event deserialize(byte[] bytes, Map<Integer, Signature> signatures) {
     try {
@@ -93,7 +93,7 @@ public class EventDeserializer {
     return switch (stdFormat) {
       case CBOR -> CBOR;
       case JSON -> JSON;
-      case MESSAGE_PACK -> MSGP;
+      case MESSAGE_PACK -> MESSAGE_PACK;
     };
   }
 

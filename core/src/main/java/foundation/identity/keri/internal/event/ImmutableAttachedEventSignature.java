@@ -57,15 +57,15 @@ public class ImmutableAttachedEventSignature implements AttachedEventSignature {
       return false;
     }
 
-    AttachedEventSignature that = (AttachedEventSignature) o;
-    return keyIndex == that.keyIndex()
-        && Objects.equals(event, that.event())
-        && Objects.equals(signature, that.signature());
+    var that = (AttachedEventSignature) o;
+    return this.keyIndex == that.keyIndex()
+           && Objects.equals(this.event, that.event())
+           && Objects.equals(this.signature, that.signature());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(event, keyIndex, signature);
+    return Objects.hash(this.event, this.keyIndex, this.signature);
   }
 
   @Override

@@ -6,7 +6,7 @@ public interface ReceiptFromTransferableIdentifierEvent extends Event {
 
   @Override
   default EventType type() {
-    return EventType.RECEIPT_FROM_TRANSFERRABLE;
+    return EventType.RECEIPT_FROM_TRANSFERABLE;
   }
 
   IdentifierEventCoordinatesWithDigest event();

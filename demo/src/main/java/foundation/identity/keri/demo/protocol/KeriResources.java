@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 public class KeriResources extends TcpResources {
 
   public static void disposeLoopsAndConnections() {
-    KeriResources resources = keriResources.getAndSet(null);
+    var resources = keriResources.getAndSet(null);
     if (resources != null) {
       resources._dispose();
     }
@@ -29,7 +29,7 @@ public class KeriResources extends TcpResources {
     requireNonNull(quietPeriod, "quietPeriod");
     requireNonNull(timeout, "timeout");
     return Mono.defer(() -> {
-      KeriResources resources = keriResources.getAndSet(null);
+      var resources = keriResources.getAndSet(null);
       if (resources != null) {
         return resources._disposeLater(quietPeriod, timeout);
       }

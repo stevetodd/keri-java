@@ -45,7 +45,7 @@ public class EdDSAOperations implements SignatureOperations {
       };
 
       this.keyPairGenerator = KeyPairGenerator.getInstance(EDDSA_ALGORITHM_NAME);
-      this.keyPairGenerator.initialize(parameterSpec);
+      this.keyPairGenerator.initialize(this.parameterSpec);
       this.keyFactory = KeyFactory.getInstance(EDDSA_ALGORITHM_NAME);
     } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
       throw new RuntimeException(e);
@@ -109,13 +109,13 @@ public class EdDSAOperations implements SignatureOperations {
   }
 
   private int keyLength() {
-    if (parameterSpec.getName().equals("Ed25519")) {
+    if (this.parameterSpec.getName().equals("Ed25519")) {
       return StandardSignatureAlgorithms.ED_25519.publicKeyLength();
-    } else if (parameterSpec.getName().equals("Ed448")) {
+    } else if (this.parameterSpec.getName().equals("Ed448")) {
       return StandardSignatureAlgorithms.ED_448.publicKeyLength();
     } else {
       // TODO handle better
-      throw new RuntimeException("Unknown Edwards curve: " + parameterSpec.getName());
+      throw new RuntimeException("Unknown Edwards curve: " + this.parameterSpec.getName());
     }
   }
 
@@ -129,7 +129,7 @@ public class EdDSAOperations implements SignatureOperations {
 
       var point = decodeEdPoint(bytes);
 
-      return this.keyFactory.generatePublic(new EdECPublicKeySpec(parameterSpec, point));
+      return this.keyFactory.generatePublic(new EdECPublicKeySpec(this.parameterSpec, point));
     } catch (GeneralSecurityException e) {
       // TODO handle better
       throw new RuntimeException(e);
@@ -140,7 +140,7 @@ public class EdDSAOperations implements SignatureOperations {
   public PrivateKey privateKey(byte[] bytes) {
     try {
 
-      return this.keyFactory.generatePrivate(new EdECPrivateKeySpec(parameterSpec, bytes));
+      return this.keyFactory.generatePrivate(new EdECPrivateKeySpec(this.parameterSpec, bytes));
     } catch (GeneralSecurityException e) {
       // TODO handle better
       throw new RuntimeException(e);
