@@ -4,7 +4,7 @@ import foundation.identity.keri.api.seal.Seal;
 
 import java.util.List;
 
-public interface InteractionEvent extends IdentifierEvent {
+public interface InteractionEvent extends IdentifierEvent, SealingEvent {
 
   List<Seal> seals();
 

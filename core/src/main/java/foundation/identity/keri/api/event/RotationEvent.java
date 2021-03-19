@@ -5,7 +5,7 @@ import foundation.identity.keri.api.seal.Seal;
 
 import java.util.List;
 
-public interface RotationEvent extends EstablishmentEvent {
+public interface RotationEvent extends EstablishmentEvent, SealingEvent {
 
   List<BasicIdentifier> removedWitnesses();
 
