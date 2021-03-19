@@ -7,7 +7,7 @@ import foundation.identity.keri.EventValidator;
 import foundation.identity.keri.api.IdentifierState;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.IdentifierEvent;
-import foundation.identity.keri.api.event.ReceiptEvent;
+import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.controller.ControllableIdentifier;
@@ -114,8 +114,8 @@ public class DirectModeNode {
         vrc.signatures().stream()
             .map(as -> ImmutableEventSignature.from(as, vrc.keyEstablishmentEvent()))
             .forEach(this.eventStore::store);
-      } else if (event instanceof ReceiptEvent) {
-        var rct = (ReceiptEvent) event;
+      } else if (event instanceof ReceiptFromBasicIdentifierEvent) {
+        var rct = (ReceiptFromBasicIdentifierEvent) event;
         //TODO this.eventValidator.validate(event);
         rct.receipts().forEach(this.eventStore::store);
       }

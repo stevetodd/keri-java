@@ -17,7 +17,7 @@ import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
-import foundation.identity.keri.api.event.ReceiptEvent;
+import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.api.event.SigningThreshold;
@@ -35,7 +35,7 @@ import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
 import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
 import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
-import foundation.identity.keri.internal.event.ImmutableReceiptEvent;
+import foundation.identity.keri.internal.event.ImmutableReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.internal.event.ImmutableReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
 import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
@@ -377,7 +377,7 @@ public class EventDeserializer {
         attachedSignatures);
   }
 
-    ReceiptEvent receipt(
+    ReceiptFromBasicIdentifierEvent receipt(
       byte[] bytes, JsonNode rootNode, Map<BasicIdentifier, Signature> signatures) {
     var versionString = rootNode.get(VERSION.label()).textValue();
     var version = version(versionString.substring(4, 6));
@@ -395,7 +395,7 @@ public class EventDeserializer {
         })
         .collect(toSet());
 
-    return new ImmutableReceiptEvent(
+    return new ImmutableReceiptFromBasicIdentifierEvent(
         bytes,
         version,
         format,

@@ -7,7 +7,7 @@ import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
-import foundation.identity.keri.api.event.ReceiptEvent;
+import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 
@@ -64,8 +64,8 @@ public final class EventUtils {
 
     }
 
-    if (e instanceof ReceiptEvent) {
-      var r = (ReceiptEvent) e;
+    if (e instanceof ReceiptFromBasicIdentifierEvent) {
+      var r = (ReceiptFromBasicIdentifierEvent) e;
       var re = r.receipts().iterator().next();
 
       System.out.println("i: " + re.event().identifier());

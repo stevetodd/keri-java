@@ -4,7 +4,7 @@ import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
-import foundation.identity.keri.api.event.ReceiptEvent;
+import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
@@ -17,7 +17,7 @@ import foundation.identity.keri.internal.event.ImmutableAttachedEventSignature;
 import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
-import foundation.identity.keri.internal.event.ImmutableReceiptEvent;
+import foundation.identity.keri.internal.event.ImmutableReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.internal.event.ImmutableReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
 
@@ -111,10 +111,10 @@ public final class EventFactory {
         signatures);
   }
 
-  public ReceiptEvent receipt(ReceiptSpec spec) {
+  public ReceiptFromBasicIdentifierEvent receipt(ReceiptSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
 
-    return new ImmutableReceiptEvent(
+    return new ImmutableReceiptFromBasicIdentifierEvent(
         bytes,
         Version.CURRENT,
         spec.format(),
