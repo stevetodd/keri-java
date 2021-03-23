@@ -19,6 +19,10 @@ import static java.util.stream.Collectors.toList;
 
 public class KeyConfigurationDigester {
 
+  public static boolean matches(SigningThreshold signingThreshold, List<PublicKey> nextKeys, KeyConfigurationDigest in) {
+    return digest(signingThreshold, nextKeys, in.algorithm()).equals(in);
+  }
+
   public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<PublicKey> nextKeys, DigestAlgorithm algo) {
     var digOps = DigestOperations.lookup(algo);
 

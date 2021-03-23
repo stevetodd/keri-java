@@ -4,6 +4,8 @@ import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 
+import java.util.Arrays;
+
 public interface DigestOperations {
 
   DigestOperations BLAKE2B_256 = new JcaDigestOperations(StandardDigestAlgorithms.BLAKE2B_256);
@@ -34,5 +36,11 @@ public interface DigestOperations {
   }
 
   Digest digest(byte[] bytes);
+
+  static boolean matches(byte[] bytes, Digest d1) {
+    return Arrays.equals(
+        d1.bytes(),
+        lookup(d1.algorithm()).digest(bytes).bytes());
+  }
 
 }
