@@ -27,7 +27,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static foundation.identity.keri.QualifiedBase64.qb64;
-import static java.util.stream.Collectors.toList;
 
 public final class EventValidator {
 
@@ -262,9 +261,9 @@ public final class EventValidator {
     } else if (signingThreshold instanceof SigningThreshold.Weighted) {
       var w = (SigningThreshold.Weighted) signingThreshold;
       var indexes = event.signatures().stream()
-          .map(AttachedEventSignature::keyIndex)
+          .mapToInt(AttachedEventSignature::keyIndex)
           .sorted()
-          .collect(toList());
+          .toArray();
 
       require(SigningThresholds.thresholdMet(w, indexes),
           "signing threshold not met: (spec: %s, present: %s)",

@@ -8,8 +8,10 @@ import foundation.identity.keri.internal.event.ImmutableWeightedSigningThreshold
 import org.apache.commons.math3.fraction.Fraction;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 public class SigningThresholds {
 
@@ -90,22 +92,30 @@ public class SigningThresholds {
         .toArray(Weight[]::new);
   }
 
-  public static boolean thresholdMet(SigningThreshold.Unweighted threshold, List<Integer> indexes) {
-    return indexes.size() >= threshold.threshold();
+  public static boolean thresholdMet(SigningThreshold threshold, int[] indexes) {
+    if (threshold instanceof SigningThreshold.Unweighted) {
+      return thresholdMet((SigningThreshold.Unweighted) threshold, indexes);
+    } else if (threshold instanceof SigningThreshold.Weighted) {
+      return thresholdMet((SigningThreshold.Weighted) threshold, indexes);
+    } else {
+      throw new IllegalArgumentException("Unknown threshold type: " + threshold.getClass().getCanonicalName());
+    }
   }
 
-  public static boolean thresholdMet(SigningThreshold.Weighted threshold, List<Integer> indexes) {
-    if (indexes.isEmpty()) {
+  public static boolean thresholdMet(SigningThreshold.Unweighted threshold, int[] indexes) {
+    return indexes.length >= threshold.threshold();
+  }
+
+  public static boolean thresholdMet(SigningThreshold.Weighted threshold, int[] indexes) {
+    requireNonNull(indexes);
+    if (indexes.length == 0) {
       return false;
     }
 
-    var maxIndex = indexes.stream()
-        .mapToInt(Integer::intValue)
+    var maxIndex = IntStream.of(indexes)
         .max()
         .getAsInt();
-    var countWeights = (int) Stream.of(threshold.weights())
-        .mapToLong(w -> w.length)
-        .sum();
+    var countWeights = countWeights(threshold.weights());
 
     var sats = prefillSats(Integer.max(maxIndex + 1, countWeights));
     for (var i : indexes) {
@@ -117,7 +127,6 @@ public class SigningThresholds {
       var accumulator = Fraction.ZERO;
       for (var weight : clause) {
         if (sats[index]) {
-          //noinspection ObjectAllocationInLoop
           accumulator = accumulator.add(fraction(weight));
         }
         index++;
@@ -129,6 +138,12 @@ public class SigningThresholds {
     }
 
     return true;
+  }
+
+  public static int countWeights(Weight[][] weights) {
+    return Arrays.stream(weights)
+        .mapToInt(w -> w.length)
+        .sum();
   }
 
   private static boolean[] prefillSats(int count) {
