@@ -49,14 +49,9 @@ public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmen
         witnessThreshold,
         bytes,
         signatures);
-
-    requireNonNull(inceptionStatement);
-    requireNonNull(witnesses);
-    requireNonNull(configurationTraits);
-
-    this.inceptionStatement = inceptionStatement.clone();
-    this.witnesses = List.copyOf(witnesses);
-    this.configurationTraits = Set.copyOf(configurationTraits);
+    this.inceptionStatement = requireNonNull(inceptionStatement, "inceptionStatement").clone();
+    this.witnesses = List.copyOf(requireNonNull(witnesses, "witnesses"));
+    this.configurationTraits = Set.copyOf(requireNonNull(configurationTraits, "configurationTraits"));
   }
 
   @Override

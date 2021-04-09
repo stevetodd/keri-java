@@ -26,8 +26,8 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
       throw new IllegalArgumentException("sequenceNumber must be >= 0");
     }
 
-    this.identifier = requireNonNull(identifier);
-    this.sequenceNumber = requireNonNull(sequenceNumber);
+    this.identifier = requireNonNull(identifier, "identifier");
+    this.sequenceNumber = sequenceNumber;
 
     if ((!(identifier instanceof BasicIdentifier) || sequenceNumber != 0)
         && Digest.NONE.equals(digest)){
@@ -35,7 +35,8 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
       throw new IllegalArgumentException("digest is required");
     }
 
-    this.digest = requireNonNull(digest, "digest");  }
+    this.digest = requireNonNull(digest, "digest");
+  }
 
   public static ImmutableKeyEventCoordinates convert(KeyEventCoordinates coordinates) {
     requireNonNull(coordinates, "coordinates");

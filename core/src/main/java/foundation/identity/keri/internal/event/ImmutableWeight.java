@@ -17,10 +17,13 @@ public class ImmutableWeight implements Weight {
     this.denominator = denominator;
   }
 
-  public ImmutableWeight(Weight weight) {
+  public static ImmutableWeight of(Weight weight) {
+    if (weight instanceof ImmutableWeight) {
+      return (ImmutableWeight) weight;
+    }
+
     requireNonNull(weight, "weight");
-    this.numerator = weight.numerator();
-    this.denominator = weight.denominator().orElse(null);
+    return new ImmutableWeight(weight.numerator(), weight.denominator().orElse(null));
   }
 
   @Override

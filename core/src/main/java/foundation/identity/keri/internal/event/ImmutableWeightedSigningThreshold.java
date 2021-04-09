@@ -20,7 +20,7 @@ public class ImmutableWeightedSigningThreshold implements Weighted {
       groupsCopy[i] = new Weight[groups[i].length];
       for (var j = 0; j < groups[i].length; j++) {
         var weight = groups[i][j];
-        groupsCopy[i][j] = weight instanceof ImmutableWeight ? weight : new ImmutableWeight(weight);
+        groupsCopy[i][j] = ImmutableWeight.of(weight);
       }
     }
 
@@ -48,6 +48,6 @@ public class ImmutableWeightedSigningThreshold implements Weighted {
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(this.weights);
+    return Arrays.deepHashCode(this.weights);
   }
 }

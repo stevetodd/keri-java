@@ -19,7 +19,7 @@ public class ImmutableKeyCoordinates implements KeyCoordinates {
       throw new IllegalArgumentException("keyIndex must be >= 0");
     }
 
-    this.establishmentEvent = requireNonNull(establishmentEvent);
+    this.establishmentEvent = requireNonNull(establishmentEvent, "establishmentEvent");
     this.keyIndex = keyIndex;
   }
 

@@ -23,7 +23,7 @@ public class ImmutableReceiptFromBasicIdentifierEvent extends AbstractImmutableE
       Format format,
       Set<EventSignature> receipts) {
     super(bytes, version, format);
-    this.receipts = Set.copyOf(requireNonNull(receipts));
+    this.receipts = Set.copyOf(requireNonNull(receipts, "receipts"));
 
     var first = this.receipts.stream().findFirst();
     if (first.isPresent()) {

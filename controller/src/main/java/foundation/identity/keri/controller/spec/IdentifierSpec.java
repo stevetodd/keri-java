@@ -18,6 +18,7 @@ import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -171,18 +172,12 @@ public class IdentifierSpec {
     }
 
     public Builder format(Format format) {
-      requireNonNull(format);
-
-      this.format = format;
-
+      this.format = requireNonNull(format);
       return this;
     }
 
     public Builder key(PublicKey key) {
-      requireNonNull(key);
-
-      this.keys.add(key);
-
+      this.keys.add(requireNonNull(key));
       return this;
     }
 
@@ -194,15 +189,11 @@ public class IdentifierSpec {
       }
 
       this.keys.addAll(keys);
-
       return this;
     }
 
     public Builder signer(Signer signer) {
-      requireNonNull(signer);
-
       this.signer = signer;
-
       return this;
     }
 
@@ -211,10 +202,7 @@ public class IdentifierSpec {
         throw new IllegalArgumentException("keyIndex must be >= 0");
       }
 
-      requireNonNull(privateKey);
-
-      this.signer = new PrivateKeySigner(keyIndex, privateKey);
-
+      this.signer = new PrivateKeySigner(keyIndex, requireNonNull(privateKey));
       return this;
     }
 
@@ -234,26 +222,17 @@ public class IdentifierSpec {
     }
 
     public Builder nextKeys(KeyConfigurationDigest nextKeysDigest) {
-      requireNonNull(nextKeysDigest);
-
-      this.nextKeyConfigurationDigest = nextKeysDigest;
-
+      this.nextKeyConfigurationDigest = requireNonNull(nextKeysDigest);
       return this;
     }
 
     public Builder witness(BasicIdentifier witness) {
-      requireNonNull(witness);
-
-      this.witnesses.add(witness);
-
+      this.witnesses.add(requireNonNull(witness));
       return this;
     }
 
     public Builder witnesses(List<BasicIdentifier> witnesses) {
-      requireNonNull(witnesses);
-
-      this.witnesses.addAll(witnesses);
-
+      this.witnesses.addAll(requireNonNull(witnesses));
       return this;
     }
 
@@ -267,7 +246,7 @@ public class IdentifierSpec {
     }
 
     public Builder configurationTraits(ConfigurationTrait... configurationTraits) {
-      this.configurationTraits.addAll(List.of(configurationTraits));
+      Collections.addAll(this.configurationTraits, configurationTraits);
       return this;
     }
 

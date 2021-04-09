@@ -3,30 +3,21 @@ package foundation.identity.keri.api.crypto;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static java.util.Objects.requireNonNull;
-
 public interface Digest {
 
   Digest NONE = new None();
 
-  static boolean equals(Digest digest, Object obj) {
-    requireNonNull(digest);
-
-    if (digest == obj) {
+  static boolean equals(Digest d1, Digest d2) {
+    if (d1 == d2) {
       return true;
     }
 
-    if (obj == null) {
+    if (d2 == null) {
       return false;
     }
 
-    if (!(obj instanceof Digest)) {
-      return false;
-    }
-
-    var other = (Digest) obj;
-    return digest.algorithm().equals(other.algorithm())
-        && Arrays.equals(digest.bytes(), other.bytes());
+    return d1.algorithm().equals(d2.algorithm())
+        && Arrays.equals(d1.bytes(), d2.bytes());
   }
 
   static int hashCode(Digest digest) {
@@ -53,7 +44,10 @@ public interface Digest {
 
     @Override
     public boolean equals(Object obj) {
-      return Digest.equals(this, obj);
+      if (!(obj instanceof Digest)) {
+        return false;
+      }
+      return Digest.equals(this, (Digest) obj);
     }
 
     @Override

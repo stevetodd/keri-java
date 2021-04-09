@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 public abstract class AbstractImmutableDelegatedEstablishmentEvent extends AbstractImmutableEstablishmentEvent
     implements DelegatedEstablishmentEvent {
 
@@ -46,7 +48,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
         witnessThreshold,
         bytes,
         signatures);
-    this.delegatingEvent = Objects.requireNonNull(delegatingEvent, "delegatingEvent");
+    this.delegatingEvent = requireNonNull(delegatingEvent, "delegatingEvent");
   }
 
   @Override

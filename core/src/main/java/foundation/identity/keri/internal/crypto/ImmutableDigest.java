@@ -12,11 +12,8 @@ public class ImmutableDigest implements Digest {
   final byte[] bytes;
 
   public ImmutableDigest(DigestAlgorithm algorithm, byte[] bytes) {
-    requireNonNull(algorithm);
-    requireNonNull(bytes);
-
-    this.algorithm = algorithm;
-    this.bytes = bytes.clone();
+    this.algorithm = requireNonNull(algorithm);
+    this.bytes = requireNonNull(bytes).clone();
   }
 
   @Override
@@ -36,7 +33,10 @@ public class ImmutableDigest implements Digest {
 
   @Override
   public boolean equals(Object obj) {
-    return Digest.equals(this, obj);
+    if (!(obj instanceof Digest)) {
+      return false;
+    }
+    return Digest.equals(this, (Digest) obj);
   }
 
   @Override

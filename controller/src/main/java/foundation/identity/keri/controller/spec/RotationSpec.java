@@ -8,18 +8,18 @@ import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 
-import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -183,22 +183,17 @@ public class RotationSpec {
     }
 
     public Builder key(PublicKey publicKey) {
-      requireNonNull(publicKey);
       this.keys.add(publicKey);
       return this;
     }
 
     public Builder keys(List<PublicKey> publicKeys) {
-      requireNonNull(publicKeys);
-      this.keys.addAll(publicKeys);
+      this.keys.addAll(requireNonNull(publicKeys));
       return this;
     }
 
     public Builder signer(Signer signer) {
-      requireNonNull(signer);
-
-      this.signer = signer;
-
+      this.signer = requireNonNull(signer);
       return this;
     }
 
@@ -207,10 +202,7 @@ public class RotationSpec {
         throw new IllegalArgumentException("keyIndex must be >= 0");
       }
 
-      requireNonNull(privateKey);
-
-      this.signer = new PrivateKeySigner(keyIndex, privateKey);
-
+      this.signer = new PrivateKeySigner(keyIndex, requireNonNull(privateKey));
       return this;
     }
 
@@ -220,7 +212,6 @@ public class RotationSpec {
       }
 
       this.nextSigningThreshold = SigningThresholds.unweighted(nextSigningThreshold);
-
       return this;
     }
 
@@ -230,63 +221,62 @@ public class RotationSpec {
     }
 
     public Builder nextKeys(KeyConfigurationDigest nextKeysDigest) {
-      requireNonNull(nextKeysDigest);
-
-      this.nextKeyConfigurationDigest = nextKeysDigest;
-
+      this.nextKeyConfigurationDigest = requireNonNull(nextKeysDigest);
       return this;
     }
 
     public Builder witnessThreshold(int witnessThreshold) {
+      if (witnessThreshold < 0) {
+        throw new IllegalArgumentException("witnessThreshold must not be negative");
+      }
+
       this.witnessThreshold = witnessThreshold;
       return this;
     }
 
     public Builder addWitness(BasicIdentifier prefix) {
-      requireNonNull(prefix);
-      this.witnesses.add(prefix);
+      this.witnesses.add(requireNonNull(prefix));
       return this;
     }
 
     public Builder addWitnesses(List<BasicIdentifier> prefixes) {
-      requireNonNull(prefixes);
-      this.witnesses.addAll(prefixes);
+      this.witnesses.addAll(requireNonNull(prefixes));
       return this;
     }
 
     public Builder addWitnesses(BasicIdentifier... prefixes) {
-      requireNonNull(prefixes);
-      this.witnesses.addAll(List.of(prefixes));
+      Collections.addAll(this.witnesses, prefixes);
       return this;
     }
 
     public Builder removeWitness(BasicIdentifier identifier) {
-      requireNonNull(identifier);
-      this.witnesses.remove(identifier);
+      if (!this.witnesses.remove(requireNonNull(identifier))) {
+        throw new IllegalArgumentException("witness not found in witness set");
+      }
       return this;
     }
 
-    public Builder removeWitnesses(List<BasicIdentifier> prefixes) {
-      requireNonNull(prefixes);
-      this.witnesses.removeAll(prefixes);
+    public Builder removeWitnesses(List<BasicIdentifier> witnesses) {
+      for (var witness : witnesses) {
+        removeWitness(witness);
+      }
       return this;
     }
 
-    public Builder removeWitnesses(BasicIdentifier... prefixes) {
-      requireNonNull(prefixes);
-      this.witnesses.removeAll(List.of(prefixes));
+    public Builder removeWitnesses(BasicIdentifier... witnesses) {
+      for (var witness : witnesses) {
+        removeWitness(witness);
+      }
       return this;
     }
 
     public Builder seal(Seal seal) {
-      requireNonNull(seal);
-      this.seals.add(seal);
+      this.seals.add(requireNonNull(seal));
       return this;
     }
 
     public Builder seals(List<Seal> seals) {
-      requireNonNull(seals);
-      this.seals.addAll(seals);
+      this.seals.addAll(requireNonNull(seals));
       return this;
     }
 

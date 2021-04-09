@@ -103,11 +103,13 @@ public class SigningThresholds {
   }
 
   public static boolean thresholdMet(SigningThreshold.Unweighted threshold, int[] indexes) {
+    requireNonNull(indexes, "indexes");
     return indexes.length >= threshold.threshold();
   }
 
   public static boolean thresholdMet(SigningThreshold.Weighted threshold, int[] indexes) {
     requireNonNull(indexes);
+
     if (indexes.length == 0) {
       return false;
     }

@@ -8,7 +8,6 @@ import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 
-import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,10 +90,7 @@ public class InteractionSpec {
     }
 
     public Builder signer(Signer signer) {
-      requireNonNull(signer);
-
-      this.signer = signer;
-
+      this.signer = requireNonNull(signer);
       return this;
     }
 
@@ -103,22 +99,17 @@ public class InteractionSpec {
         throw new IllegalArgumentException("keyIndex must be >= 0");
       }
 
-      requireNonNull(privateKey);
-
-      this.signer = new PrivateKeySigner(keyIndex, privateKey);
-
+      this.signer = new PrivateKeySigner(keyIndex, requireNonNull(privateKey));
       return this;
     }
 
     public Builder seal(Seal seal) {
-      requireNonNull(seal);
-      this.seals.add(seal);
+      this.seals.add(requireNonNull(seal));
       return this;
     }
 
     public Builder seals(List<Seal> seals) {
-      requireNonNull(seals);
-      this.seals.addAll(seals);
+      this.seals.addAll(requireNonNull(seals));
       return this;
     }
 

@@ -57,14 +57,9 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
         delegatingEvent,
         bytes,
         signatures);
-
-    requireNonNull(removedWitnesses);
-    requireNonNull(addedWitnesses);
-    requireNonNull(seals);
-
-    this.removedWitnesses = List.copyOf(removedWitnesses);
-    this.addedWitnesses = List.copyOf(addedWitnesses);
-    this.seals = List.copyOf(seals);
+    this.removedWitnesses = List.copyOf(requireNonNull(removedWitnesses, "removedWitnesses"));
+    this.addedWitnesses = List.copyOf(requireNonNull(addedWitnesses, "addedWitnesses"));
+    this.seals = List.copyOf(requireNonNull(seals, "seals"));
   }
 
   @Override

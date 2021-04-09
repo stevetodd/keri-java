@@ -53,9 +53,9 @@ public final class ImmutableRotationEvent extends AbstractImmutableEstablishment
         witnessThreshold,
         bytes,
         signatures);
-    this.removedWitnesses = List.copyOf(requireNonNull(removedWitnesses));
-    this.addedWitnesses = List.copyOf(requireNonNull(addedWitnesses));
-    this.seals = List.copyOf(requireNonNull(seals));
+    this.removedWitnesses = List.copyOf(requireNonNull(removedWitnesses, "removedWitnesses"));
+    this.addedWitnesses = List.copyOf(requireNonNull(addedWitnesses, "addedWitnesses"));
+    this.seals = List.copyOf(requireNonNull(seals, "seals"));
   }
 
   @Override
