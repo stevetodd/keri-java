@@ -10,6 +10,4 @@ public interface Event {
 
   Format format();
 
-  EventType type();
-
 }

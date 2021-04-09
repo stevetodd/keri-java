@@ -10,7 +10,7 @@ public interface DelegatingEventCoordinates {
 
   BigInteger sequenceNumber();
 
-  EventType eventType();
+  Class<? extends Event> eventType();
 
   KeyEventCoordinates previousEvent();
 

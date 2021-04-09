@@ -13,9 +13,4 @@ public interface RotationEvent extends EstablishmentEvent, SealingEvent {
 
   List<Seal> seals();
 
-  @Override
-  default EventType type() {
-    return EventType.ROTATION;
-  }
-
 }

@@ -8,9 +8,4 @@ public interface InteractionEvent extends KeyEvent, SealingEvent {
 
   List<Seal> seals();
 
-  @Override
-  default EventType type() {
-    return EventType.INTERACTION;
-  }
-
 }

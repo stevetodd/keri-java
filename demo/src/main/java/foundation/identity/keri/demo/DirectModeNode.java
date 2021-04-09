@@ -2,6 +2,7 @@ package foundation.identity.keri.demo;
 
 import foundation.identity.keri.KeyEventStore;
 import foundation.identity.keri.KeyEventValidator;
+import foundation.identity.keri.KeyEvents;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.KeyEvent;
@@ -73,7 +74,7 @@ public class DirectModeNode {
         .delayElements(Duration.ofMillis(250), Schedulers.single())
         .doOnNext(e-> {
           System.out.println("\n[Node] >>> EVENT >>> " + address);
-          EventUtils.printEvent(e);
+          KeyEvents.toString(e);
         });
   }
 
@@ -82,7 +83,7 @@ public class DirectModeNode {
         .doOnError(Throwable::printStackTrace)
         .doOnNext(e -> {
           System.out.println("\n[Node] <<< EVENT <<< " + ((Connection) in).channel().remoteAddress());
-          EventUtils.printEvent(e);
+          KeyEvents.toString(e);
         })
         .flatMap(e ->
             out.sendEvent(
@@ -90,7 +91,7 @@ public class DirectModeNode {
                   .doOnError(Throwable::printStackTrace)
                 .doOnNext(e2 -> {
                   System.out.println("\n[Node] >>> EVENT >>> " + ((Connection) in).channel().remoteAddress());
-                  EventUtils.printEvent(e2);
+                  KeyEvents.toString(e2);
                 })
             )
             .then(),
@@ -118,20 +119,20 @@ public class DirectModeNode {
     }
   }
 
-  private Flux<Event> produceChit(KeyEvent ie) {
-    var lastReceipt = this.keyEventStore.findLatestReceipt(this.identifier.identifier(), ie.identifier());
-    var lastEventSequenceNumber = lastReceipt.isPresent()
-                                  ? lastReceipt.get().event().sequenceNumber()
-                                  : -1;
+  private Flux<Event> produceChit(KeyEvent keyEvent) {
     var events = Flux.<Event> empty();
-    if (lastEventSequenceNumber != this.identifier.lastEvent().sequenceNumber()) {
+    long lastEventSequenceNumber = this.keyEventStore.findLatestReceipt(this.identifier.identifier(), keyEvent.identifier())
+        .map(es -> es.event().sequenceNumber())
+        .orElse(-1L);
+
+    if (lastEventSequenceNumber < this.identifier.lastEvent().sequenceNumber()) {
       // make sure we've sent our log so they can verify the chit
       System.out.println("[Node] WILL SEND LOG >>> ");
       events = produceOwnLog(lastEventSequenceNumber);
     }
 
     System.out.println("[Node] WILL SEND VRC >>> ");
-    return Flux.concat(events, Mono.just(receiptEvent(ie)));
+    return Flux.concat(events, Mono.just(receiptEvent(keyEvent)));
   }
 
   private Flux<Event> produceOwnLog(long fromSequenceNumber) {

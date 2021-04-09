@@ -1,6 +1,8 @@
 package foundation.identity.keri;
 
 import foundation.identity.keri.api.event.AttachedEventSignature;
+import foundation.identity.keri.api.event.DelegatedInceptionEvent;
+import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.KeyEvent;
@@ -11,6 +13,7 @@ import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent
 import foundation.identity.keri.api.event.RotationEvent;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -22,7 +25,7 @@ public final class KeyEvents {
 
   public static String toString(Event e) {
     var sb = new StringBuilder();
-    sb.append(format("%s (KERI %s %s)", e.type(), e.version(), e.format())).append("\n");
+    sb.append(format("%s (KERI %s %s)", type(e.getClass()), e.version(), e.format())).append("\n");
 
     if (e instanceof KeyEvent) {
       var ie = (KeyEvent) e;
@@ -100,6 +103,20 @@ public final class KeyEvents {
     sb.append("--- RAW").append("\n");
     sb.append(new String(e.bytes(), UTF_8)).append("\n");
     return sb.toString();
+  }
+
+  private static final Map<Class<? extends Event>, String> typeMapping = Map.of(
+      InceptionEvent.class, "icp",
+      RotationEvent.class, "rot",
+      InteractionEvent.class, "ixn",
+      DelegatedInceptionEvent.class, "dip",
+      DelegatedRotationEvent.class, "drt",
+      ReceiptFromBasicIdentifierEvent.class, "rct",
+      ReceiptFromTransferableIdentifierEvent.class, "vrc"
+  );
+
+  private static String type(Class<? extends Event> cls) {
+    return typeMapping.getOrDefault(cls, "?" + cls.getName());
   }
 
   private static <T> String listToString(List<T> list, Function<T, String> toString) {

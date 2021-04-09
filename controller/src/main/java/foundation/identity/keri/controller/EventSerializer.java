@@ -9,7 +9,6 @@ import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
-import foundation.identity.keri.api.event.EventType;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
@@ -33,14 +32,21 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static foundation.identity.keri.Hex.hex;
 import static foundation.identity.keri.Hex.hexNoPad;
 import static foundation.identity.keri.QualifiedBase64.qb64;
 import static foundation.identity.keri.api.event.EventFieldNames.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class EventSerializer {
-  private final static byte[] KERI_BYTES = "KERI".getBytes(UTF_8);
+  private static final byte[] KERI_BYTES = "KERI".getBytes(UTF_8);
+
+  private static final String INCEPTION_TYPE = "icp";
+  private static final String ROTATION_TYPE = "rot";
+  private static final String INTERACTION_TYPE = "ixn";
+  private static final String DELEGATED_INCEPTION_TYPE = "dip";
+  private static final String DELEGATED_ROTATION_TYPE = "drt";
+  private static final String RECEIPT_FROM_BASIC_TYPE = "rct";
+  private static final String RECEIPT_FROM_TRANSFERABLE_TYPE = "vrc";
 
   private static final ObjectMapper JSON = new ObjectMapper();
   private static final ObjectMapper CBOR = new ObjectMapper(new CBORFactory());
@@ -71,18 +77,6 @@ public final class EventSerializer {
       case CBOR -> "CBOR";
       case JSON -> "JSON";
       case MESSAGE_PACK -> "MGPK";
-    };
-  }
-
-  static String type(EventType t) {
-    return switch (t) {
-      case INCEPTION -> "icp";
-      case ROTATION -> "rot";
-      case INTERACTION -> "ixn";
-      case DELEGATED_INCEPTION -> "dip";
-      case DELEGATED_ROTATION -> "drt";
-      case RECEIPT -> "rct";
-      case RECEIPT_FROM_TRANSFERABLE -> "vrc";
     };
   }
 
@@ -183,7 +177,7 @@ public final class EventSerializer {
       rootNode.put(IDENTIFIER.label(), qb64(identifier));
     }
     rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(0));
-    rootNode.put(EVENT_TYPE.label(), type(EventType.INCEPTION));
+    rootNode.put(EVENT_TYPE.label(), INCEPTION_TYPE);
 
     rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
 
@@ -223,7 +217,7 @@ public final class EventSerializer {
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
     rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), type(EventType.ROTATION));
+    rootNode.put(EVENT_TYPE.label(), ROTATION_TYPE);
     rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
 
     rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
@@ -268,7 +262,7 @@ public final class EventSerializer {
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
     rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), type(EventType.INTERACTION));
+    rootNode.put(EVENT_TYPE.label(), INTERACTION_TYPE);
     rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
 
     var sealsNode = mapper.createArrayNode();
@@ -288,13 +282,16 @@ public final class EventSerializer {
     var mapper = mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
-    var eventSignature = spec.signatures().stream().findFirst().get();
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
-    rootNode.put(IDENTIFIER.label(), qb64(eventSignature.event().identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(eventSignature.event().sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT_FROM_TRANSFERABLE));
-    rootNode.put(EVENT_DIGEST.label(), qb64(eventSignature.event().digest()));
+    rootNode.put(IDENTIFIER.label(), qb64(spec.event().identifier()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.event().sequenceNumber()));
+    rootNode.put(EVENT_TYPE.label(), RECEIPT_FROM_TRANSFERABLE_TYPE);
+    rootNode.put(EVENT_DIGEST.label(), qb64(spec.event().digest()));
 
+    var eventSignature = spec.signatures()
+        .stream()
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("at least one signature is required"));
     var anchorNode = mapper.createObjectNode();
     anchorNode.put(IDENTIFIER.label(), qb64(eventSignature.key().establishmentEvent().identifier()));
     anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(eventSignature.key().establishmentEvent().sequenceNumber()));
@@ -317,7 +314,7 @@ public final class EventSerializer {
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(spec.event().identifier()));
     rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.event().sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT));
+    rootNode.put(EVENT_TYPE.label(), RECEIPT_FROM_BASIC_TYPE);
     rootNode.put(EVENT_DIGEST.label(), qb64(spec.event().digest()));
 
     try {

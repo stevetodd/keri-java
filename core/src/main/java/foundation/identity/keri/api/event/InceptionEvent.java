@@ -13,9 +13,4 @@ public interface InceptionEvent extends EstablishmentEvent {
 
   Set<ConfigurationTrait> configurationTraits();
 
-  @Override
-  default EventType type() {
-    return EventType.INCEPTION;
-  }
-
 }
