@@ -14,8 +14,8 @@ import foundation.identity.keri.api.event.RotationEvent;
 import java.util.List;
 import java.util.function.Function;
 
-import static java.util.Comparator.comparingInt;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.joining;
 
 public final class EventUtils {

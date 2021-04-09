@@ -1,6 +1,6 @@
 package foundation.identity.keri.controller;
 
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.EventSignature;
@@ -19,9 +19,9 @@ import java.util.Set;
 public class DefaultControllableIdentifier implements ControllableIdentifier {
 
   public final Controller controller;
-  private final IdentifierState state;
+  private final KeyState state;
 
-  public DefaultControllableIdentifier(Controller controller, IdentifierState initialState) {
+  public DefaultControllableIdentifier(Controller controller, KeyState initialState) {
     this.controller = controller;
     this.state = initialState;
   }

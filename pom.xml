@@ -10,13 +10,14 @@
   <name>root</name>
 
   <modules>
-    <module>core</module>
     <module>controller</module>
     <module>controller-cli</module>
+    <module>core</module>
     <module>demo</module>
     <module>event-storage-in-memory</module>
     <module>key-storage-in-memory</module>
     <module>lookup</module>
+    <module>transport-tcp</module>
   </modules>
 
   <properties>

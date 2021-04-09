@@ -1,6 +1,6 @@
 package foundation.identity.keri.internal;
 
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.IdentifierEvent;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class ImmutableIdentifierState implements IdentifierState {
+public class ImmutableKeyState implements KeyState {
 
   private final Identifier identifier;
   private final SigningThreshold signingThreshold;
@@ -27,7 +27,7 @@ public class ImmutableIdentifierState implements IdentifierState {
   private final EstablishmentEvent lastEstablishmentEvent;
   private final Identifier delegatingIdentifier;
 
-  public ImmutableIdentifierState(
+  public ImmutableKeyState(
       Identifier identifier,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,

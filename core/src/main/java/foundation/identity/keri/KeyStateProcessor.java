@@ -1,31 +1,20 @@
 package foundation.identity.keri;
 
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatedInceptionEvent;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.RotationEvent;
-import foundation.identity.keri.internal.ImmutableIdentifierState;
+import foundation.identity.keri.internal.ImmutableKeyState;
 
 import java.util.ArrayList;
 
 import static java.util.Objects.requireNonNull;
 
-public final class EventProcessor {
+public final class KeyStateProcessor {
 
-  /**
-   * Computes the next {@link IdentifierState} from the currentState the next
-   * event.
-   *
-   * @param currentState
-   *     the state existing before the event
-   * @param event
-   *     the next event
-   *
-   * @return the identifier state
-   */
-  public IdentifierState apply(IdentifierState currentState, IdentifierEvent event) {
+  public static KeyState apply(KeyState currentState, IdentifierEvent event) {
     if (event instanceof InceptionEvent) {
       if (currentState != null) {
         throw new IllegalArgumentException("currentState must not be passed for inception events");
@@ -56,7 +45,7 @@ public final class EventProcessor {
       lastEstablishmentEvent = re;
     }
 
-    return new ImmutableIdentifierState(
+    return new ImmutableKeyState(
         currentState.identifier(),
         signingThreshold,
         keys,
@@ -69,12 +58,12 @@ public final class EventProcessor {
         currentState.delegatingIdentifier().orElse(null));
   }
 
-  public IdentifierState initialState(InceptionEvent event) {
+  public static KeyState initialState(InceptionEvent event) {
     var delegatingPrefix = event instanceof DelegatedInceptionEvent
-                           ? ((DelegatedEstablishmentEvent) event).delegatingEvent().identifier()
-                           : null;
+        ? ((DelegatedEstablishmentEvent) event).delegatingEvent().identifier()
+        : null;
 
-    return new ImmutableIdentifierState(
+    return new ImmutableKeyState(
         event.identifier(),
         event.signingThreshold(),
         event.keys(),

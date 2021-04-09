@@ -9,6 +9,7 @@ import foundation.identity.keri.api.identifier.Identifier;
 
 import java.math.BigInteger;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -19,6 +20,12 @@ public abstract class AbstractImmutableIdentifierEvent extends AbstractImmutable
   private final BigInteger sequenceNumber;
   private final IdentifierEventCoordinatesWithDigest previous;
   private final Set<AttachedEventSignature> signatures;
+  private Supplier<IdentifierEventCoordinatesWithDigest> coordinates = () -> {
+    // with multiple threads this might be ran multiple times concurrently, and that's ok
+    var coordinates = ImmutableIdentifierEventCoordinatesWithDigest.of(this);
+    this.coordinates = () -> coordinates;
+    return coordinates;
+  };
 
   public AbstractImmutableIdentifierEvent(
       Version version,
@@ -43,6 +50,11 @@ public abstract class AbstractImmutableIdentifierEvent extends AbstractImmutable
   @Override
   public BigInteger sequenceNumber() {
     return this.sequenceNumber;
+  }
+
+  @Override
+  public IdentifierEventCoordinatesWithDigest coordinates() {
+    return coordinates.get();
   }
 
   @Override

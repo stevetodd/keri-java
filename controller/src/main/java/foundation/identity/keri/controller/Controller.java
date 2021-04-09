@@ -1,11 +1,11 @@
 package foundation.identity.keri.controller;
 
-import foundation.identity.keri.EventProcessor;
-import foundation.identity.keri.EventStore;
-import foundation.identity.keri.EventValidator;
 import foundation.identity.keri.IdentifierKeyStore;
 import foundation.identity.keri.KeyConfigurationDigester;
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.KeyEventStore;
+import foundation.identity.keri.KeyEventValidator;
+import foundation.identity.keri.KeyStateProcessor;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.SignatureAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
@@ -36,18 +36,18 @@ public final class Controller {
   private static final DigestAlgorithm DEFAULT_DIGEST_ALGO = StandardDigestAlgorithms.BLAKE3_256;
   private static final SignatureAlgorithm DEFAULT_SIGNATURE_ALGO = StandardSignatureAlgorithms.ED_25519;
 
-  private final EventStore eventStore;
+  private final KeyEventStore keyEventStore;
   private final IdentifierKeyStore keyStore;
   private final SecureRandom secureRandom;
 
   private final EventFactory eventFactory = new EventFactory();
-  private final EventProcessor eventProcessor = new EventProcessor();
-  private final EventValidator eventValidator = new EventValidator();
+  private final KeyEventValidator keyEventValidator;
 
-  public Controller(EventStore eventStore, IdentifierKeyStore keyStore, SecureRandom secureRandom) {
-    this.eventStore = eventStore;
+  public Controller(KeyEventStore keyEventStore, IdentifierKeyStore keyStore, SecureRandom secureRandom) {
+    this.keyEventStore = keyEventStore;
     this.keyStore = keyStore;
     this.secureRandom = secureRandom;
+    this.keyEventValidator = new KeyEventValidator(keyEventStore);
   }
 
   private KeyPair generateKeyPair(SignatureAlgorithm algorithm) {
@@ -73,14 +73,14 @@ public final class Controller {
         .build();
 
     var event = this.eventFactory.inception(spec);
-    this.eventValidator.validate(null, event);
-    this.eventStore.store(event);
+    this.keyEventValidator.validate(null, event);
+    this.keyEventStore.append(event);
 
     var keyCoordinates = ImmutableKeyCoordinates.of(event, 0);
     this.keyStore.storeKey(keyCoordinates, initialKeyPair);
     this.keyStore.storeNextKey(keyCoordinates, nextKeyPair);
 
-    var state = this.eventProcessor.apply(null, event);
+    var state = KeyStateProcessor.apply(null, event);
 
     return new DefaultControllableIdentifier(this, state);
   }
@@ -98,8 +98,8 @@ public final class Controller {
         .build();
 
     var event = this.eventFactory.inception(spec);
-    this.eventValidator.validate(null, event);
-    this.eventStore.store(event);
+    this.keyEventValidator.validate(null, event);
+    this.keyEventStore.append(event);
 
     var keyCoordinates = ImmutableKeyCoordinates.of(event, 0);
 
@@ -148,8 +148,8 @@ public final class Controller {
 
 
     var event = this.eventFactory.rotation(spec);
-    this.eventValidator.validate(state, event);
-    this.eventStore.store(event);
+    this.keyEventValidator.validate(state, event);
+    this.keyEventStore.append(event);
 
     var nextKeyCoordinates = ImmutableKeyCoordinates.of(event, 0);
     this.keyStore.storeKey(nextKeyCoordinates, nextKeyPair.get());
@@ -157,7 +157,7 @@ public final class Controller {
     this.keyStore.removeKey(currentKeyCoordinates);
     this.keyStore.removeNextKey(currentKeyCoordinates);
 
-    var newState = this.eventProcessor.apply(state, event);
+    var newState = KeyStateProcessor.apply(state, event);
 
     return new DefaultControllableIdentifier(this, newState);
   }
@@ -182,10 +182,10 @@ public final class Controller {
         .build();
 
     var event = this.eventFactory.interaction(spec);
-    this.eventValidator.validate(state, event);
-    this.eventStore.store(event);
+    this.keyEventValidator.validate(state, event);
+    this.keyEventStore.append(event);
 
-    var newState = this.eventProcessor.apply(state, event);
+    var newState = KeyStateProcessor.apply(state, event);
 
     return new DefaultControllableIdentifier(this, newState);
   }
@@ -210,12 +210,12 @@ public final class Controller {
   }
 
   // TODO should be private
-  public IdentifierState getIdentifierState(Identifier identifier) {
-    var i = this.eventStore.find(identifier).iterator();
+  public KeyState getIdentifierState(Identifier identifier) {
+    var i = this.keyEventStore.streamKeyEvents(identifier).iterator();
 
-    IdentifierState state = null;
+    KeyState state = null;
     while (i.hasNext()) {
-      state = this.eventProcessor.apply(state, i.next());
+      state = KeyStateProcessor.apply(state, i.next());
     }
 
     return state;

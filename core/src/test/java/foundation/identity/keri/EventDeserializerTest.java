@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import static foundation.identity.keri.EventDeserializer.readSigningThreshold;
-import static foundation.identity.keri.SigningThresholds.group;
-import static foundation.identity.keri.SigningThresholds.unweighted;
-import static foundation.identity.keri.SigningThresholds.weighted;
-import static org.junit.Assert.*;
+import static foundation.identity.keri.SigningThresholds.*;
+import static org.junit.Assert.assertEquals;
 
 public class EventDeserializerTest {
 

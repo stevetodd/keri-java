@@ -1,13 +1,13 @@
 package foundation.identity.keri.controller;
 
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.IdentifierEvent;
 import foundation.identity.keri.api.seal.Seal;
 
 import java.util.List;
 
-public interface ControllableIdentifier extends IdentifierState {
+public interface ControllableIdentifier extends KeyState {
 
   void rotate();
 

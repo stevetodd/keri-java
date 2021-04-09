@@ -1,13 +1,11 @@
 package foundation.identity.keri.demo;
 
-import foundation.identity.keri.EventProcessor;
-import foundation.identity.keri.EventStore;
-import foundation.identity.keri.EventValidationException;
-import foundation.identity.keri.EventValidator;
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.KeyEventStore;
+import foundation.identity.keri.KeyEventValidator;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.IdentifierEvent;
-import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
+import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.controller.ControllableIdentifier;
@@ -17,7 +15,6 @@ import foundation.identity.keri.demo.protocol.EventInbound;
 import foundation.identity.keri.demo.protocol.EventOutbound;
 import foundation.identity.keri.demo.protocol.KeriClient;
 import foundation.identity.keri.demo.protocol.KeriServer;
-import foundation.identity.keri.internal.event.ImmutableEventSignature;
 import io.netty.handler.logging.LogLevel;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -35,15 +32,15 @@ import java.time.Duration;
 public class DirectModeNode {
 
   private final ControllableIdentifier identifier;
-  private final EventStore eventStore;
+  private final KeyEventStore keyEventStore;
 
-  private final EventValidator eventValidator = new EventValidator();
+  private final KeyEventValidator keyEventValidator;
   private final EventFactory eventFactory = new EventFactory();
-  private final EventProcessor eventProcessor = new EventProcessor();
 
-  public DirectModeNode(ControllableIdentifier identifier, EventStore eventStore) {
+  public DirectModeNode(ControllableIdentifier identifier, KeyEventStore keyEventStore) {
     this.identifier = identifier;
-    this.eventStore = eventStore;
+    this.keyEventStore = keyEventStore;
+    this.keyEventValidator = new KeyEventValidator(keyEventStore);
   }
 
   public Mono<? extends DisposableServer> bind(InetSocketAddress address) {
@@ -72,7 +69,7 @@ public class DirectModeNode {
   }
 
   private Publisher<? extends Event> retrieveIdentifierEvents(InetSocketAddress address) {
-    return Flux.fromStream(this.eventStore.find(this.identifier.identifier()))
+    return Flux.fromStream(this.keyEventStore.streamKeyEvents(this.identifier.identifier()))
         .delayElements(Duration.ofMillis(250), Schedulers.single())
         .doOnNext(e-> {
           System.out.println("\n[Node] >>> EVENT >>> " + address);
@@ -82,6 +79,7 @@ public class DirectModeNode {
 
   private Publisher<Void> handleEvents(EventInbound in, EventOutbound out) {
     return in.receiveEvents()
+        .doOnError(Throwable::printStackTrace)
         .doOnNext(e -> {
           System.out.println("\n[Node] <<< EVENT <<< " + ((Connection) in).channel().remoteAddress());
           EventUtils.printEvent(e);
@@ -89,6 +87,7 @@ public class DirectModeNode {
         .flatMap(e ->
             out.sendEvent(
               process(e)
+                  .doOnError(Throwable::printStackTrace)
                 .doOnNext(e2 -> {
                   System.out.println("\n[Node] >>> EVENT >>> " + ((Connection) in).channel().remoteAddress());
                   EventUtils.printEvent(e2);
@@ -104,30 +103,23 @@ public class DirectModeNode {
           var ie = (IdentifierEvent) event;
           // TODO these should all be reactive -- eventStore will eventually block!
           var state = getState(ie.identifier());
-          this.eventValidator.validate(state, ie);
-          this.eventStore.store(ie); // stator
+          this.keyEventValidator.validate(state, ie);
+          this.keyEventStore.append(ie); // stator
 
           return produceChit(ie);
-      } else if (event instanceof ReceiptFromTransferableIdentifierEvent) {
-        var vrc = (ReceiptFromTransferableIdentifierEvent) event;
-        //TODO this.eventValidator.validate(event);
-        vrc.signatures().stream()
-            .map(as -> ImmutableEventSignature.from(as, vrc.keyEstablishmentEvent()))
-            .forEach(this.eventStore::store);
-      } else if (event instanceof ReceiptFromBasicIdentifierEvent) {
-        var rct = (ReceiptFromBasicIdentifierEvent) event;
-        //TODO this.eventValidator.validate(event);
-        rct.receipts().forEach(this.eventStore::store);
       }
+
+      // TODO validate Receipt
+      this.keyEventStore.append((ReceiptEvent) event);
       return Flux.empty();
-    } catch (EventValidationException e) {
+    } catch (Exception e) {
       e.printStackTrace(System.err);
       return Flux.error(e);
     }
   }
 
   private Flux<Event> produceChit(IdentifierEvent ie) {
-    var lastReceipt = this.eventStore.findLatestReceipt(this.identifier.identifier(), ie.identifier());
+    var lastReceipt = this.keyEventStore.findLatestReceipt(this.identifier.identifier(), ie.identifier());
     var lastEventSequenceNumber = lastReceipt.isPresent()
                                   ? lastReceipt.get().event().sequenceNumber()
                                   : BigInteger.valueOf(-1);
@@ -143,21 +135,14 @@ public class DirectModeNode {
   }
 
   private Flux<Event> produceOwnLog(BigInteger fromSequenceNumber) {
-    var events = this.eventStore
-        .find(this.identifier.identifier(), fromSequenceNumber.add(BigInteger.ONE));
+    var events = this.keyEventStore
+        .streamKeyEvents(this.identifier.identifier(), fromSequenceNumber.add(BigInteger.ONE));
 
     return Flux.fromStream(events);
   }
 
-  private IdentifierState getState(Identifier identifier) {
-    var i = this.eventStore.find(identifier).iterator();
-
-    IdentifierState state = null;
-    while (i.hasNext()) {
-      state = this.eventProcessor.apply(state, i.next());
-    }
-
-    return state;
+  private KeyState getState(Identifier identifier) {
+    return this.keyEventStore.getKeyState(identifier).orElse(null);
   }
 
   private ReceiptFromTransferableIdentifierEvent receiptEvent(IdentifierEvent event) {
@@ -167,8 +152,9 @@ public class DirectModeNode {
         .signature(receipt)
         .build();
 
-    this.eventStore.store(receipt);
-    return this.eventFactory.receipt(spec);
+    var rct = this.eventFactory.receipt(spec);
+    this.keyEventStore.append(rct);
+    return rct;
   }
 
 }

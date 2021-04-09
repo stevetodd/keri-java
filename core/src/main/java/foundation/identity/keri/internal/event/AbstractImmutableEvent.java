@@ -1,5 +1,6 @@
 package foundation.identity.keri.internal.event;
 
+import foundation.identity.keri.KeyEvents;
 import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.Format;
@@ -60,4 +61,8 @@ public abstract class AbstractImmutableEvent implements Event {
     return Arrays.equals(this.bytes, other.bytes);
   }
 
+  @Override
+  public String toString() {
+    return KeyEvents.toString(this);
+  }
 }

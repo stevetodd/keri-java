@@ -1,6 +1,6 @@
 package foundation.identity.keri.controller.spec;
 
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
@@ -37,7 +37,7 @@ public class InteractionSpec {
     this.seals = List.copyOf(seals);
   }
 
-  public static Builder builder(IdentifierState state) {
+  public static Builder builder(KeyState state) {
     return new Builder(state);
   }
 
@@ -66,12 +66,12 @@ public class InteractionSpec {
   }
 
   public static class Builder {
-    private final IdentifierState state;
+    private final KeyState state;
     private final List<Seal> seals = new ArrayList<>();
     private Format format = StandardFormats.JSON;
     private Signer signer;
 
-    public Builder(IdentifierState state) {
+    public Builder(KeyState state) {
       this.state = state;
     }
 

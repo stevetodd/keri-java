@@ -2,7 +2,7 @@ package foundation.identity.keri.controller.spec;
 
 import foundation.identity.keri.KeyConfigurationDigester;
 import foundation.identity.keri.SigningThresholds;
-import foundation.identity.keri.api.IdentifierState;
+import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
@@ -72,7 +72,7 @@ public class RotationSpec {
     this.seals = List.copyOf(seals);
   }
 
-  public static Builder builder(IdentifierState state) {
+  public static Builder builder(KeyState state) {
     return new Builder(state);
   }
 
@@ -125,7 +125,7 @@ public class RotationSpec {
   }
 
   public static class Builder {
-    private final IdentifierState state;
+    private final KeyState state;
 
     private Format format = StandardFormats.JSON;
 
@@ -149,7 +149,7 @@ public class RotationSpec {
     private int witnessThreshold = 0;
     private final List<BasicIdentifier> witnesses = new ArrayList<>();
 
-    public Builder(IdentifierState state) {
+    public Builder(KeyState state) {
       this.state = state;
     }
 

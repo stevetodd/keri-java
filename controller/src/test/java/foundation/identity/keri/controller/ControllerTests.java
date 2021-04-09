@@ -5,7 +5,7 @@ import foundation.identity.keri.KeyConfigurationDigester;
 import foundation.identity.keri.api.event.SigningThreshold.Unweighted;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.crypto.DigestOperations;
-import foundation.identity.keri.eventstorage.inmemory.InMemoryEventStore;
+import foundation.identity.keri.eventstorage.inmemory.InMemoryKeyEventStore;
 import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
 import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
 import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 public class ControllerTests {
 
   SecureRandom secureRandom = new SecureRandom(new byte[]{0});
-  InMemoryEventStore testEventStore = new InMemoryEventStore();
+  InMemoryKeyEventStore testEventStore = new InMemoryKeyEventStore();
   InMemoryIdentifierKeyStore testKeyStore = new InMemoryIdentifierKeyStore();
 
   @BeforeClass

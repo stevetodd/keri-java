@@ -11,6 +11,8 @@ public interface IdentifierEvent extends Event {
 
   BigInteger sequenceNumber();
 
+  IdentifierEventCoordinatesWithDigest coordinates();
+
   IdentifierEventCoordinatesWithDigest previous();
 
   Set<AttachedEventSignature> signatures();
