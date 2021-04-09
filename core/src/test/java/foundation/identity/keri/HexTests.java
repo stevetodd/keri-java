@@ -2,8 +2,6 @@ package foundation.identity.keri;
 
 import org.junit.Test;
 
-import java.math.BigInteger;
-
 import static foundation.identity.keri.Hex.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -25,52 +23,6 @@ public class HexTests {
 
     var expected = new byte[]{0x01, 0x09, 0x0a, 0x0f, 0x10, (byte) 0xf0, (byte) 0xff};
     assertArrayEquals(expected, bytes);
-  }
-
-  @Test
-  public void testHexBigInteger() {
-    var i = new BigInteger("75043633293596258117532452589460127027942070164795662430288688224914942555303");
-
-    var result = hex(i);
-
-    var expected = "a5e930f5d34c7e4d510dc158b2db4f062549d061dc5188714c980031fbf974a7";
-    assertEquals(expected, result);
-  }
-
-  @Test
-  public void testUnhexBigInteger() {
-    var i = unhexBigInteger("00a5e930f5d34c7e4d510dc158b2db4f062549d061dc5188714c980031fbf974a7");
-
-    var expected = new BigInteger("75043633293596258117532452589460127027942070164795662430288688224914942555303");
-
-    assertEquals(expected, i);
-  }
-
-  @Test
-  public void testBigIntegerToHex() {
-    assertEquals("-8000000000000000", hex(BigInteger.valueOf(Long.MIN_VALUE)));
-    assertEquals("-8000000000000000", hex(BigInteger.valueOf(Long.MIN_VALUE)));
-    assertEquals("-1", hex(BigInteger.valueOf(-1)));
-    assertEquals("0", hex(BigInteger.ZERO));
-    assertEquals("1", hex(BigInteger.ONE));
-    assertEquals("2", hex(BigInteger.TWO));
-    assertEquals("a", hex(BigInteger.valueOf(10)));
-    assertEquals("10", hex(BigInteger.valueOf(16)));
-    assertEquals("7fffffffffffffff", hex(BigInteger.valueOf(Long.MAX_VALUE)));
-    assertEquals("8000000000000000", hex(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE)));
-  }
-
-  @Test
-  public void testHexToBigInteger() {
-    assertEquals(BigInteger.valueOf(Long.MIN_VALUE), unhexBigInteger("-8000000000000000"));
-    assertEquals(BigInteger.valueOf(-1), unhexBigInteger("-1"));
-    assertEquals(BigInteger.ZERO, unhexBigInteger("0"));
-    assertEquals(BigInteger.ONE, unhexBigInteger("1"));
-    assertEquals(BigInteger.TWO, unhexBigInteger("2"));
-    assertEquals(BigInteger.valueOf(10), unhexBigInteger("a"));
-    assertEquals(BigInteger.valueOf(16), unhexBigInteger("10"));
-    assertEquals(BigInteger.valueOf(Long.MAX_VALUE), unhexBigInteger("7fffffffffffffff"));
-    assertEquals(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE), unhexBigInteger("8000000000000000"));
   }
 
   @Test

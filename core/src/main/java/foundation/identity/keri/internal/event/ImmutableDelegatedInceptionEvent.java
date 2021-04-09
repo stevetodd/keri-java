@@ -45,7 +45,7 @@ public class ImmutableDelegatedInceptionEvent extends AbstractImmutableDelegated
         version,
         format,
         identifier,
-        BigInteger.ZERO,
+        0,
         KeyEventCoordinates.NONE,
         signingThreshold,
         keys,

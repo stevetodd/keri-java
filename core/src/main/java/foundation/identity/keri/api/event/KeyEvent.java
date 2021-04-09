@@ -9,7 +9,7 @@ public interface KeyEvent extends Event {
 
   Identifier identifier();
 
-  BigInteger sequenceNumber();
+  long sequenceNumber();
 
   KeyEventCoordinates coordinates();
 

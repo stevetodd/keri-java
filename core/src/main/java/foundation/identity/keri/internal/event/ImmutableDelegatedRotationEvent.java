@@ -32,7 +32,7 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,

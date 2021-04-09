@@ -25,7 +25,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,

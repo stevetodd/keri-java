@@ -50,8 +50,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Map;
 
-import static foundation.identity.keri.Hex.unhexBigInteger;
-import static foundation.identity.keri.Hex.unhexInt;
+import static foundation.identity.keri.Hex.*;
 import static foundation.identity.keri.QualifiedBase64.*;
 import static foundation.identity.keri.SigningThresholds.*;
 import static foundation.identity.keri.api.event.EventFieldNames.*;
@@ -157,7 +156,7 @@ public class EventDeserializer {
     }
 
     var digest = DigestOperations.lookup(nextKeyConfiguration.algorithm()).digest(bytes);
-    var eventCoordinates = new ImmutableKeyEventCoordinates(prefix, BigInteger.ZERO, digest);
+    var eventCoordinates = new ImmutableKeyEventCoordinates(prefix, 0, digest);
     var attachedSignatures = signatures.entrySet().stream()
         .map(e -> (AttachedEventSignature) new ImmutableAttachedEventSignature(eventCoordinates, e.getKey(), e.getValue()))
         .collect(toSet());
@@ -205,9 +204,9 @@ public class EventDeserializer {
     var version = version(versionString.substring(4, 6));
     var format = format(versionString.substring(6, 10));
     var prefix = identifier(rootNode.get(IDENTIFIER.label()).textValue());
-    var sequenceNumber = unhexBigInteger(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
+    var sequenceNumber = unhexLong(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
     var previousDigest = digest(rootNode.get(PRIOR_EVENT_DIGEST.label()).textValue());
-    var previous = new ImmutableKeyEventCoordinates(prefix, sequenceNumber.subtract(BigInteger.ONE), previousDigest);
+    var previous = new ImmutableKeyEventCoordinates(prefix, sequenceNumber - 1, previousDigest);
     var signingThreshold = readSigningThreshold(rootNode.get(SIGNING_THRESHOLD.label()));
 
     var keys = new ArrayList<PublicKey>();
@@ -305,7 +304,7 @@ public class EventDeserializer {
       return new ImmutableKeyEventCoordinatesSeal(
           new ImmutableKeyEventCoordinates(
               identifier(jsonNode.get("i").textValue()),
-              unhexBigInteger(jsonNode.get("s").textValue()),
+              unhexLong(jsonNode.get("s").textValue()),
               digest(jsonNode.get("d").textValue())));
     } else if (jsonNode.has("rd")) {
       return new ImmutableMerkleTreeRootSeal(digest(jsonNode.get("rd").textValue()));
@@ -322,9 +321,9 @@ public class EventDeserializer {
     var version = version(versionString.substring(4, 6));
     var format = format(versionString.substring(6, 10));
     var prefix = identifier(rootNode.get(IDENTIFIER.label()).textValue());
-    var sequenceNumber = unhexBigInteger(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
+    var sequenceNumber = unhexLong(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
     var previousDigest = digest(rootNode.get(PRIOR_EVENT_DIGEST.label()).textValue());
-    var previous = new ImmutableKeyEventCoordinates(prefix, sequenceNumber.subtract(BigInteger.ONE), previousDigest);
+    var previous = new ImmutableKeyEventCoordinates(prefix, sequenceNumber - 1, previousDigest);
 
     var seals = new ArrayList<Seal>();
     var sealIterator = rootNode.get(ANCHORS.label()).elements();
@@ -357,7 +356,7 @@ public class EventDeserializer {
     var version = version(versionString.substring(4, 6));
     var format = format(versionString.substring(6, 10));
     var identifier = identifier(rootNode.get(IDENTIFIER.label()).textValue());
-    var sequenceNumber = unhexBigInteger(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
+    var sequenceNumber = unhexLong(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
     var eventDigest = digest(rootNode.get(EVENT_DIGEST.label()).textValue());
     var eventCoordinates = new ImmutableKeyEventCoordinates(identifier, sequenceNumber, eventDigest);
 
@@ -383,9 +382,9 @@ public class EventDeserializer {
     var version = version(versionString.substring(4, 6));
     var format = format(versionString.substring(6, 10));
     var identifier = identifier(rootNode.get(IDENTIFIER.label()).textValue());
-    var sequenceNumber = unhexBigInteger(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
+    var sequenceNumber = unhexLong(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
     var eventDigest = digest(rootNode.get(EVENT_DIGEST.label()).textValue());
-    var eventCoordinates = new ImmutableKeyEventCoordinates(identifier, sequenceNumber.subtract(BigInteger.ONE), eventDigest);
+    var eventCoordinates = new ImmutableKeyEventCoordinates(identifier, sequenceNumber - 1, eventDigest);
 
     var eventSignatures = signatures.entrySet()
         .stream()

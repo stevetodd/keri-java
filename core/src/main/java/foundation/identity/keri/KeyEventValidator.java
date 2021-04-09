@@ -6,9 +6,9 @@ import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
@@ -66,7 +66,7 @@ public class KeyEventValidator {
       if (event instanceof InceptionEvent) {
         var icp = (InceptionEvent) ee;
 
-        validate(icp.sequenceNumber().equals(BigInteger.ZERO),
+        validate(icp.sequenceNumber() == 0,
             "inception events must have a sequence number of 0");
 
         validateIdentifier(icp);
@@ -78,7 +78,7 @@ public class KeyEventValidator {
         validate(!(state.delegated()) || rot instanceof DelegatedRotationEvent,
             "delegated identifiers must use delegated rotation event type");
 
-        validate(rot.sequenceNumber().compareTo(BigInteger.ZERO) > 0,
+        validate(rot.sequenceNumber() > 0,
             "non-inception event must have a sequence number greater than 0 (s: %s)",
             rot.sequenceNumber());
 
@@ -106,7 +106,7 @@ public class KeyEventValidator {
     } else if (event instanceof InteractionEvent) {
       var ixn = (InteractionEvent) event;
 
-      validate(ixn.sequenceNumber().compareTo(BigInteger.ZERO) > 0,
+      validate(ixn.sequenceNumber() > 0,
           "non-inception event must have a sequence number greater than 0 (s: %s)",
           ixn.sequenceNumber());
 
@@ -120,7 +120,7 @@ public class KeyEventValidator {
       if (s instanceof KeyEventCoordinatesSeal) {
         var ecds = (KeyEventCoordinatesSeal) s;
         if (ecds.event().identifier().equals(event.identifier())
-            && ecds.event().sequenceNumber().equals(event.sequenceNumber())
+            && ecds.event().sequenceNumber() == event.sequenceNumber()
             && DigestOperations.matches(event.bytes(), ecds.event().digest())) {
           return true;
         }

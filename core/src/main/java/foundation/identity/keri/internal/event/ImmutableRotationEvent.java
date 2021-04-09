@@ -30,7 +30,7 @@ public final class ImmutableRotationEvent extends AbstractImmutableEstablishment
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,

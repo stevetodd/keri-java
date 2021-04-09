@@ -31,7 +31,7 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,

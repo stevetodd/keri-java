@@ -3,15 +3,13 @@ package foundation.identity.keri.api.event;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.identifier.Identifier;
 
-import java.math.BigInteger;
-
 public interface KeyEventCoordinates {
 
   KeyEventCoordinates NONE = new None();
 
   Identifier identifier();
 
-  BigInteger sequenceNumber();
+  long sequenceNumber();
 
   Digest digest();
 
@@ -26,8 +24,8 @@ public interface KeyEventCoordinates {
     }
 
     @Override
-    public BigInteger sequenceNumber() {
-      return BigInteger.valueOf(-1);
+    public long sequenceNumber() {
+      return -1;
     }
 
     @Override

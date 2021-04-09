@@ -4,6 +4,7 @@ import foundation.identity.keri.crypto.SignatureOperations;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.interfaces.EdECPrivateKey;
@@ -35,7 +36,7 @@ public class EdDSAOperationsTests {
   @Test
   public void test_ED25519_encode() throws GeneralSecurityException {
     var point = new EdECPoint(false,
-        Hex.unhexBigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c"));
+        new BigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c", 16));
     var keyFactory = KeyFactory.getInstance("Ed25519");
     var spec = new EdECPublicKeySpec(NamedParameterSpec.ED25519, point);
     var publicKey = (EdECPublicKey) keyFactory.generatePublic(spec);
@@ -58,14 +59,14 @@ public class EdDSAOperationsTests {
     assertEquals(NamedParameterSpec.ED25519.getName(), result.getParams().getName());
 
     var expectedPoint = new EdECPoint(false,
-        Hex.unhexBigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c"));
+        new BigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c", 16));
     assertEquals(expectedPoint.isXOdd(), result.getPoint().isXOdd());
     assertEquals(expectedPoint.getY(), result.getPoint().getY());
   }
 
   @Test
   public void test_ED25519_encodeDecodeRoundtrip() throws GeneralSecurityException {
-    final var ecPointY = Hex.unhexBigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c");
+    final var ecPointY = new BigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c", 16);
     var point = new EdECPoint(false, ecPointY);
     var keyFactory = KeyFactory.getInstance("Ed25519");
     var spec = new EdECPublicKeySpec(NamedParameterSpec.ED25519, point);
@@ -128,8 +129,8 @@ public class EdDSAOperationsTests {
   @Test
   public void test_ED448_encode() throws GeneralSecurityException {
     var point = new EdECPoint(true,
-        Hex.unhexBigInteger(
-            "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf"));
+        new BigInteger(
+            "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf", 16));
     var keyFactory = KeyFactory.getInstance("Ed448");
     var spec = new EdECPublicKeySpec(NamedParameterSpec.ED448, point);
     var publicKey = (EdECPublicKey) keyFactory.generatePublic(spec);
@@ -154,16 +155,16 @@ public class EdDSAOperationsTests {
     assertEquals(NamedParameterSpec.ED448.getName(), result.getParams().getName());
 
     var expectedPoint = new EdECPoint(true,
-        Hex.unhexBigInteger(
-            "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf"));
+        new BigInteger(
+            "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf", 16));
     assertEquals(expectedPoint.isXOdd(), result.getPoint().isXOdd());
     assertEquals(expectedPoint.getY(), result.getPoint().getY());
   }
 
   @Test
   public void test_ED448_encodeDecodeRoundtrip() throws GeneralSecurityException {
-    final var ecPointY = Hex.unhexBigInteger(
-        "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf");
+    final var ecPointY = new BigInteger(
+        "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf", 16);
     var point = new EdECPoint(true, ecPointY);
     var keyFactory = KeyFactory.getInstance("Ed448");
     var spec = new EdECPublicKeySpec(NamedParameterSpec.ED448, point);

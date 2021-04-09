@@ -20,14 +20,14 @@ public class InteractionSpec {
   private final Format format;
 
   private final Identifier identifier;
-  private final BigInteger sequenceNumber;
+  private final long sequenceNumber;
   private final KeyEventCoordinates previous;
 
   private final Signer signer;
 
   private final List<Seal> seals;
 
-  public InteractionSpec(Format format, Identifier identifier, BigInteger sequenceNumber, KeyEventCoordinates previous,
+  public InteractionSpec(Format format, Identifier identifier, long sequenceNumber, KeyEventCoordinates previous,
                          Signer signer, List<Seal> seals) {
     this.format = format;
     this.identifier = identifier;
@@ -49,7 +49,7 @@ public class InteractionSpec {
     return this.identifier;
   }
 
-  public BigInteger sequenceNumber() {
+  public long sequenceNumber() {
     return this.sequenceNumber;
   }
 
@@ -126,7 +126,7 @@ public class InteractionSpec {
       return new InteractionSpec(
           this.format,
           this.state.identifier(),
-          this.state.lastEvent().sequenceNumber().add(BigInteger.ONE),
+          this.state.lastEvent().sequenceNumber() + 1,
           ImmutableKeyEventCoordinates.of(this.state.lastEvent()),
           this.signer,
           this.seals);

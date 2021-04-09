@@ -25,7 +25,7 @@ public interface KeyEventStore {
 
   Stream<KeyEvent> streamKeyEvents(Identifier identifier);
 
-  Stream<KeyEvent> streamKeyEvents(Identifier identifier, BigInteger from);
+  Stream<KeyEvent> streamKeyEvents(Identifier identifier, long from);
 
   Optional<KeyState> getKeyState(Identifier identifier);
 

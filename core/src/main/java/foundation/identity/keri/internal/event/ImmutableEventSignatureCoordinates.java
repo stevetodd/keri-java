@@ -16,12 +16,12 @@ import static java.util.Objects.requireNonNull;
 public class ImmutableEventSignatureCoordinates implements EventSignatureCoordinates {
 
   private final Identifier identifier;
-  private final BigInteger sequenceNumber;
+  private final long sequenceNumber;
   private final Digest digest;
   private final int keyIndex;
 
-  public ImmutableEventSignatureCoordinates(Identifier identifier, BigInteger sequenceNumber, Digest digest, int keyIndex) {
-    if (sequenceNumber.compareTo(BigInteger.ZERO) < 0) {
+  public ImmutableEventSignatureCoordinates(Identifier identifier, long sequenceNumber, Digest digest, int keyIndex) {
+    if (sequenceNumber < 0) {
       throw new IllegalArgumentException("sequenceNumber must be >= 0");
     }
 
@@ -30,7 +30,7 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
     }
 
     this.identifier = requireNonNull(identifier, "identifier");
-    this.sequenceNumber = requireNonNull(sequenceNumber, "sequenceNumber");
+    this.sequenceNumber = sequenceNumber;
     this.digest = requireNonNull(digest, "digest");
     this.keyIndex = keyIndex;
   }
@@ -59,7 +59,7 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
   }
 
   @Override
-  public BigInteger sequenceNumber() {
+  public long sequenceNumber() {
     return this.sequenceNumber;
   }
 
@@ -99,7 +99,7 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
   public String toString() {
     return String.join(":",
         qb64(this.identifier),
-        this.sequenceNumber.toString(),
+        Long.toString(this.sequenceNumber),
         qb64(this.digest),
         Integer.toString(this.keyIndex)
     );

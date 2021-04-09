@@ -41,7 +41,7 @@ public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmen
         version,
         format,
         identifier,
-        BigInteger.ZERO,
+        0,
         KeyEventCoordinates.NONE,
         signingThreshold,
         keys,

@@ -18,18 +18,18 @@ import static java.util.Objects.requireNonNull;
 public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
 
   private final Identifier identifier;
-  private final BigInteger sequenceNumber;
+  private final long sequenceNumber;
   private final Digest digest;
 
-  public ImmutableKeyEventCoordinates(Identifier identifier, BigInteger sequenceNumber, Digest digest) {
-    if (sequenceNumber.compareTo(BigInteger.ZERO) < 0) {
+  public ImmutableKeyEventCoordinates(Identifier identifier, long sequenceNumber, Digest digest) {
+    if (sequenceNumber < 0) {
       throw new IllegalArgumentException("sequenceNumber must be >= 0");
     }
 
     this.identifier = requireNonNull(identifier);
     this.sequenceNumber = requireNonNull(sequenceNumber);
 
-    if ((!(identifier instanceof BasicIdentifier) || !sequenceNumber.equals(BigInteger.ZERO))
+    if ((!(identifier instanceof BasicIdentifier) || sequenceNumber != 0)
         && Digest.NONE.equals(digest)){
       // Digest isn't required for BasicIdentifiers or for inception events
       throw new IllegalArgumentException("digest is required");
@@ -79,7 +79,7 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
   }
 
   public static ImmutableKeyEventCoordinates of(BasicIdentifier identifier) {
-    return new ImmutableKeyEventCoordinates(identifier, BigInteger.ZERO, Digest.NONE);
+    return new ImmutableKeyEventCoordinates(identifier, 0, Digest.NONE);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
   }
 
   @Override
-  public BigInteger sequenceNumber() {
+  public long sequenceNumber() {
     return this.sequenceNumber;
   }
 
@@ -117,7 +117,7 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
 
     var other = (KeyEventCoordinates) obj;
     return Objects.equals(this.identifier, other.identifier())
-        && Objects.equals(this.sequenceNumber, other.sequenceNumber())
+        && this.sequenceNumber == other.sequenceNumber()
         && Objects.equals(this.digest, other.digest());
   }
 

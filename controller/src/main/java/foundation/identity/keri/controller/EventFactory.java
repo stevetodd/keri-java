@@ -40,7 +40,7 @@ public final class EventFactory {
     var bytes = this.eventSerializer.serialize(prefix, spec);
 
     var digest = DigestOperations.BLAKE3_256.digest(bytes);
-    var event = new ImmutableKeyEventCoordinates(prefix, BigInteger.ZERO, digest);
+    var event = new ImmutableKeyEventCoordinates(prefix, 0, digest);
     var signature = spec.signer().sign(bytes);
     var eventSignature = new ImmutableAttachedEventSignature(event, 0, signature);
 

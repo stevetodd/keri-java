@@ -3,12 +3,11 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.InteractionEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +21,7 @@ public final class ImmutableInteractionEvent extends AbstractImmutableKeyEvent i
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previous,
       List<Seal> seals,
       byte[] bytes,

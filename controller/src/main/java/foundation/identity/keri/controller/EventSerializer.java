@@ -91,7 +91,7 @@ public final class EventSerializer {
     if (seal instanceof KeyEventCoordinatesSeal) {
       var els = (KeyEventCoordinatesSeal) seal;
       obj.put("i", qb64(els.event().identifier()));
-      obj.put("s", hex(els.event().sequenceNumber()));
+      obj.put("s", hexNoPad(els.event().sequenceNumber()));
       obj.put("d", qb64(els.event().digest()));
     } else if ((seal instanceof DigestSeal)) {
       obj.put("d", qb64(((DigestSeal) seal).digest()));
@@ -222,7 +222,7 @@ public final class EventSerializer {
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hex(spec.sequenceNumber()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
     rootNode.put(EVENT_TYPE.label(), type(EventType.ROTATION));
     rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
 
@@ -267,7 +267,7 @@ public final class EventSerializer {
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hex(spec.sequenceNumber()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
     rootNode.put(EVENT_TYPE.label(), type(EventType.INTERACTION));
     rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
 
@@ -291,13 +291,13 @@ public final class EventSerializer {
     var eventSignature = spec.signatures().stream().findFirst().get();
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(eventSignature.event().identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hex(eventSignature.event().sequenceNumber()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(eventSignature.event().sequenceNumber()));
     rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT_FROM_TRANSFERABLE));
     rootNode.put(EVENT_DIGEST.label(), qb64(eventSignature.event().digest()));
 
     var anchorNode = mapper.createObjectNode();
     anchorNode.put(IDENTIFIER.label(), qb64(eventSignature.key().establishmentEvent().identifier()));
-    anchorNode.put(SEQUENCE_NUMBER.label(), hex(eventSignature.key().establishmentEvent().sequenceNumber()));
+    anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(eventSignature.key().establishmentEvent().sequenceNumber()));
     anchorNode.put(EVENT_DIGEST.label(), qb64(eventSignature.key().establishmentEvent().digest()));
     rootNode.set(ANCHORS.label(), anchorNode);
 
@@ -316,7 +316,7 @@ public final class EventSerializer {
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
     rootNode.put(IDENTIFIER.label(), qb64(spec.event().identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hex(spec.event().sequenceNumber()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.event().sequenceNumber()));
     rootNode.put(EVENT_TYPE.label(), type(EventType.RECEIPT));
     rootNode.put(EVENT_DIGEST.label(), qb64(spec.event().digest()));
 

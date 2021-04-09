@@ -17,7 +17,7 @@ public abstract class AbstractImmutableKeyEvent extends AbstractImmutableEvent
     implements KeyEvent {
 
   private final Identifier identifier;
-  private final BigInteger sequenceNumber;
+  private final long sequenceNumber;
   private final KeyEventCoordinates previous;
   private final Set<AttachedEventSignature> signatures;
   private Supplier<KeyEventCoordinates> coordinates = () -> {
@@ -31,13 +31,13 @@ public abstract class AbstractImmutableKeyEvent extends AbstractImmutableEvent
       Version version,
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previous,
       byte[] bytes,
       Set<AttachedEventSignature> signatures) {
     super(bytes, version, format);
     this.identifier = requireNonNull(identifier, "identifier");
-    this.sequenceNumber = requireNonNull(sequenceNumber, "sequenceNumber");
+    this.sequenceNumber = sequenceNumber;
     this.previous = requireNonNull(previous, "previous");
     this.signatures = Set.copyOf(requireNonNull(signatures, "signatures"));
   }
@@ -48,7 +48,7 @@ public abstract class AbstractImmutableKeyEvent extends AbstractImmutableEvent
   }
 
   @Override
-  public BigInteger sequenceNumber() {
+  public long sequenceNumber() {
     return this.sequenceNumber;
   }
 

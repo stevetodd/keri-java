@@ -122,9 +122,9 @@ public class DirectModeNode {
     var lastReceipt = this.keyEventStore.findLatestReceipt(this.identifier.identifier(), ie.identifier());
     var lastEventSequenceNumber = lastReceipt.isPresent()
                                   ? lastReceipt.get().event().sequenceNumber()
-                                  : BigInteger.valueOf(-1);
+                                  : -1;
     var events = Flux.<Event> empty();
-    if (!lastEventSequenceNumber.equals(this.identifier.lastEvent().sequenceNumber())) {
+    if (lastEventSequenceNumber != this.identifier.lastEvent().sequenceNumber()) {
       // make sure we've sent our log so they can verify the chit
       System.out.println("[Node] WILL SEND LOG >>> ");
       events = produceOwnLog(lastEventSequenceNumber);
@@ -134,9 +134,9 @@ public class DirectModeNode {
     return Flux.concat(events, Mono.just(receiptEvent(ie)));
   }
 
-  private Flux<Event> produceOwnLog(BigInteger fromSequenceNumber) {
+  private Flux<Event> produceOwnLog(long fromSequenceNumber) {
     var events = this.keyEventStore
-        .streamKeyEvents(this.identifier.identifier(), fromSequenceNumber.add(BigInteger.ONE));
+        .streamKeyEvents(this.identifier.identifier(), fromSequenceNumber + 1);
 
     return Flux.fromStream(events);
   }

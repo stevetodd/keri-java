@@ -30,7 +30,7 @@ public class RotationSpec {
   private final Format format;
 
   private final Identifier identifier;
-  private final BigInteger sequenceNumber;
+  private final long sequenceNumber;
   private final KeyEventCoordinates previous;
 
   private final SigningThreshold signingThreshold;
@@ -48,7 +48,7 @@ public class RotationSpec {
   public RotationSpec(
       Format format,
       Identifier identifier,
-      BigInteger sequenceNumber,
+      long sequenceNumber,
       KeyEventCoordinates previousEvent,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,
@@ -80,7 +80,7 @@ public class RotationSpec {
     return this.identifier;
   }
 
-  public BigInteger sequenceNumber() {
+  public long sequenceNumber() {
     return this.sequenceNumber;
   }
 
@@ -381,7 +381,7 @@ public class RotationSpec {
       return new RotationSpec(
           this.format,
           this.state.identifier(),
-          this.state.lastEvent().sequenceNumber().add(BigInteger.ONE),
+          this.state.lastEvent().sequenceNumber() + 1,
           ImmutableKeyEventCoordinates.of(this.state.lastEvent()),
           this.signingThreshold,
           this.keys,

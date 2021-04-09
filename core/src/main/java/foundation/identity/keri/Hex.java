@@ -1,6 +1,5 @@
 package foundation.identity.keri;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 
 public final class Hex {
@@ -53,10 +52,6 @@ public final class Hex {
     return Long.toString(l, 16);
   }
 
-  public static String hex(BigInteger b) {
-    return b.toString(16);
-  }
-
   public static byte[] unhex(String hex) {
     if ((hex.length() % 2) != 0) {
       throw new IllegalArgumentException("hex must have an even length.");
@@ -79,10 +74,6 @@ public final class Hex {
 
   public static long unhexLong(String hex) {
     return Long.parseLong(hex, 16);
-  }
-
-  public static BigInteger unhexBigInteger(String hex) {
-    return new BigInteger(hex, 16);
   }
 
 }

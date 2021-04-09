@@ -89,9 +89,9 @@ public class InMemoryKeyEventStore implements KeyEventStore {
   }
 
   @Override
-  public Stream<KeyEvent> streamKeyEvents(Identifier identifier, BigInteger from) {
+  public Stream<KeyEvent> streamKeyEvents(Identifier identifier, long from) {
     return streamKeyEvents(identifier)
-        .dropWhile(e -> e.sequenceNumber().compareTo(from) < 0);
+        .dropWhile(e -> e.sequenceNumber() < from);
   }
 
   @Override
