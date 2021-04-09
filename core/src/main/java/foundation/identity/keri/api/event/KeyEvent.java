@@ -5,15 +5,15 @@ import foundation.identity.keri.api.identifier.Identifier;
 import java.math.BigInteger;
 import java.util.Set;
 
-public interface IdentifierEvent extends Event {
+public interface KeyEvent extends Event {
 
   Identifier identifier();
 
   BigInteger sequenceNumber();
 
-  IdentifierEventCoordinatesWithDigest coordinates();
+  KeyEventCoordinates coordinates();
 
-  IdentifierEventCoordinatesWithDigest previous();
+  KeyEventCoordinates previous();
 
   Set<AttachedEventSignature> signatures();
 

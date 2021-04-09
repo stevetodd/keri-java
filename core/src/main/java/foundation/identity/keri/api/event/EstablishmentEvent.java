@@ -4,7 +4,7 @@ import java.security.PublicKey;
 import java.util.List;
 import java.util.Optional;
 
-public interface EstablishmentEvent extends IdentifierEvent {
+public interface EstablishmentEvent extends KeyEvent {
 
   SigningThreshold signingThreshold();
 

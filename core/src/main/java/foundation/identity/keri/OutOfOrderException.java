@@ -2,22 +2,22 @@ package foundation.identity.keri;
 
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEvent;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 
 public class OutOfOrderException extends RuntimeException {
 
   private final Event event;
-  private final IdentifierEventCoordinatesWithDigest requiredEvent;
+  private final KeyEventCoordinates requiredEvent;
   private final DelegatingEventCoordinates requiredDelegatingEvent;
 
-  public OutOfOrderException(Event event, IdentifierEventCoordinatesWithDigest requiredEvent) {
+  public OutOfOrderException(Event event, KeyEventCoordinates requiredEvent) {
     this.event = event;
     this.requiredEvent = requiredEvent;
     this.requiredDelegatingEvent = null;
   }
 
-  public OutOfOrderException(IdentifierEvent event, DelegatingEventCoordinates delegatingEvent) {
+  public OutOfOrderException(KeyEvent event, DelegatingEventCoordinates delegatingEvent) {
     this.event = event;
     this.requiredEvent = null;
     this.requiredDelegatingEvent = delegatingEvent;
@@ -27,7 +27,7 @@ public class OutOfOrderException extends RuntimeException {
     return this.event;
   }
 
-  public IdentifierEventCoordinatesWithDigest requiredEvent() {
+  public KeyEventCoordinates requiredEvent() {
     return this.requiredEvent;
   }
 

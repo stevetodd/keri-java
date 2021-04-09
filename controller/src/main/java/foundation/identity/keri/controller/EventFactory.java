@@ -14,7 +14,7 @@ import foundation.identity.keri.controller.spec.ReceiptSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.internal.event.ImmutableAttachedEventSignature;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
 import foundation.identity.keri.internal.event.ImmutableReceiptFromBasicIdentifierEvent;
@@ -40,7 +40,7 @@ public final class EventFactory {
     var bytes = this.eventSerializer.serialize(prefix, spec);
 
     var digest = DigestOperations.BLAKE3_256.digest(bytes);
-    var event = new ImmutableIdentifierEventCoordinatesWithDigest(prefix, BigInteger.ZERO, digest);
+    var event = new ImmutableKeyEventCoordinates(prefix, BigInteger.ZERO, digest);
     var signature = spec.signer().sign(bytes);
     var eventSignature = new ImmutableAttachedEventSignature(event, 0, signature);
 
@@ -65,7 +65,7 @@ public final class EventFactory {
 
     if (spec.signer() != null) {
       var digest = DigestOperations.BLAKE3_256.digest(bytes);
-      var event = new ImmutableIdentifierEventCoordinatesWithDigest(spec.identifier(), spec.sequenceNumber(), digest);
+      var event = new ImmutableKeyEventCoordinates(spec.identifier(), spec.sequenceNumber(), digest);
       var signature = spec.signer().sign(bytes);
       var eventSignature = new ImmutableAttachedEventSignature(event, spec.signer().keyIndex(), signature);
       signatures.add(eventSignature);
@@ -94,7 +94,7 @@ public final class EventFactory {
 
     if (spec.signer() != null) {
       var digest = DigestOperations.BLAKE3_256.digest(bytes);
-      var event = new ImmutableIdentifierEventCoordinatesWithDigest(spec.identifier(), spec.sequenceNumber(), digest);
+      var event = new ImmutableKeyEventCoordinates(spec.identifier(), spec.sequenceNumber(), digest);
       var signature = spec.signer().sign(bytes);
       var eventSignature = new ImmutableAttachedEventSignature(event, spec.signer().keyIndex(), signature);
       signatures.add(eventSignature);

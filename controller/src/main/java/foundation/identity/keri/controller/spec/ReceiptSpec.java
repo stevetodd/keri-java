@@ -3,9 +3,9 @@ package foundation.identity.keri.controller.spec;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEvent;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,28 +16,28 @@ import static java.util.Objects.requireNonNull;
 
 public class ReceiptSpec {
 
-  private final IdentifierEventCoordinatesWithDigest event;
+  private final KeyEventCoordinates event;
   private final Format format;
   private final Set<EventSignature> receipts;
 
   public ReceiptSpec(
       Format format,
-      IdentifierEventCoordinatesWithDigest event,
+      KeyEventCoordinates event,
       Set<EventSignature> receipts) {
     this.format = format;
     this.event = event;
     this.receipts = Set.copyOf(requireNonNull(receipts));
   }
 
-  public static Builder builder(IdentifierEvent event) {
-    return builder(ImmutableIdentifierEventCoordinatesWithDigest.of(event));
+  public static Builder builder(KeyEvent event) {
+    return builder(ImmutableKeyEventCoordinates.of(event));
   }
 
-  public static Builder builder(IdentifierEventCoordinatesWithDigest event) {
+  public static Builder builder(KeyEventCoordinates event) {
     return new Builder(event);
   }
 
-  public IdentifierEventCoordinatesWithDigest event() {
+  public KeyEventCoordinates event() {
     return this.event;
   }
 
@@ -50,11 +50,11 @@ public class ReceiptSpec {
   }
 
   public static class Builder {
-    private final IdentifierEventCoordinatesWithDigest event;
+    private final KeyEventCoordinates event;
     private final Set<EventSignature> receipts = new HashSet<>();
     private Format format = StandardFormats.JSON;
 
-    public Builder(IdentifierEventCoordinatesWithDigest event) {
+    public Builder(KeyEventCoordinates event) {
       this.event = event;
     }
 

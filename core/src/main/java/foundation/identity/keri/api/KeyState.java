@@ -2,7 +2,7 @@ package foundation.identity.keri.api;
 
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -34,7 +34,7 @@ public interface KeyState {
 
   Set<ConfigurationTrait> configurationTraits();
 
-  IdentifierEvent lastEvent();
+  KeyEvent lastEvent();
 
   EstablishmentEvent lastEstablishmentEvent();
 

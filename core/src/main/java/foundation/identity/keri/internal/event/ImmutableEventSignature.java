@@ -3,19 +3,19 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyCoordinates;
 
 import java.util.Objects;
 
 public class ImmutableEventSignature implements EventSignature {
 
-  private final IdentifierEventCoordinatesWithDigest event;
+  private final KeyEventCoordinates event;
   private final KeyCoordinates key;
   private final Signature signature;
 
   public ImmutableEventSignature(
-      IdentifierEventCoordinatesWithDigest event,
+      KeyEventCoordinates event,
       KeyCoordinates key,
       Signature signature) {
     this.event = event;
@@ -23,12 +23,12 @@ public class ImmutableEventSignature implements EventSignature {
     this.signature = signature;
   }
 
-  public static ImmutableEventSignature from(AttachedEventSignature attachedSignature, IdentifierEventCoordinatesWithDigest establishmentEvent) {
+  public static ImmutableEventSignature from(AttachedEventSignature attachedSignature, KeyEventCoordinates establishmentEvent) {
     var key = new ImmutableKeyCoordinates(establishmentEvent, attachedSignature.keyIndex());
     return new ImmutableEventSignature(attachedSignature.event(), key, attachedSignature.signature());
   }
 
-  public static ImmutableEventSignature of(IdentifierEventCoordinatesWithDigest event,
+  public static ImmutableEventSignature of(KeyEventCoordinates event,
                                            KeyCoordinates key, Signature signature) {
     return new ImmutableEventSignature(
         ImmutableEventSignatureCoordinates.of(event, key),
@@ -37,7 +37,7 @@ public class ImmutableEventSignature implements EventSignature {
   }
 
   @Override
-  public IdentifierEventCoordinatesWithDigest event() {
+  public KeyEventCoordinates event() {
     return this.event;
   }
 

@@ -9,7 +9,7 @@ public interface ReceiptFromTransferableIdentifierEvent extends ReceiptEvent {
     return EventType.RECEIPT_FROM_TRANSFERABLE;
   }
 
-  IdentifierEventCoordinatesWithDigest keyEstablishmentEvent();
+  KeyEventCoordinates keyEstablishmentEvent();
 
   Set<AttachedEventSignature> signatures();
 

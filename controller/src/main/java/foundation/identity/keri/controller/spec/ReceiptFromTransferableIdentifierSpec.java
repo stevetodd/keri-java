@@ -3,7 +3,7 @@ package foundation.identity.keri.controller.spec;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,12 +14,12 @@ import static java.util.Objects.requireNonNull;
 public class ReceiptFromTransferableIdentifierSpec {
 
   private final Format format;
-  private final IdentifierEventCoordinatesWithDigest event;
+  private final KeyEventCoordinates event;
   private final Set<EventSignature> signatures;
 
   public ReceiptFromTransferableIdentifierSpec(
       Format format,
-      IdentifierEventCoordinatesWithDigest event,
+      KeyEventCoordinates event,
       Set<EventSignature> signatures) {
     this.format = requireNonNull(format);
     this.event = requireNonNull(event);
@@ -34,7 +34,7 @@ public class ReceiptFromTransferableIdentifierSpec {
     return this.format;
   }
 
-  public IdentifierEventCoordinatesWithDigest event() {
+  public KeyEventCoordinates event() {
     return this.event;
   }
 

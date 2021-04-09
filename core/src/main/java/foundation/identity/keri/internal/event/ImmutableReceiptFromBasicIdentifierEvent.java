@@ -3,7 +3,7 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 
@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 public class ImmutableReceiptFromBasicIdentifierEvent extends AbstractImmutableEvent
     implements ReceiptFromBasicIdentifierEvent {
 
-  private final IdentifierEventCoordinatesWithDigest event;
+  private final KeyEventCoordinates event;
   private final Set<EventSignature> receipts;
 
   public ImmutableReceiptFromBasicIdentifierEvent(
@@ -42,7 +42,7 @@ public class ImmutableReceiptFromBasicIdentifierEvent extends AbstractImmutableE
   }
 
   @Override
-  public IdentifierEventCoordinatesWithDigest event() {
+  public KeyEventCoordinates event() {
     return this.event;
   }
 

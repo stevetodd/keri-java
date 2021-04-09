@@ -11,7 +11,7 @@ import foundation.identity.keri.api.crypto.SignatureAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
@@ -21,7 +21,7 @@ import foundation.identity.keri.controller.spec.RotationSpec;
 import foundation.identity.keri.crypto.SignatureOperations;
 import foundation.identity.keri.internal.event.ImmutableEventSignature;
 import foundation.identity.keri.internal.event.ImmutableEventSignatureCoordinates;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
 
 import java.security.KeyPair;
@@ -190,7 +190,7 @@ public final class Controller {
     return new DefaultControllableIdentifier(this, newState);
   }
 
-  public EventSignature sign(Identifier identifier, IdentifierEvent event) {
+  public EventSignature sign(Identifier identifier, KeyEvent event) {
     var state = getIdentifierState(identifier);
 
     if (state == null) {
@@ -204,7 +204,7 @@ public final class Controller {
     var ops = SignatureOperations.lookup(keyPair.getPrivate());
     var signature = ops.sign(event.bytes(), keyPair.getPrivate());
 
-    var eventCoordinates = ImmutableIdentifierEventCoordinatesWithDigest.of(event);
+    var eventCoordinates = ImmutableKeyEventCoordinates.of(event);
     var eventSigCoords = ImmutableEventSignatureCoordinates.of(eventCoordinates, keyCoords);
     return new ImmutableEventSignature(eventSigCoords, keyCoords, signature);
   }

@@ -6,7 +6,7 @@ import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
@@ -17,7 +17,7 @@ import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
-import foundation.identity.keri.api.seal.EventCoordinatesWithDigestSeal;
+import foundation.identity.keri.api.seal.KeyEventCoordinatesSeal;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.crypto.SignatureOperations;
@@ -43,8 +43,8 @@ public class KeyEventValidator {
   }
 
   public void validate(KeyState state, Event event) {
-    if (event instanceof IdentifierEvent) {
-      validate(state, (IdentifierEvent) event);
+    if (event instanceof KeyEvent) {
+      validate(state, (KeyEvent) event);
     } else if (event instanceof ReceiptEvent) {
       validate((ReceiptEvent) event);
     } else {
@@ -52,7 +52,7 @@ public class KeyEventValidator {
     }
   }
 
-  private void validate(KeyState state, IdentifierEvent event) {
+  private void validate(KeyState state, KeyEvent event) {
     validateAttachedSignatures(event, state);
 
     if (event instanceof EstablishmentEvent) {
@@ -117,8 +117,8 @@ public class KeyEventValidator {
 
   private boolean containsSeal(List<Seal> seals, DelegatedEstablishmentEvent event) {
     for (var s : seals) {
-      if (s instanceof EventCoordinatesWithDigestSeal) {
-        var ecds = (EventCoordinatesWithDigestSeal) s;
+      if (s instanceof KeyEventCoordinatesSeal) {
+        var ecds = (KeyEventCoordinatesSeal) s;
         if (ecds.event().identifier().equals(event.identifier())
             && ecds.event().sequenceNumber().equals(event.sequenceNumber())
             && DigestOperations.matches(event.bytes(), ecds.event().digest())) {
@@ -243,7 +243,7 @@ public class KeyEventValidator {
     }
   }
 
-  public void validateAttachedSignatures(IdentifierEvent event, KeyState state) {
+  public void validateAttachedSignatures(KeyEvent event, KeyState state) {
     var keyEstablishmentEvent = event instanceof EstablishmentEvent
         ? (EstablishmentEvent) event
         : state.lastEstablishmentEvent();

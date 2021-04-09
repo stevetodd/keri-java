@@ -5,7 +5,7 @@ import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -33,7 +33,7 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
       Format format,
       Identifier identifier,
       BigInteger sequenceNumber,
-      IdentifierEventCoordinatesWithDigest previous,
+      KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,
       KeyConfigurationDigest nextKeys,

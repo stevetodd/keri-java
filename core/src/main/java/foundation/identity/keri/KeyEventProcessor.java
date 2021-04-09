@@ -3,11 +3,11 @@ package foundation.identity.keri;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEvent;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +30,10 @@ public class KeyEventProcessor {
     LOGGER.debug("PROCESS:\n{}", event);
 
     try {
-      if (event instanceof IdentifierEvent) {
-        processKeyEvent((IdentifierEvent) event);
+      if (event instanceof KeyEvent) {
+        processKeyEvent((KeyEvent) event);
         // see of arrival of event enables escrowed events to be processed
-        processEscrow((IdentifierEvent) event);
+        processEscrow((KeyEvent) event);
       } else if (event instanceof ReceiptEvent) {
         processReceipt((ReceiptEvent) event);
       }
@@ -55,9 +55,9 @@ public class KeyEventProcessor {
     }
   }
 
-  private void processEscrow(IdentifierEvent event) {
+  private void processEscrow(KeyEvent event) {
     // TODO delegation
-    var coords = ImmutableIdentifierEventCoordinatesWithDigest.of(event);
+    var coords = ImmutableKeyEventCoordinates.of(event);
     escrow.eventsAwaiting(coords)
       .forEach(this::process);
   }
@@ -66,7 +66,7 @@ public class KeyEventProcessor {
     LOGGER.error("ERROR", e);
   }
 
-  private void processKeyEvent(IdentifierEvent keyEvent) {
+  private void processKeyEvent(KeyEvent keyEvent) {
     KeyState state = null;
     if (!(keyEvent instanceof InceptionEvent)) {
       state = this.keyEventStore.getKeyState(keyEvent.previous())
@@ -87,7 +87,7 @@ public class KeyEventProcessor {
     this.keyEventStore.append(receiptEvent);
   }
 
-  protected void doOnMissingEvent(IdentifierEventCoordinatesWithDigest missingEvent,
+  protected void doOnMissingEvent(KeyEventCoordinates missingEvent,
       Event dependingEvent) {
     LOGGER.debug("MISSING EVENT: {}",  missingEvent);
     this.escrow.await(missingEvent, dependingEvent);

@@ -3,7 +3,7 @@ package foundation.identity.keri;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
@@ -24,8 +24,8 @@ public final class KeyEvents {
     var sb = new StringBuilder();
     sb.append(format("%s (KERI %s %s)", e.type(), e.version(), e.format())).append("\n");
 
-    if (e instanceof IdentifierEvent) {
-      var ie = (IdentifierEvent) e;
+    if (e instanceof KeyEvent) {
+      var ie = (KeyEvent) e;
       sb.append("i:  ").append(ie.identifier()).append("\n");
       sb.append("s:  ").append(ie.sequenceNumber()).append("\n");
       sb.append("p:  ").append(ie.previous().digest()).append("\n");

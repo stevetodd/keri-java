@@ -3,7 +3,7 @@ package foundation.identity.keri.internal;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -23,7 +23,7 @@ public class ImmutableKeyState implements KeyState {
   private final int witnessThreshold;
   private final List<BasicIdentifier> witnesses;
   private final Set<ConfigurationTrait> configurationTraits;
-  private final IdentifierEvent lastEvent;
+  private final KeyEvent lastEvent;
   private final EstablishmentEvent lastEstablishmentEvent;
   private final Identifier delegatingIdentifier;
 
@@ -35,7 +35,7 @@ public class ImmutableKeyState implements KeyState {
       int witnessThreshold,
       List<BasicIdentifier> witnesses,
       Set<ConfigurationTrait> configurationTraits,
-      IdentifierEvent lastEvent,
+      KeyEvent lastEvent,
       EstablishmentEvent lastEstablishmentEvent,
       Identifier delegatingIdentifier) {
     this.identifier = identifier;
@@ -86,7 +86,7 @@ public class ImmutableKeyState implements KeyState {
   }
 
   @Override
-  public IdentifierEvent lastEvent() {
+  public KeyEvent lastEvent() {
     return this.lastEvent;
   }
 

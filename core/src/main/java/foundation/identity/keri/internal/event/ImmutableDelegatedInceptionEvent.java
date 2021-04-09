@@ -6,7 +6,7 @@ import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.DelegatedInceptionEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -46,7 +46,7 @@ public class ImmutableDelegatedInceptionEvent extends AbstractImmutableDelegated
         format,
         identifier,
         BigInteger.ZERO,
-        IdentifierEventCoordinatesWithDigest.NONE,
+        KeyEventCoordinates.NONE,
         signingThreshold,
         keys,
         nextKeys,

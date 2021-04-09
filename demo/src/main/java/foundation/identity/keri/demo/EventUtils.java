@@ -4,7 +4,7 @@ import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
@@ -23,8 +23,8 @@ public final class EventUtils {
   public static void printEvent(Event e) {
     System.out.printf("%s (KERI %s %s)\n", e.type(), e.version(), e.format());
 
-    if (e instanceof IdentifierEvent) {
-      var ie = (IdentifierEvent) e;
+    if (e instanceof KeyEvent) {
+      var ie = (KeyEvent) e;
       System.out.println("i:  " + ie.identifier());
       System.out.println("s:  " + ie.sequenceNumber());
       System.out.println("p:  " + ie.previous().digest());

@@ -1,7 +1,7 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.event.EstablishmentEvent;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyCoordinates;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 
@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 public class ImmutableKeyCoordinates implements KeyCoordinates {
 
   private final int keyIndex;
-  private final IdentifierEventCoordinatesWithDigest establishmentEvent;
+  private final KeyEventCoordinates establishmentEvent;
 
-  public ImmutableKeyCoordinates(IdentifierEventCoordinatesWithDigest establishmentEvent, int keyIndex) {
+  public ImmutableKeyCoordinates(KeyEventCoordinates establishmentEvent, int keyIndex) {
     if (keyIndex < 0) {
       throw new IllegalArgumentException("keyIndex must be >= 0");
     }
@@ -35,17 +35,17 @@ public class ImmutableKeyCoordinates implements KeyCoordinates {
   }
 
   public static ImmutableKeyCoordinates of(BasicIdentifier basicIdentifier) {
-    var coordinates = ImmutableIdentifierEventCoordinatesWithDigest.of(basicIdentifier);
+    var coordinates = ImmutableKeyEventCoordinates.of(basicIdentifier);
     return new ImmutableKeyCoordinates(coordinates, 0);
   }
 
   public static ImmutableKeyCoordinates of(EstablishmentEvent establishmentEvent, int keyIndex) {
-    var coordinates = ImmutableIdentifierEventCoordinatesWithDigest.of(establishmentEvent);
+    var coordinates = ImmutableKeyEventCoordinates.of(establishmentEvent);
     return new ImmutableKeyCoordinates(coordinates, keyIndex);
   }
 
   @Override
-  public IdentifierEventCoordinatesWithDigest establishmentEvent() {
+  public KeyEventCoordinates establishmentEvent() {
     return this.establishmentEvent;
   }
 

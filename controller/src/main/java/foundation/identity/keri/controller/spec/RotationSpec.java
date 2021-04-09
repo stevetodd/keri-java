@@ -8,13 +8,13 @@ import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
@@ -31,7 +31,7 @@ public class RotationSpec {
 
   private final Identifier identifier;
   private final BigInteger sequenceNumber;
-  private final IdentifierEventCoordinatesWithDigest previous;
+  private final KeyEventCoordinates previous;
 
   private final SigningThreshold signingThreshold;
   private final List<PublicKey> keys;
@@ -49,7 +49,7 @@ public class RotationSpec {
       Format format,
       Identifier identifier,
       BigInteger sequenceNumber,
-      IdentifierEventCoordinatesWithDigest previousEvent,
+      KeyEventCoordinates previousEvent,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,
       Signer signer,
@@ -84,7 +84,7 @@ public class RotationSpec {
     return this.sequenceNumber;
   }
 
-  public IdentifierEventCoordinatesWithDigest previous() {
+  public KeyEventCoordinates previous() {
     return this.previous;
   }
 
@@ -382,7 +382,7 @@ public class RotationSpec {
           this.format,
           this.state.identifier(),
           this.state.lastEvent().sequenceNumber().add(BigInteger.ONE),
-          ImmutableIdentifierEventCoordinatesWithDigest.of(this.state.lastEvent()),
+          ImmutableKeyEventCoordinates.of(this.state.lastEvent()),
           this.signingThreshold,
           this.keys,
           this.signer,

@@ -3,10 +3,10 @@ package foundation.identity.keri.controller.spec;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
@@ -21,13 +21,13 @@ public class InteractionSpec {
 
   private final Identifier identifier;
   private final BigInteger sequenceNumber;
-  private final IdentifierEventCoordinatesWithDigest previous;
+  private final KeyEventCoordinates previous;
 
   private final Signer signer;
 
   private final List<Seal> seals;
 
-  public InteractionSpec(Format format, Identifier identifier, BigInteger sequenceNumber, IdentifierEventCoordinatesWithDigest previous,
+  public InteractionSpec(Format format, Identifier identifier, BigInteger sequenceNumber, KeyEventCoordinates previous,
                          Signer signer, List<Seal> seals) {
     this.format = format;
     this.identifier = identifier;
@@ -53,7 +53,7 @@ public class InteractionSpec {
     return this.sequenceNumber;
   }
 
-  public IdentifierEventCoordinatesWithDigest previous() {
+  public KeyEventCoordinates previous() {
     return this.previous;
   }
 
@@ -127,7 +127,7 @@ public class InteractionSpec {
           this.format,
           this.state.identifier(),
           this.state.lastEvent().sequenceNumber().add(BigInteger.ONE),
-          ImmutableIdentifierEventCoordinatesWithDigest.of(this.state.lastEvent()),
+          ImmutableKeyEventCoordinates.of(this.state.lastEvent()),
           this.signer,
           this.seals);
     }

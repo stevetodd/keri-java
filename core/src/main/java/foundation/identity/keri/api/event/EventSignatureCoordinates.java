@@ -1,6 +1,6 @@
 package foundation.identity.keri.api.event;
 
-public interface EventSignatureCoordinates extends IdentifierEventCoordinatesWithDigest {
+public interface EventSignatureCoordinates extends KeyEventCoordinates {
 
   int keyIndex();
 

@@ -4,7 +4,7 @@ import foundation.identity.keri.api.crypto.Signature;
 
 public interface AttachedEventSignature {
 
-  IdentifierEventCoordinatesWithDigest event();
+  KeyEventCoordinates event();
 
   int keyIndex();
 

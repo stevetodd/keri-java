@@ -4,7 +4,7 @@ import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
@@ -42,7 +42,7 @@ public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmen
         format,
         identifier,
         BigInteger.ZERO,
-        IdentifierEventCoordinatesWithDigest.NONE,
+        KeyEventCoordinates.NONE,
         signingThreshold,
         keys,
         nextKeys,

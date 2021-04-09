@@ -5,8 +5,8 @@ import foundation.identity.keri.KeyStateProcessor;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.IdentifierEvent;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
@@ -28,12 +28,12 @@ import static java.util.Comparator.comparing;
 
 public class InMemoryKeyEventStore implements KeyEventStore {
 
-  private final ArrayList<IdentifierEvent> events = new ArrayList<>();
-  private final Map<IdentifierEventCoordinatesWithDigest, KeyState> states = new HashMap<>();
-  private final Map<IdentifierEventCoordinatesWithDigest, Set<EventSignature>> signatures = new HashMap<>();
+  private final ArrayList<KeyEvent> events = new ArrayList<>();
+  private final Map<KeyEventCoordinates, KeyState> states = new HashMap<>();
+  private final Map<KeyEventCoordinates, Set<EventSignature>> signatures = new HashMap<>();
 
   @Override
-  public void append(IdentifierEvent event) {
+  public void append(KeyEvent event) {
     var previousState = getKeyState(event.previous()).orElse(null);
     var newState = KeyStateProcessor.apply(previousState, event);
 
@@ -77,19 +77,19 @@ public class InMemoryKeyEventStore implements KeyEventStore {
   }
 
   @Override
-  public Optional<IdentifierEvent> getKeyEvent(IdentifierEventCoordinatesWithDigest coordinates) {
+  public Optional<KeyEvent> getKeyEvent(KeyEventCoordinates coordinates) {
     return Optional.empty();
   }
 
   @Override
-  public Stream<IdentifierEvent> streamKeyEvents(Identifier identifier) {
+  public Stream<KeyEvent> streamKeyEvents(Identifier identifier) {
     return this.events.stream()
         .filter(e -> e.identifier().equals(identifier))
-        .sorted(comparing(IdentifierEvent::sequenceNumber));
+        .sorted(comparing(KeyEvent::sequenceNumber));
   }
 
   @Override
-  public Stream<IdentifierEvent> streamKeyEvents(Identifier identifier, BigInteger from) {
+  public Stream<KeyEvent> streamKeyEvents(Identifier identifier, BigInteger from) {
     return streamKeyEvents(identifier)
         .dropWhile(e -> e.sequenceNumber().compareTo(from) < 0);
   }
@@ -103,7 +103,7 @@ public class InMemoryKeyEventStore implements KeyEventStore {
   }
 
   @Override
-  public Optional<KeyState> getKeyState(IdentifierEventCoordinatesWithDigest coordinates) {
+  public Optional<KeyState> getKeyState(KeyEventCoordinates coordinates) {
     return Optional.ofNullable(this.states.get(coordinates));
   }
 

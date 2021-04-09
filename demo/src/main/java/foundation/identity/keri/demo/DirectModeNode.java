@@ -4,7 +4,7 @@ import foundation.identity.keri.KeyEventStore;
 import foundation.identity.keri.KeyEventValidator;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.identifier.Identifier;
@@ -99,8 +99,8 @@ public class DirectModeNode {
 
   private Flux<Event> process(Event event) {
     try {
-      if (event instanceof IdentifierEvent) {
-          var ie = (IdentifierEvent) event;
+      if (event instanceof KeyEvent) {
+          var ie = (KeyEvent) event;
           // TODO these should all be reactive -- eventStore will eventually block!
           var state = getState(ie.identifier());
           this.keyEventValidator.validate(state, ie);
@@ -118,7 +118,7 @@ public class DirectModeNode {
     }
   }
 
-  private Flux<Event> produceChit(IdentifierEvent ie) {
+  private Flux<Event> produceChit(KeyEvent ie) {
     var lastReceipt = this.keyEventStore.findLatestReceipt(this.identifier.identifier(), ie.identifier());
     var lastEventSequenceNumber = lastReceipt.isPresent()
                                   ? lastReceipt.get().event().sequenceNumber()
@@ -145,7 +145,7 @@ public class DirectModeNode {
     return this.keyEventStore.getKeyState(identifier).orElse(null);
   }
 
-  private ReceiptFromTransferableIdentifierEvent receiptEvent(IdentifierEvent event) {
+  private ReceiptFromTransferableIdentifierEvent receiptEvent(KeyEvent event) {
     var receipt = this.identifier.sign(event);
 
     var spec = ReceiptFromTransferableIdentifierSpec.builder()

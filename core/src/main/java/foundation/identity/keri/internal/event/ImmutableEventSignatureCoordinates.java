@@ -3,7 +3,7 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.EventSignatureCoordinates;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
 
@@ -35,7 +35,7 @@ public class ImmutableEventSignatureCoordinates implements EventSignatureCoordin
     this.keyIndex = keyIndex;
   }
 
-  public static ImmutableEventSignatureCoordinates of(IdentifierEventCoordinatesWithDigest event,
+  public static ImmutableEventSignatureCoordinates of(KeyEventCoordinates event,
                                                       KeyCoordinates key) {
     return new ImmutableEventSignatureCoordinates(
         event.identifier(),

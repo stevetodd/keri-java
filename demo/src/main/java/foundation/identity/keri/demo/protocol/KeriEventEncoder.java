@@ -3,7 +3,7 @@ package foundation.identity.keri.demo.protocol;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import io.netty.buffer.ByteBuf;
@@ -21,8 +21,8 @@ public class KeriEventEncoder extends MessageToByteEncoder<Event> {
   @Override
   protected void encode(ChannelHandlerContext ctx, Event event, ByteBuf out) {
     writeEvent(out, event);
-    if (event instanceof IdentifierEvent) {
-      writeSignatures(out, ((IdentifierEvent) event).signatures());
+    if (event instanceof KeyEvent) {
+      writeSignatures(out, ((KeyEvent) event).signatures());
     } else if (event instanceof ReceiptFromTransferableIdentifierEvent) {
       var r = (ReceiptFromTransferableIdentifierEvent) event;
       writeSignatures(out, r.signatures());

@@ -4,7 +4,7 @@ import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -62,7 +62,7 @@ public class DefaultControllableIdentifier implements ControllableIdentifier {
   }
 
   @Override
-  public IdentifierEvent lastEvent() {
+  public KeyEvent lastEvent() {
     return this.state.lastEvent();
   }
 
@@ -92,7 +92,7 @@ public class DefaultControllableIdentifier implements ControllableIdentifier {
   }
 
   @Override
-  public EventSignature sign(IdentifierEvent event) {
+  public EventSignature sign(KeyEvent event) {
     return this.controller.sign(this.identifier(), event);
   }
 

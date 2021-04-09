@@ -3,7 +3,7 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 
 import java.util.Objects;
 
@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 public class ImmutableAttachedEventSignature implements AttachedEventSignature {
 
-  private final IdentifierEventCoordinatesWithDigest event;
+  private final KeyEventCoordinates event;
   private final int keyIndex;
   private final Signature signature;
 
-  public ImmutableAttachedEventSignature(IdentifierEventCoordinatesWithDigest event, int keyIndex, Signature signature) {
+  public ImmutableAttachedEventSignature(KeyEventCoordinates event, int keyIndex, Signature signature) {
     if (keyIndex < 0) {
       throw new IllegalArgumentException("keyIndex must be >= 0");
     }
@@ -33,7 +33,7 @@ public class ImmutableAttachedEventSignature implements AttachedEventSignature {
   }
 
   @Override
-  public IdentifierEventCoordinatesWithDigest event() {
+  public KeyEventCoordinates event() {
     return this.event;
   }
 

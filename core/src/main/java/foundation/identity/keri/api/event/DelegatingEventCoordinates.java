@@ -12,6 +12,6 @@ public interface DelegatingEventCoordinates {
 
   EventType eventType();
 
-  IdentifierEventCoordinatesWithDigest previousEvent();
+  KeyEventCoordinates previousEvent();
 
 }

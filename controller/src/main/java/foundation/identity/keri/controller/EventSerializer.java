@@ -19,7 +19,7 @@ import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
 import foundation.identity.keri.api.seal.DigestSeal;
-import foundation.identity.keri.api.seal.EventCoordinatesWithDigestSeal;
+import foundation.identity.keri.api.seal.KeyEventCoordinatesSeal;
 import foundation.identity.keri.api.seal.MerkleTreeRootSeal;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
@@ -88,8 +88,8 @@ public final class EventSerializer {
 
   static ObjectNode seal(Seal seal, ObjectMapper mapper) {
     var obj = mapper.createObjectNode();
-    if (seal instanceof EventCoordinatesWithDigestSeal) {
-      var els = (EventCoordinatesWithDigestSeal) seal;
+    if (seal instanceof KeyEventCoordinatesSeal) {
+      var els = (KeyEventCoordinatesSeal) seal;
       obj.put("i", qb64(els.event().identifier()));
       obj.put("s", hex(els.event().sequenceNumber()));
       obj.put("d", qb64(els.event().digest()));

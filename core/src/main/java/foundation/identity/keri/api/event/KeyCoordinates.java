@@ -2,7 +2,7 @@ package foundation.identity.keri.api.event;
 
 public interface KeyCoordinates {
 
-  IdentifierEventCoordinatesWithDigest establishmentEvent();
+  KeyEventCoordinates establishmentEvent();
 
   int keyIndex();
 

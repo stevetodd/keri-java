@@ -3,7 +3,7 @@ package foundation.identity.keri.internal.event;
 import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 
 import java.util.Set;
@@ -11,16 +11,16 @@ import java.util.Set;
 public class ImmutableReceiptFromTransferableIdentifierEvent extends AbstractImmutableEvent
     implements ReceiptFromTransferableIdentifierEvent {
 
-  private final IdentifierEventCoordinatesWithDigest event;
-  private final IdentifierEventCoordinatesWithDigest keyEstablishmentEvent;
+  private final KeyEventCoordinates event;
+  private final KeyEventCoordinates keyEstablishmentEvent;
   private final Set<AttachedEventSignature> signatures;
 
   public ImmutableReceiptFromTransferableIdentifierEvent(
       byte[] bytes,
       Version version,
       Format format,
-      IdentifierEventCoordinatesWithDigest event,
-      IdentifierEventCoordinatesWithDigest keyEstablishmentEvent,
+      KeyEventCoordinates event,
+      KeyEventCoordinates keyEstablishmentEvent,
       Set<AttachedEventSignature> signatures) {
     super(bytes, version, format);
     this.event = event;
@@ -29,12 +29,12 @@ public class ImmutableReceiptFromTransferableIdentifierEvent extends AbstractImm
   }
 
   @Override
-  public IdentifierEventCoordinatesWithDigest event() {
+  public KeyEventCoordinates event() {
     return this.event;
   }
 
   @Override
-  public IdentifierEventCoordinatesWithDigest keyEstablishmentEvent() {
+  public KeyEventCoordinates keyEstablishmentEvent() {
     return this.keyEstablishmentEvent;
   }
 

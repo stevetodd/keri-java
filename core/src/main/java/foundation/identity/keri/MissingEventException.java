@@ -1,20 +1,20 @@
 package foundation.identity.keri;
 
 import foundation.identity.keri.api.event.Event;
-import foundation.identity.keri.api.event.IdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 
 public class MissingEventException extends RuntimeException {
 
-  private final IdentifierEventCoordinatesWithDigest missingEvent;
+  private final KeyEventCoordinates missingEvent;
   private final Event dependingEvent;
 
-  public MissingEventException(IdentifierEventCoordinatesWithDigest missingEvent,
+  public MissingEventException(KeyEventCoordinates missingEvent,
       Event dependingEvent) {
     this.missingEvent = missingEvent;
     this.dependingEvent = dependingEvent;
   }
 
-  public IdentifierEventCoordinatesWithDigest missingEvent() {
+  public KeyEventCoordinates missingEvent() {
     return this.missingEvent;
   }
 

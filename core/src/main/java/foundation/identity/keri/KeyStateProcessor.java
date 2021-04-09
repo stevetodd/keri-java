@@ -3,7 +3,7 @@ package foundation.identity.keri;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatedInceptionEvent;
-import foundation.identity.keri.api.event.IdentifierEvent;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.internal.ImmutableKeyState;
@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 
 public final class KeyStateProcessor {
 
-  public static KeyState apply(KeyState currentState, IdentifierEvent event) {
+  public static KeyState apply(KeyState currentState, KeyEvent event) {
     if (event instanceof InceptionEvent) {
       if (currentState != null) {
         throw new IllegalArgumentException("currentState must not be passed for inception events");

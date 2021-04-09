@@ -6,10 +6,10 @@ import foundation.identity.keri.api.event.SigningThreshold.Unweighted;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.eventstorage.inmemory.InMemoryKeyEventStore;
-import foundation.identity.keri.internal.event.ImmutableIdentifierEventCoordinatesWithDigest;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
 import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
-import foundation.identity.keri.internal.seal.ImmutableIdentifierEventCoordinatesWithDigestSeal;
+import foundation.identity.keri.internal.seal.ImmutableKeyEventCoordinatesSeal;
 import foundation.identity.keri.internal.seal.ImmutableMerkleTreeRootSeal;
 import foundation.identity.keri.keystorage.inmemory.InMemoryIdentifierKeyStore;
 import org.junit.Before;
@@ -114,13 +114,13 @@ public class ControllerTests {
     var i = controller.newPrivateIdentifier();
 
     var digest = DigestOperations.BLAKE3_256.digest("digest seal".getBytes());
-    var event = ImmutableIdentifierEventCoordinatesWithDigest.of(i.lastEstablishmentEvent());
+    var event = ImmutableKeyEventCoordinates.of(i.lastEstablishmentEvent());
 
     i.rotate(
         List.of(
             new ImmutableDigestSeal(digest),
             new ImmutableMerkleTreeRootSeal(digest),
-            new ImmutableIdentifierEventCoordinatesWithDigestSeal(event)
+            new ImmutableKeyEventCoordinatesSeal(event)
         ));
 
     i.rotate();
@@ -133,11 +133,11 @@ public class ControllerTests {
     var i = controller.newPrivateIdentifier();
 
     var digest = DigestOperations.BLAKE3_256.digest("digest seal".getBytes());
-    var event = ImmutableIdentifierEventCoordinatesWithDigest.of(i.lastEstablishmentEvent());
+    var event = ImmutableKeyEventCoordinates.of(i.lastEstablishmentEvent());
     var seals = List.of(
         new ImmutableDigestSeal(digest),
         new ImmutableMerkleTreeRootSeal(digest),
-        new ImmutableIdentifierEventCoordinatesWithDigestSeal(event)
+        new ImmutableKeyEventCoordinatesSeal(event)
     );
 
     i.rotate();
