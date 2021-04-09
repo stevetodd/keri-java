@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 
 public class EventSerializerTests {
 
-  ObjectMapper mapper = new ObjectMapper();
+  final ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void signingThreshold__unweighted() {

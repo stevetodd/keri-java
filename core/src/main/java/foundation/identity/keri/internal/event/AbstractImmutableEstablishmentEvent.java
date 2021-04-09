@@ -9,7 +9,6 @@ import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.Identifier;
 
-import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Optional;

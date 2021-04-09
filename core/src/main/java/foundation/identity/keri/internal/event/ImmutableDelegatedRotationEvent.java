@@ -12,7 +12,6 @@ import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
 
-import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Set;

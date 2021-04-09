@@ -32,7 +32,10 @@ public class ImmutableSignature implements Signature {
 
   @Override
   public boolean equals(Object obj) {
-    return Signature.equals(this, obj);
+    if (!(obj instanceof Signature)) {
+      return false;
+    }
+    return Signature.equals(this, (Signature) obj);
   }
 
   @Override

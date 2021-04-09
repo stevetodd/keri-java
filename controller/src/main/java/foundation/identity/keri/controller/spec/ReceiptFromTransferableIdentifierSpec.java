@@ -73,11 +73,11 @@ public class ReceiptFromTransferableIdentifierSpec {
     }
 
     public ReceiptFromTransferableIdentifierSpec build() {
-      var event = this.signatures.stream()
-          .findFirst()
-          .get()
-          .event();
+      if (this.signatures.isEmpty()) {
+        throw new IllegalArgumentException("at least one signature is required");
+      }
 
+      var event = this.signatures.iterator().next().event();
       for (var es : this.signatures) {
         if (!es.event().equals(event)) {
           throw new IllegalArgumentException("all signatures must be for the same event");

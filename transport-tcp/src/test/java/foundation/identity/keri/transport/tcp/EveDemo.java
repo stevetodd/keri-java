@@ -11,21 +11,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 public class EveDemo {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EveDemo.class);
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
     // enables secp256k1 -- TODO need to switch to bouncycastle for jdk16
     System.setProperty("jdk.sunec.disableNative", "false");
     InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE);
 
     LOGGER.info("Starting Eve demo...");
 
-    // processor
-    var secureRandom = new SecureRandom(new byte[]{0});
+    var secureRandom = SecureRandom.getInstance("SHA1PRNG");
+    secureRandom.setSeed(new byte[]{0});
+
     var keyStore = new InMemoryIdentifierKeyStore();
     var keyEventStore = new InMemoryKeyEventStore();
     var keyEventEscrow = new InMemoryKeyEventEscrow();

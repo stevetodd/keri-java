@@ -85,9 +85,10 @@ public enum StandardSignatureAlgorithms implements SignatureAlgorithm {
       var genParamSpec = algorithmParameters.getParameterSpec(ECGenParameterSpec.class);
       var curveName = genParamSpec.getName();
       return switch (curveName.toLowerCase()) {
-        case "1.3.132.0.10" -> EC_SECP256K1;
-        case "secp256k1" -> EC_SECP256K1;
-        default -> throw new IllegalArgumentException("Unknown EC curve: " + curveName);
+        case "1.3.132.0.10":
+        case "secp256k1":
+          yield EC_SECP256K1;
+        default: throw new IllegalArgumentException("Unknown EC curve: " + curveName);
       };
     } catch (NoSuchAlgorithmException | InvalidParameterSpecException e) {
       throw new IllegalStateException("EC algorithm or needed curves unavailable.", e);

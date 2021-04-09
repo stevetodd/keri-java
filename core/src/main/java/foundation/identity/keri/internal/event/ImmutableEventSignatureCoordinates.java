@@ -7,7 +7,6 @@ import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
 
-import java.math.BigInteger;
 import java.util.Objects;
 
 import static foundation.identity.keri.QualifiedBase64.qb64;

@@ -21,7 +21,6 @@ import foundation.identity.keri.internal.event.ImmutableReceiptFromBasicIdentifi
 import foundation.identity.keri.internal.event.ImmutableReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
 
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -123,8 +122,12 @@ public final class EventFactory {
   }
 
   public ReceiptFromTransferableIdentifierEvent receipt(ReceiptFromTransferableIdentifierSpec spec) {
+    if (spec.signatures().isEmpty()) {
+      throw new IllegalArgumentException("spec signatures are required");
+    }
+
     var bytes = this.eventSerializer.serialize(spec);
-    var keyEstablishmentEvent = spec.signatures().stream().findFirst().get().key().establishmentEvent();
+    var keyEstablishmentEvent = spec.signatures().iterator().next().key().establishmentEvent();
     var attachedSignatures = spec.signatures().stream()
         .map(ImmutableAttachedEventSignature::convert)
         .map(as -> (AttachedEventSignature) as)

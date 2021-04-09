@@ -6,8 +6,8 @@ import foundation.identity.keri.api.event.SigningThreshold.Unweighted;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.eventstorage.inmemory.InMemoryKeyEventStore;
-import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
 import foundation.identity.keri.internal.seal.ImmutableKeyEventCoordinatesSeal;
 import foundation.identity.keri.internal.seal.ImmutableMerkleTreeRootSeal;
@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
@@ -27,8 +26,8 @@ import static org.junit.Assert.*;
 public class ControllerTests {
 
   SecureRandom secureRandom = new SecureRandom(new byte[]{0});
-  InMemoryKeyEventStore testEventStore = new InMemoryKeyEventStore();
-  InMemoryIdentifierKeyStore testKeyStore = new InMemoryIdentifierKeyStore();
+  final InMemoryKeyEventStore testEventStore = new InMemoryKeyEventStore();
+  final InMemoryIdentifierKeyStore testKeyStore = new InMemoryIdentifierKeyStore();
 
   @BeforeClass
   public static void beforeClass() {
@@ -41,9 +40,6 @@ public class ControllerTests {
     // this makes the values of secureRandom deterministic
     this.secureRandom = SecureRandom.getInstance("SHA1PRNG");
     this.secureRandom.setSeed(new byte[]{0});
-
-    //this.testEventStore.clear();
-    //this.testKeyStore.clear();
   }
 
   @Test
@@ -92,12 +88,12 @@ public class ControllerTests {
 
     // lastEstablishmentEvent
     assertEquals(i.identifier(), i.lastEstablishmentEvent().identifier());
-    assertEquals(BigInteger.ZERO, i.lastEstablishmentEvent().sequenceNumber());
+    assertEquals(0, i.lastEstablishmentEvent().sequenceNumber());
     // TODO check digest
 
     // lastEvent
     assertEquals(i.identifier(), i.lastEvent().identifier());
-    assertEquals(BigInteger.ZERO, i.lastEvent().sequenceNumber());
+    assertEquals(0, i.lastEvent().sequenceNumber());
     // TODO digest
 
     assertEquals(i.lastEvent(), i.lastEstablishmentEvent());

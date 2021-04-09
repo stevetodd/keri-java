@@ -5,20 +5,16 @@ import java.util.Objects;
 
 public interface BasicIdentifier extends Identifier {
 
-  static boolean equals(BasicIdentifier prefix, Object o) {
-    if (prefix == o) {
+  static boolean equals(BasicIdentifier i1, BasicIdentifier i2) {
+    if (i1 == i2) {
       return true;
     }
 
-    if (o == null) {
+    if (i2 == null) {
       return false;
     }
 
-    if (!(o instanceof BasicIdentifier)) {
-      return false;
-    }
-
-    return prefix.publicKey().equals(((BasicIdentifier) o).publicKey());
+    return i1.publicKey().equals(i2.publicKey());
   }
 
   static int hashCode(BasicIdentifier prefix) {

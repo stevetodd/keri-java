@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 public class EventDeserializerTest {
 
-  ObjectMapper mapper = new ObjectMapper();
+  final ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void test__readSigningThreshold__unweighted() throws JsonProcessingException {

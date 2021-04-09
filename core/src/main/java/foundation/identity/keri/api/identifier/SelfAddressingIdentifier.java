@@ -6,6 +6,13 @@ import java.util.Objects;
 
 public interface SelfAddressingIdentifier extends Identifier {
 
+  @Override
+  default boolean transferable() {
+    return true;
+  }
+
+  Digest digest();
+
   static boolean equals(SelfAddressingIdentifier prefix, Object o) {
     if (prefix == o) {
       return true;
@@ -25,12 +32,5 @@ public interface SelfAddressingIdentifier extends Identifier {
   static int hashCode(SelfAddressingIdentifier prefix) {
     return Objects.hash(prefix.digest());
   }
-
-  @Override
-  default boolean transferable() {
-    return true;
-  }
-
-  Digest digest();
 
 }

@@ -9,7 +9,6 @@ import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.crypto.DigestOperations;
 
-import java.math.BigInteger;
 import java.util.Objects;
 
 import static foundation.identity.keri.QualifiedBase64.qb64;

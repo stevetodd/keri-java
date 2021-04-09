@@ -5,22 +5,21 @@ import java.util.Objects;
 
 public interface Signature {
 
-  static boolean equals(Signature signature, Object o) {
-    if (signature == o) {
+  SignatureAlgorithm algorithm();
+
+  byte[] bytes();
+
+  static boolean equals(Signature s1, Signature s2) {
+    if (s1 == s2) {
       return true;
     }
 
-    if (o == null) {
+    if (s2 == null) {
       return false;
     }
 
-    if (!(o instanceof Signature)) {
-      return false;
-    }
-
-    var otherSignature = (Signature) o;
-    return signature.algorithm().equals(otherSignature.algorithm())
-        && Arrays.equals(signature.bytes(), otherSignature.bytes());
+    return s1.algorithm().equals(s2.algorithm())
+        && Arrays.equals(s1.bytes(), s2.bytes());
   }
 
   static int hashCode(Signature signature) {
@@ -28,9 +27,5 @@ public interface Signature {
         signature.algorithm(),
         Arrays.hashCode(signature.bytes()));
   }
-
-  SignatureAlgorithm algorithm();
-
-  byte[] bytes();
 
 }

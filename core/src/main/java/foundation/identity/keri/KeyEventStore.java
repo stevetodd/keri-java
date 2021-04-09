@@ -9,7 +9,6 @@ import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.SealingEvent;
 import foundation.identity.keri.api.identifier.Identifier;
 
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.stream.Stream;
 

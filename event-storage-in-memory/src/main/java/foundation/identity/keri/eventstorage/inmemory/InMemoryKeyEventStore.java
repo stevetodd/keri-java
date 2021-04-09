@@ -14,7 +14,6 @@ import foundation.identity.keri.api.event.SealingEvent;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.internal.event.ImmutableEventSignature;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

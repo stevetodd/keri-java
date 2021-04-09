@@ -23,7 +23,6 @@ import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.crypto.SignatureOperations;
 import foundation.identity.keri.internal.event.ImmutableEventSignature;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;

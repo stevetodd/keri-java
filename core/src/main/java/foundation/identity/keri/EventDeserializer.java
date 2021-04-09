@@ -43,7 +43,6 @@ import foundation.identity.keri.internal.seal.ImmutableKeyEventCoordinatesSeal;
 import foundation.identity.keri.internal.seal.ImmutableMerkleTreeRootSeal;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
-import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -292,10 +291,10 @@ public class EventDeserializer {
         }
         return weighted(groups);
       } else {
-        throw new IllegalArgumentException("unknown threshold structure: " + jsonNode.toString());
+        throw new IllegalArgumentException("unknown threshold structure: " + jsonNode);
       }
     } else {
-      throw new IllegalArgumentException("unknown threshold type: " + jsonNode.toString());
+      throw new IllegalArgumentException("unknown threshold type: " + jsonNode);
     }
   }
 

@@ -26,7 +26,7 @@ public class KeriEventDecoder extends ReplayingDecoder<Void> {
   private static final int MAX_PEEK = 10;
   private static final int VERSION_STRING_LENGTH = "KERIVVFFFSSSSSS_".length();
 
-  EventDeserializer deserializer = new EventDeserializer();
+  private final EventDeserializer deserializer = new EventDeserializer();
 
   @Override
   protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {

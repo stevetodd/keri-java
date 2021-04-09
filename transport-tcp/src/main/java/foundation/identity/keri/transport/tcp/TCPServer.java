@@ -21,12 +21,12 @@ import java.net.SocketAddress;
 
 public final class TCPServer  {
 
-  EventLoopGroup bossGroup = new NioEventLoopGroup();
-  EventLoopGroup workerGroup = new NioEventLoopGroup();
+  private Channel listeningChannel;
 
-  Channel listeningChannel;
+  private final EventLoopGroup bossGroup = new NioEventLoopGroup();
+  private final EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-  final KeyEventProcessor processor;
+  private final KeyEventProcessor processor;
 
   public TCPServer(KeyEventProcessor processor) {
     this.processor = processor;

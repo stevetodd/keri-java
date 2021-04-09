@@ -6,6 +6,13 @@ import java.util.Objects;
 
 public interface SelfSigningIdentifier extends Identifier {
 
+  @Override
+  default boolean transferable() {
+    return true;
+  }
+
+  Signature signature();
+
   static boolean equals(SelfSigningIdentifier prefix, Object o) {
     if (prefix == o) {
       return true;
@@ -25,12 +32,5 @@ public interface SelfSigningIdentifier extends Identifier {
   static int hashCode(SelfSigningIdentifier prefix) {
     return Objects.hash(prefix.signature());
   }
-
-  @Override
-  default boolean transferable() {
-    return true;
-  }
-
-  Signature signature();
 
 }

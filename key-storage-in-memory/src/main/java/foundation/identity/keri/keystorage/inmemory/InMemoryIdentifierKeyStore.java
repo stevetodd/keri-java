@@ -75,16 +75,12 @@ public class InMemoryIdentifierKeyStore implements IdentifierKeyStore {
 
     this.keys.entrySet().stream()
         .sorted(comparingByKey(keyCoordinatesComparator))
-        .forEachOrdered(kv -> {
-          System.out.println(kv.getKey() + " -> " + QualifiedBase64.qb64(kv.getValue().getPublic()));
-        });
+        .forEachOrdered(kv -> System.out.println(kv.getKey() + " -> " + QualifiedBase64.qb64(kv.getValue().getPublic())));
 
     System.out.println("NEXT KEYS:");
     this.nextKeys.entrySet().stream()
         .sorted(comparingByKey(keyCoordinatesComparator))
-        .forEachOrdered(kv -> {
-          System.out.println(kv.getKey() + " -> " + QualifiedBase64.qb64(kv.getValue().getPublic()));
-        });
+        .forEachOrdered(kv -> System.out.println(kv.getKey() + " -> " + QualifiedBase64.qb64(kv.getValue().getPublic())));
 
     System.out.println("=========================");
     System.out.println();

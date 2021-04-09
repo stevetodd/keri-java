@@ -11,7 +11,7 @@ public enum StandardDigestAlgorithms implements DigestAlgorithm {
   SHA3_256("SHA3-256", 32),
   SHA3_512("SHA3-512", 64);
 
-  public static StandardDigestAlgorithms DEFAULT = BLAKE3_256;
+  public static final StandardDigestAlgorithms DEFAULT = BLAKE3_256;
 
   final String algorithmName;
   final int digestLength;

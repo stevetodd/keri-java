@@ -24,7 +24,10 @@ public class ImmutableBasicIdentifier implements BasicIdentifier {
 
   @Override
   public boolean equals(Object obj) {
-    return BasicIdentifier.equals(this, obj);
+    if (!(obj instanceof BasicIdentifier)) {
+      return false;
+    }
+    return BasicIdentifier.equals(this, (BasicIdentifier) obj);
   }
 
   @Override

@@ -5,6 +5,10 @@ import java.util.Objects;
 
 public interface Digest {
 
+  DigestAlgorithm algorithm();
+
+  byte[] bytes();
+
   Digest NONE = new None();
 
   static boolean equals(Digest d1, Digest d2) {
@@ -25,10 +29,6 @@ public interface Digest {
         digest.algorithm(),
         Arrays.hashCode(digest.bytes()));
   }
-
-  DigestAlgorithm algorithm();
-
-  byte[] bytes();
 
   class None implements Digest {
 
