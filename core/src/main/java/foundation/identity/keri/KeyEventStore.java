@@ -1,22 +1,22 @@
 package foundation.identity.keri;
 
 import foundation.identity.keri.api.KeyState;
+import foundation.identity.keri.api.event.AttachmentEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
-import foundation.identity.keri.api.event.ReceiptEvent;
 import foundation.identity.keri.api.event.SealingEvent;
 import foundation.identity.keri.api.identifier.Identifier;
 
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.stream.Stream;
 
 public interface KeyEventStore {
 
   void append(KeyEvent event);
 
-  void append(ReceiptEvent event);
+  void append(AttachmentEvent event);
 
   Optional<SealingEvent> getKeyEvent(DelegatingEventCoordinates coordinates);
 
@@ -30,5 +30,5 @@ public interface KeyEventStore {
 
   Optional<KeyState> getKeyState(KeyEventCoordinates previous);
 
-  Optional<EventSignature> findLatestReceipt(Identifier forIdentifier, Identifier byIdentifier);
+  OptionalLong findLatestReceipt(Identifier forIdentifier, Identifier byIdentifier);
 }

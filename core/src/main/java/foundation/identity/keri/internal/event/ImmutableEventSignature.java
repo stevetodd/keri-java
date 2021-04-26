@@ -1,39 +1,25 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.event.AttachedEventSignature;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
-import foundation.identity.keri.api.event.KeyCoordinates;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class ImmutableEventSignature implements EventSignature {
 
   private final KeyEventCoordinates event;
-  private final KeyCoordinates key;
-  private final Signature signature;
+  private final KeyEventCoordinates keyEstablishmentEvent;
+  private final Map<Integer, Signature> signatures;
 
   public ImmutableEventSignature(
       KeyEventCoordinates event,
-      KeyCoordinates key,
-      Signature signature) {
+      KeyEventCoordinates keyEstablishmentEvent,
+      Map<Integer, Signature> signatures) {
     this.event = event;
-    this.key = key;
-    this.signature = signature;
-  }
-
-  public static ImmutableEventSignature from(AttachedEventSignature attachedSignature, KeyEventCoordinates establishmentEvent) {
-    var key = new ImmutableKeyCoordinates(establishmentEvent, attachedSignature.keyIndex());
-    return new ImmutableEventSignature(attachedSignature.event(), key, attachedSignature.signature());
-  }
-
-  public static ImmutableEventSignature of(KeyEventCoordinates event,
-                                           KeyCoordinates key, Signature signature) {
-    return new ImmutableEventSignature(
-        ImmutableEventSignatureCoordinates.of(event, key),
-        key,
-        signature);
+    this.keyEstablishmentEvent = keyEstablishmentEvent;
+    this.signatures = Map.copyOf(signatures);
   }
 
   @Override
@@ -42,13 +28,13 @@ public class ImmutableEventSignature implements EventSignature {
   }
 
   @Override
-  public KeyCoordinates key() {
-    return this.key;
+  public KeyEventCoordinates keyEstablishmentEvent() {
+    return this.keyEstablishmentEvent;
   }
 
   @Override
-  public Signature signature() {
-    return this.signature;
+  public Map<Integer, Signature> signatures() {
+    return this.signatures;
   }
 
   @Override
@@ -61,21 +47,21 @@ public class ImmutableEventSignature implements EventSignature {
     }
     var that = (EventSignature) o;
     return Objects.equals(this.event, that.event())
-        && Objects.equals(this.key, that.key())
-        && Objects.equals(this.signature, that.signature());
+        && Objects.equals(this.keyEstablishmentEvent, that.keyEstablishmentEvent())
+        && Objects.equals(this.signatures, that.signatures());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.event, this.key, this.signature);
+    return Objects.hash(this.event, this.keyEstablishmentEvent, this.signatures);
   }
 
   @Override
   public String toString() {
     return "ImmutableEventSignature [" +
         "event=" + this.event + ", " +
-        "key=" + this.key + ", " +
-        "signature=" + this.signature +
+        "keyEstablishmentEvent=" + this.keyEstablishmentEvent + ", " +
+        "signatures=" + this.signatures +
         "]";
   }
 

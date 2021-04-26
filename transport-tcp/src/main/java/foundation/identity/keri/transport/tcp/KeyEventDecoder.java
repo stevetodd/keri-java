@@ -1,6 +1,6 @@
 package foundation.identity.keri.transport.tcp;
 
-import foundation.identity.keri.EventDeserializer;
+import foundation.identity.keri.KeyEventDeserializer;
 import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.crypto.SignatureAlgorithm;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
@@ -20,13 +20,13 @@ import static foundation.identity.keri.Hex.unhexInt;
 import static foundation.identity.keri.QualifiedBase64.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class KeriEventDecoder extends ReplayingDecoder<Void> {
+public class KeyEventDecoder extends ReplayingDecoder<Void> {
 
   private static final ByteBuf KERI = Unpooled.wrappedBuffer("KERI".getBytes(UTF_8));
   private static final int MAX_PEEK = 10;
   private static final int VERSION_STRING_LENGTH = "KERIVVFFFSSSSSS_".length();
 
-  private final EventDeserializer deserializer = new EventDeserializer();
+  private final KeyEventDeserializer deserializer = new KeyEventDeserializer();
 
   @Override
   protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -35,7 +35,6 @@ public class KeriEventDecoder extends ReplayingDecoder<Void> {
     // var receipts = readReceipts(in); // Pending keri#91
 
     var event = this.deserializer.deserialize(messageBytes, signatures);
-
     out.add(event);
   }
 

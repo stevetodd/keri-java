@@ -3,6 +3,8 @@ package foundation.identity.keri;
 
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.Signature;
+import foundation.identity.keri.api.event.DelegatingEventCoordinates;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
 
 import java.security.PublicKey;
@@ -31,6 +33,15 @@ public class ShortQualifiedBase64 {
 
   public static String shortQb64(Identifier identifier) {
     return qb64(identifier).substring(0, SHORTENED_LENGTH);
+  }
+
+  public static String shortQb64(KeyEventCoordinates c) {
+    return shortQb64(c.identifier()) + ":" + c.sequenceNumber() + ":" + shortQb64(c.digest());
+  }
+
+  public static String shortQb64(DelegatingEventCoordinates c) {
+    var p = c.previousEvent();
+    return shortQb64(p.identifier()) + ":" + p.sequenceNumber() + ":" + shortQb64(p.digest());
   }
 
 }

@@ -6,11 +6,11 @@ import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
-import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
+import foundation.identity.keri.api.event.StandardFormats;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
@@ -258,14 +258,14 @@ public class RotationSpec {
 
     public Builder removeWitnesses(List<BasicIdentifier> witnesses) {
       for (var witness : witnesses) {
-        removeWitness(witness);
+        this.removeWitness(witness);
       }
       return this;
     }
 
     public Builder removeWitnesses(BasicIdentifier... witnesses) {
       for (var witness : witnesses) {
-        removeWitness(witness);
+        this.removeWitness(witness);
       }
       return this;
     }

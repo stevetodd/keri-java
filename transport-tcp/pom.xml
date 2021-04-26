@@ -32,7 +32,7 @@
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>controller</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
@@ -43,14 +43,14 @@
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
-      <artifactId>controller</artifactId>
+      <artifactId>event-storage-in-memory</artifactId>
       <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
-      <artifactId>event-storage-in-memory</artifactId>
+      <artifactId>key-storage-in-memory</artifactId>
       <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
@@ -59,12 +59,6 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>foundation.identity.keri</groupId>
-      <artifactId>key-storage-in-memory</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 

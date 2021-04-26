@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
-import static foundation.identity.keri.EventDeserializer.readSigningThreshold;
+import static foundation.identity.keri.KeyEventDeserializer.readSigningThreshold;
 import static foundation.identity.keri.SigningThresholds.*;
 import static org.junit.Assert.assertEquals;
 
-public class EventDeserializerTest {
+public class KeyEventDeserializerTest {
 
   final ObjectMapper mapper = new ObjectMapper();
 

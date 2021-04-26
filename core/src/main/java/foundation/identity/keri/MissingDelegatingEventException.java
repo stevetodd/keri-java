@@ -1,25 +1,20 @@
 package foundation.identity.keri;
 
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.Event;
+import foundation.identity.keri.api.event.KeyEvent;
 
-public class MissingDelegatingEventException extends RuntimeException {
+public class MissingDelegatingEventException extends KeyEventProcessingException {
 
   private final DelegatingEventCoordinates missingEvent;
-  private final Event dependingEvent;
 
-  public MissingDelegatingEventException(DelegatingEventCoordinates missingEvent,
-      Event dependingEvent) {
+  public MissingDelegatingEventException(KeyEvent dependingEvent,
+      DelegatingEventCoordinates missingEvent) {
+    super(dependingEvent);
     this.missingEvent = missingEvent;
-    this.dependingEvent = dependingEvent;
   }
 
   public DelegatingEventCoordinates missingEvent() {
     return this.missingEvent;
-  }
-
-  public Event dependingEvent() {
-    return this.dependingEvent;
   }
 
 }

@@ -1,4 +1,4 @@
-package foundation.identity.keri.demo.protocol;
+package foundation.identity.keri.transport.tcp;
 
 import foundation.identity.keri.api.event.KeyEvent;
 import io.netty.buffer.ByteBuf;
@@ -11,23 +11,19 @@ import static foundation.identity.keri.QualifiedBase64.attachedSignatureCode;
 import static foundation.identity.keri.QualifiedBase64.base64;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class KeriEventEncoder extends MessageToByteEncoder<KeyEvent> {
+public class KeyEventEncoder extends MessageToByteEncoder<KeyEvent> {
 
   @Override
   protected void encode(ChannelHandlerContext ctx, KeyEvent event, ByteBuf out) {
     out.writeBytes(event.bytes());
 
     // this will be replaced when we support new framing. For now, direct mode
-    var first = event.otherReceipts()
-        .entrySet()
-        .stream()
-        .findFirst()
-        .get();
+    var eventSignature = event.signatures();
 
     out.writeCharSequence("-A", UTF_8);
-    out.writeCharSequence(base64(first.getValue().size(), 2), UTF_8);
+    out.writeCharSequence(base64(event.signatures().size(), 2), UTF_8);
 
-    first.getValue()
+    event.signatures()
         .entrySet()
         .stream()
         .sorted(Map.Entry.comparingByKey())

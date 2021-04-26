@@ -4,11 +4,7 @@ import foundation.identity.keri.api.crypto.Signature;
 
 import java.util.Map;
 
-public interface EventSignature {
-
-  KeyEventCoordinates event();
-
-  KeyEventCoordinates keyEstablishmentEvent();
+public interface SignatureThresholdAuthentication {
 
   Map<Integer, Signature> signatures();
 

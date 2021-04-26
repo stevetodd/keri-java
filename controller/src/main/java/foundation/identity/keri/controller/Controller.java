@@ -20,14 +20,13 @@ import foundation.identity.keri.controller.spec.InteractionSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
 import foundation.identity.keri.crypto.SignatureOperations;
 import foundation.identity.keri.internal.event.ImmutableEventSignature;
-import foundation.identity.keri.internal.event.ImmutableEventSignatureCoordinates;
-import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
 
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static foundation.identity.keri.SigningThresholds.unweighted;
 
@@ -113,12 +112,12 @@ public final class Controller {
     return null;
   }
 
-  public ControllableIdentifier rotate(Identifier identifier) {
-    return rotate(identifier, List.of());
+  public KeyState rotate(Identifier identifier) {
+    return this.rotate(identifier, List.of());
   }
 
-  public ControllableIdentifier rotate(Identifier identifier, List<Seal> seals) {
-    var state = getIdentifierState(identifier);
+  public KeyState rotate(Identifier identifier, List<Seal> seals) {
+    var state = this.getIdentifierState(identifier);
 
     if (state == null) {
       throw new IllegalArgumentException("identifier state not found in event store");
@@ -157,13 +156,11 @@ public final class Controller {
     this.keyStore.removeKey(currentKeyCoordinates);
     this.keyStore.removeNextKey(currentKeyCoordinates);
 
-    var newState = KeyStateProcessor.apply(state, event);
-
-    return new DefaultControllableIdentifier(this, newState);
+    return KeyStateProcessor.apply(state, event);
   }
 
-  public ControllableIdentifier seal(Identifier identifier, List<Seal> seals) {
-    var state = getIdentifierState(identifier);
+  public KeyState seal(Identifier identifier, List<Seal> seals) {
+    var state = this.getIdentifierState(identifier);
 
     if (state == null) {
       throw new IllegalArgumentException("identifier not found in event store");
@@ -185,16 +182,14 @@ public final class Controller {
     this.keyEventValidator.validate(state, event);
     this.keyEventStore.append(event);
 
-    var newState = KeyStateProcessor.apply(state, event);
-
-    return new DefaultControllableIdentifier(this, newState);
+    return KeyStateProcessor.apply(state, event);
   }
 
   public EventSignature sign(Identifier identifier, KeyEvent event) {
-    var state = getIdentifierState(identifier);
+    var state = this.getIdentifierState(identifier);
 
     if (state == null) {
-      throw new IllegalArgumentException("prefix not found in event store");
+      throw new IllegalArgumentException("identifier not found in event store");
     }
 
     var keyCoords = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
@@ -204,9 +199,10 @@ public final class Controller {
     var ops = SignatureOperations.lookup(keyPair.getPrivate());
     var signature = ops.sign(event.bytes(), keyPair.getPrivate());
 
-    var eventCoordinates = ImmutableKeyEventCoordinates.of(event);
-    var eventSigCoords = ImmutableEventSignatureCoordinates.of(eventCoordinates, keyCoords);
-    return new ImmutableEventSignature(eventSigCoords, keyCoords, signature);
+    return new ImmutableEventSignature(
+        event.coordinates(),
+        state.lastEstablishmentEvent().coordinates(),
+        Map.of(0, signature));
   }
 
   // TODO should be private

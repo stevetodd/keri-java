@@ -1,25 +1,19 @@
 package foundation.identity.keri;
 
-import foundation.identity.keri.api.event.Event;
+import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
 
-public class MissingEventException extends RuntimeException {
+public class MissingEventException extends KeyEventProcessingException {
 
   private final KeyEventCoordinates missingEvent;
-  private final Event dependingEvent;
 
-  public MissingEventException(KeyEventCoordinates missingEvent,
-      Event dependingEvent) {
+  public MissingEventException(KeyEvent dependingEvent, KeyEventCoordinates missingEvent) {
+    super(dependingEvent);
     this.missingEvent = missingEvent;
-    this.dependingEvent = dependingEvent;
   }
 
   public KeyEventCoordinates missingEvent() {
     return this.missingEvent;
-  }
-
-  public Event dependingEvent() {
-    return this.dependingEvent;
   }
 
 }

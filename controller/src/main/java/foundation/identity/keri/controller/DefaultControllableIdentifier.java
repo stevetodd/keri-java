@@ -4,8 +4,9 @@ import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.EventSignature;
-import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.KeyEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
@@ -19,7 +20,7 @@ import java.util.Set;
 public class DefaultControllableIdentifier implements ControllableIdentifier {
 
   public final Controller controller;
-  private final KeyState state;
+  private KeyState state;
 
   public DefaultControllableIdentifier(Controller controller, KeyState initialState) {
     this.controller = controller;
@@ -27,8 +28,8 @@ public class DefaultControllableIdentifier implements ControllableIdentifier {
   }
 
   @Override
-  public Identifier identifier() {
-    return this.state.identifier();
+  public KeyEventCoordinates coordinates() {
+    return this.state.coordinates();
   }
 
   @Override
@@ -78,17 +79,17 @@ public class DefaultControllableIdentifier implements ControllableIdentifier {
 
   @Override
   public void rotate() {
-    this.controller.rotate(this.identifier());
+    this.state = this.controller.rotate(this.identifier());
   }
 
   @Override
   public void rotate(List<Seal> seals) {
-    this.controller.rotate(this.identifier(), seals);
+    this.state = this.controller.rotate(this.identifier(), seals);
   }
 
   @Override
   public void seal(List<Seal> seals) {
-    this.controller.seal(this.identifier(), seals);
+    this.state = this.controller.seal(this.identifier(), seals);
   }
 
   @Override

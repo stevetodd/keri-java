@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
+import foundation.identity.keri.api.event.AttachmentEvent;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
+import foundation.identity.keri.api.event.StandardFormats;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
@@ -23,8 +24,6 @@ import foundation.identity.keri.api.seal.MerkleTreeRootSeal;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.InteractionSpec;
-import foundation.identity.keri.controller.spec.ReceiptFromTransferableIdentifierSpec;
-import foundation.identity.keri.controller.spec.ReceiptSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
@@ -37,7 +36,9 @@ import static foundation.identity.keri.QualifiedBase64.qb64;
 import static foundation.identity.keri.api.event.EventFieldNames.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class EventSerializer {
+public final class KeyEventSerializer {
+  public static final KeyEventSerializer INSTANCE = new KeyEventSerializer();
+
   private static final byte[] KERI_BYTES = "KERI".getBytes(UTF_8);
 
   private static final String INCEPTION_TYPE = "icp";
@@ -105,7 +106,7 @@ public final class EventSerializer {
       var groupArrayNodes = Stream.of(wt.weights())
           .map(lw -> {
                 var textNodes = Stream.of(lw)
-                    .map(EventSerializer::weight)
+                    .map(KeyEventSerializer::weight)
                     .map(str -> mapper.getNodeFactory().textNode(str))
                     .collect(Collectors.toList());
                 return mapper.getNodeFactory().arrayNode()
@@ -163,11 +164,11 @@ public final class EventSerializer {
   }
 
   public byte[] inceptionStatement(IdentifierSpec spec) {
-    return serialize(null, spec);
+    return this.serialize(null, spec);
   }
 
   public byte[] serialize(Identifier identifier, IdentifierSpec spec) {
-    var mapper = mapper(spec.format());
+    var mapper = this.mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
@@ -211,7 +212,7 @@ public final class EventSerializer {
   }
 
   public byte[] serialize(RotationSpec spec) {
-    var mapper = mapper(spec.format());
+    var mapper = this.mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
@@ -256,7 +257,7 @@ public final class EventSerializer {
   }
 
   public byte[] serialize(InteractionSpec spec) {
-    var mapper = mapper(spec.format());
+    var mapper = this.mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
@@ -278,8 +279,41 @@ public final class EventSerializer {
     }
   }
 
-  public byte[] serialize(ReceiptFromTransferableIdentifierSpec spec) {
-    var mapper = mapper(spec.format());
+  public byte[] serialize(AttachmentEvent event) {
+    var mapper = this.mapper(StandardFormats.JSON);
+    var rootNode = mapper.createObjectNode();
+
+    var vrc = event.signatures().isEmpty()
+        && event.receipts().isEmpty()
+        && event.otherReceipts().size() == 1;
+
+    rootNode.put(VERSION.label(), version(Version.CURRENT, StandardFormats.JSON, 0));
+    rootNode.put(IDENTIFIER.label(), qb64(event.coordinates().identifier()));
+    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(event.coordinates().sequenceNumber()));
+    rootNode.put(EVENT_TYPE.label(), vrc ? RECEIPT_FROM_TRANSFERABLE_TYPE : RECEIPT_FROM_BASIC_TYPE);
+    rootNode.put(EVENT_DIGEST.label(), qb64(event.coordinates().digest()));
+
+    if (vrc) {
+      var vrcSigs = event.otherReceipts().entrySet().stream().findFirst().get();
+      var establishmentEvent = vrcSigs.getKey();
+      var anchorNode = mapper.createObjectNode();
+      anchorNode.put(IDENTIFIER.label(), qb64(establishmentEvent.identifier()));
+      anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(establishmentEvent.sequenceNumber()));
+      anchorNode.put(EVENT_DIGEST.label(), qb64(establishmentEvent.digest()));
+      rootNode.set(ANCHORS.label(), anchorNode);
+    }
+
+    try {
+      var bytes = mapper.writeValueAsBytes(rootNode);
+      writeSize(bytes);
+      return bytes;
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+/*  public byte[] serialize(ReceiptFromTransferableIdentifierSpec spec) {
+    var mapper = this.mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
@@ -288,14 +322,11 @@ public final class EventSerializer {
     rootNode.put(EVENT_TYPE.label(), RECEIPT_FROM_TRANSFERABLE_TYPE);
     rootNode.put(EVENT_DIGEST.label(), qb64(spec.event().digest()));
 
-    var eventSignature = spec.signatures()
-        .stream()
-        .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("at least one signature is required"));
+    var eventSignature = spec.signature();
     var anchorNode = mapper.createObjectNode();
-    anchorNode.put(IDENTIFIER.label(), qb64(eventSignature.key().establishmentEvent().identifier()));
-    anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(eventSignature.key().establishmentEvent().sequenceNumber()));
-    anchorNode.put(EVENT_DIGEST.label(), qb64(eventSignature.key().establishmentEvent().digest()));
+    anchorNode.put(IDENTIFIER.label(), qb64(eventSignature.keyEstablishmentEvent().identifier()));
+    anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(eventSignature.keyEstablishmentEvent().sequenceNumber()));
+    anchorNode.put(EVENT_DIGEST.label(), qb64(eventSignature.keyEstablishmentEvent().digest()));
     rootNode.set(ANCHORS.label(), anchorNode);
 
     try {
@@ -308,7 +339,7 @@ public final class EventSerializer {
   }
 
   public byte[] serialize(ReceiptSpec spec) {
-    var mapper = mapper(spec.format());
+    var mapper = this.mapper(spec.format());
     var rootNode = mapper.createObjectNode();
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
@@ -325,5 +356,5 @@ public final class EventSerializer {
       throw new IllegalStateException(e);
     }
   }
-
+*/
 }

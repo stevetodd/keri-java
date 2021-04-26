@@ -5,6 +5,7 @@ import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
@@ -51,8 +52,8 @@ public class ImmutableKeyState implements KeyState {
   }
 
   @Override
-  public Identifier identifier() {
-    return this.identifier;
+  public KeyEventCoordinates coordinates() {
+    return this.lastEvent().coordinates();
   }
 
   @Override

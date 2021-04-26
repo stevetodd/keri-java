@@ -1,9 +1,11 @@
 package foundation.identity.keri.api;
 
+import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
-import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.KeyEvent;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
@@ -15,7 +17,19 @@ import java.util.Set;
 
 public interface KeyState {
 
-  Identifier identifier();
+  default Identifier identifier() {
+    return this.coordinates().identifier();
+  }
+
+  default long sequenceNumber() {
+    return this.coordinates().sequenceNumber();
+  }
+
+  default Digest digest() {
+    return this.coordinates().digest();
+  }
+
+  KeyEventCoordinates coordinates();
 
   SigningThreshold signingThreshold();
 
@@ -24,8 +38,8 @@ public interface KeyState {
   Optional<KeyConfigurationDigest> nextKeyConfigurationDigest();
 
   default boolean transferable() {
-    return identifier().transferable()
-        && nextKeyConfigurationDigest().isPresent();
+    return this.coordinates().identifier().transferable()
+        && this.nextKeyConfigurationDigest().isPresent();
   }
 
   int witnessThreshold();
@@ -41,7 +55,7 @@ public interface KeyState {
   Optional<Identifier> delegatingIdentifier();
 
   default boolean delegated() {
-    return delegatingIdentifier().isPresent();
+    return this.delegatingIdentifier().isPresent();
   }
 
 }

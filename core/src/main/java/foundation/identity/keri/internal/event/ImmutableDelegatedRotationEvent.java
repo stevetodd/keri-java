@@ -1,12 +1,12 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.AttachedEventSignature;
+import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
@@ -14,7 +14,7 @@ import foundation.identity.keri.api.seal.Seal;
 
 import java.security.PublicKey;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,7 +42,9 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
       List<Seal> seals,
       DelegatingEventCoordinates delegatingEvent,
       byte[] bytes,
-      Set<AttachedEventSignature> signatures) {
+      Map<Integer, Signature> signatures,
+      Map<Integer, Signature> receipts,
+      Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
     super(
         version,
         format,
@@ -55,7 +57,9 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
         witnessThreshold,
         delegatingEvent,
         bytes,
-        signatures);
+        signatures,
+        receipts,
+        otherReceipts);
     this.removedWitnesses = List.copyOf(requireNonNull(removedWitnesses, "removedWitnesses"));
     this.addedWitnesses = List.copyOf(requireNonNull(addedWitnesses, "addedWitnesses"));
     this.seals = List.copyOf(requireNonNull(seals, "seals"));

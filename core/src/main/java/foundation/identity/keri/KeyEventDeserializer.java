@@ -7,36 +7,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.StandardFormats;
-import foundation.identity.keri.api.event.AttachedEventSignature;
+import foundation.identity.keri.api.event.AttachmentEvent;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.DelegatedInceptionEvent;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
-import foundation.identity.keri.api.event.Event;
 import foundation.identity.keri.api.event.EventSignature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
-import foundation.identity.keri.api.event.ReceiptFromBasicIdentifierEvent;
-import foundation.identity.keri.api.event.ReceiptFromTransferableIdentifierEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
+import foundation.identity.keri.api.event.StandardFormats;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.KeyEventCoordinatesSeal;
 import foundation.identity.keri.api.seal.Seal;
-import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.internal.ImmutableVersion;
-import foundation.identity.keri.internal.event.ImmutableAttachedEventSignature;
+import foundation.identity.keri.internal.event.ImmutableAttachmentEvent;
 import foundation.identity.keri.internal.event.ImmutableEventSignature;
-import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
 import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
-import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
-import foundation.identity.keri.internal.event.ImmutableReceiptFromBasicIdentifierEvent;
-import foundation.identity.keri.internal.event.ImmutableReceiptFromTransferableIdentifierEvent;
+import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
 import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
 import foundation.identity.keri.internal.seal.ImmutableKeyEventCoordinatesSeal;
@@ -49,14 +42,15 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Map;
 
-import static foundation.identity.keri.Hex.*;
+import static foundation.identity.keri.Hex.unhexInt;
+import static foundation.identity.keri.Hex.unhexLong;
 import static foundation.identity.keri.QualifiedBase64.*;
 import static foundation.identity.keri.SigningThresholds.*;
 import static foundation.identity.keri.api.event.EventFieldNames.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toSet;
 
-public class EventDeserializer {
+public class KeyEventDeserializer {
 
   private final static byte[] KERI_BYTES = "KERI".getBytes(UTF_8);
 
@@ -64,20 +58,20 @@ public class EventDeserializer {
   private final static ObjectMapper CBOR = new ObjectMapper(new CBORFactory());
   private final static ObjectMapper MESSAGE_PACK = new ObjectMapper(new MessagePackFactory());
 
-  public Event deserialize(byte[] bytes, Map<Integer, Signature> signatures) {
+  public Object deserialize(byte[] bytes, Map<Integer, Signature> signatures) {
     try {
-      var mapper = mapper(peekFormat(bytes));
+      var mapper = this.mapper(this.peekFormat(bytes));
       var rootNode = mapper.readTree(bytes);
       var type = rootNode.get("t").textValue();
 
       return switch (type) {
-        case "icp" -> inception(bytes, rootNode, signatures);
-        case "rot" -> rotation(bytes, rootNode, signatures);
-        case "ixn" -> interaction(bytes, rootNode, signatures);
-        case "dip" -> delegatedInception(bytes, rootNode, signatures);
-        case "drt" -> delegatedRotation(bytes, rootNode, signatures);
-        case "vrc" -> receiptFromTransferableIdentifier(bytes, rootNode, signatures);
-        case "rct" -> receipt(bytes, rootNode, Map.of()); // TODO
+        case "icp" -> this.inception(bytes, rootNode, signatures);
+        case "rot" -> this.rotation(bytes, rootNode, signatures);
+        case "ixn" -> this.interaction(bytes, rootNode, signatures);
+        case "dip" -> this.delegatedInception(bytes, rootNode, signatures);
+        case "drt" -> this.delegatedRotation(bytes, rootNode, signatures);
+        case "rct" -> this.attachments(bytes, rootNode, Map.of());
+        case "vrc" -> this.attachmentsFromTransferableIdentifier(bytes, rootNode, signatures);
         default -> throw new IllegalArgumentException("Unknown event type: " + type);
       };
     } catch (Exception e) {
@@ -111,7 +105,7 @@ public class EventDeserializer {
   }
 
   byte[] inceptionStatement(Format format, Identifier identifier, JsonNode rootNode) {
-    var mapper = mapper(format);
+    var mapper = this.mapper(format);
     var copy = (ObjectNode) rootNode.deepCopy();
     copy.put(IDENTIFIER.label(), identifierPlaceholder(identifier));
 
@@ -154,13 +148,7 @@ public class EventDeserializer {
       configurationTraits.add(trait);
     }
 
-    var digest = DigestOperations.lookup(nextKeyConfiguration.algorithm()).digest(bytes);
-    var eventCoordinates = new ImmutableKeyEventCoordinates(prefix, 0, digest);
-    var attachedSignatures = signatures.entrySet().stream()
-        .map(e -> (AttachedEventSignature) new ImmutableAttachedEventSignature(eventCoordinates, e.getKey(), e.getValue()))
-        .collect(toSet());
-
-    var inceptionStatement = inceptionStatement(format, prefix, rootNode);
+    var inceptionStatement = this.inceptionStatement(format, prefix, rootNode);
 
     return new ImmutableInceptionEvent(
         bytes,
@@ -174,14 +162,17 @@ public class EventDeserializer {
         witnessThreshold,
         witnesses,
         configurationTraits,
-        attachedSignatures);
+        signatures,
+        Map.of(),
+        Map.of()
+        );
   }
 
-  Version version(String str) {
+  static Version version(String str) {
     return new ImmutableVersion(unhexInt(str.substring(0, 1)), unhexInt(str.substring(1, 2)));
   }
 
-  ConfigurationTrait trait(String str) {
+  static ConfigurationTrait trait(String str) {
     return switch (str) {
       case "EO" -> ConfigurationTrait.ESTABLISHMENT_EVENTS_ONLY;
       case "DND" -> ConfigurationTrait.DO_NOT_DELEGATE;
@@ -189,7 +180,7 @@ public class EventDeserializer {
     };
   }
 
-  StandardFormats format(String str) {
+  static StandardFormats format(String str) {
     return switch (str) {
       case "CBOR" -> StandardFormats.CBOR;
       case "JSON" -> StandardFormats.JSON;
@@ -243,12 +234,6 @@ public class EventDeserializer {
       seals.add(seal);
     }
 
-    var digest = DigestOperations.lookup(previousDigest.algorithm()).digest(bytes);
-    var eventCoordinates = new ImmutableKeyEventCoordinates(prefix, sequenceNumber, digest);
-    var attachedSignatures = signatures.entrySet().stream()
-        .map(e -> (AttachedEventSignature) new ImmutableAttachedEventSignature(eventCoordinates, e.getKey(), e.getValue()))
-        .collect(toSet());
-
     return new ImmutableRotationEvent(
         version,
         format,
@@ -263,7 +248,9 @@ public class EventDeserializer {
         addedWitnesses,
         seals,
         bytes,
-        attachedSignatures);
+        signatures,
+        Map.of(),
+        Map.of());
   }
 
   static SigningThreshold readSigningThreshold(JsonNode jsonNode) {
@@ -298,7 +285,7 @@ public class EventDeserializer {
     }
   }
 
-  private Seal readSeal(JsonNode jsonNode) {
+  static Seal readSeal(JsonNode jsonNode) {
     if (jsonNode.has("i")) {
       return new ImmutableKeyEventCoordinatesSeal(
           new ImmutableKeyEventCoordinates(
@@ -331,13 +318,6 @@ public class EventDeserializer {
       seals.add(seal);
     }
 
-    var digest = DigestOperations.lookup(previousDigest.algorithm()).digest(bytes);
-    var eventCoordinates = new ImmutableKeyEventCoordinates(prefix, sequenceNumber, digest);
-    var attachedSignatures = signatures.entrySet()
-        .stream()
-        .map(e -> (AttachedEventSignature) new ImmutableAttachedEventSignature(eventCoordinates, e.getKey(), e.getValue()))
-        .collect(toSet());
-
     return new ImmutableInteractionEvent(
         version,
         format,
@@ -346,10 +326,12 @@ public class EventDeserializer {
         previous,
         seals,
         bytes,
-        attachedSignatures);
+        signatures,
+        Map.of(),
+        Map.of());
   }
 
-  ReceiptFromTransferableIdentifierEvent receiptFromTransferableIdentifier(
+  AttachmentEvent attachmentsFromTransferableIdentifier(
       byte[] bytes, JsonNode rootNode, Map<Integer, Signature> signatures) {
     var versionString = rootNode.get(VERSION.label()).textValue();
     var version = version(versionString.substring(4, 6));
@@ -361,21 +343,14 @@ public class EventDeserializer {
 
     var seal = (KeyEventCoordinatesSeal) readSeal(rootNode.get(ANCHORS.label()));
 
-    var attachedSignatures = signatures.entrySet()
-        .stream()
-        .map(e -> (AttachedEventSignature) new ImmutableAttachedEventSignature(eventCoordinates, e.getKey(), e.getValue()))
-        .collect(toSet());
-
-    return new ImmutableReceiptFromTransferableIdentifierEvent(
-        bytes,
-        version,
-        format,
+    return new ImmutableAttachmentEvent(
         eventCoordinates,
-        seal.event(),
-        attachedSignatures);
+        Map.of(),
+        Map.of(),
+        Map.of(seal.event(), signatures));
   }
 
-    ReceiptFromBasicIdentifierEvent receipt(
+  AttachmentEvent attachments(
       byte[] bytes, JsonNode rootNode, Map<BasicIdentifier, Signature> signatures) {
     var versionString = rootNode.get(VERSION.label()).textValue();
     var version = version(versionString.substring(4, 6));
@@ -383,21 +358,23 @@ public class EventDeserializer {
     var identifier = identifier(rootNode.get(IDENTIFIER.label()).textValue());
     var sequenceNumber = unhexLong(rootNode.get(SEQUENCE_NUMBER.label()).textValue());
     var eventDigest = digest(rootNode.get(EVENT_DIGEST.label()).textValue());
-    var eventCoordinates = new ImmutableKeyEventCoordinates(identifier, sequenceNumber - 1, eventDigest);
+    var eventCoordinates = new ImmutableKeyEventCoordinates(identifier, sequenceNumber, eventDigest);
 
     var eventSignatures = signatures.entrySet()
         .stream()
         .map(e -> {
-          var keyCoordinates = ImmutableKeyCoordinates.of(e.getKey());
-          return (EventSignature) ImmutableEventSignature.of(eventCoordinates, keyCoordinates, e.getValue());
+          var keyCoordinates = ImmutableKeyEventCoordinates.of(e.getKey());
+          return (EventSignature) new ImmutableEventSignature(
+              eventCoordinates, keyCoordinates, Map.of(0, e.getValue()));
         })
         .collect(toSet());
 
-    return new ImmutableReceiptFromBasicIdentifierEvent(
-        bytes,
-        version,
-        format,
-        eventSignatures);
+    // FIXME this is broken until attachments are refactored.
+    return new ImmutableAttachmentEvent(
+        eventCoordinates,
+        Map.of(),
+        Map.of(),
+        Map.of());
   }
 
   DelegatedInceptionEvent delegatedInception(byte[] bytes, JsonNode rootNode, Map<Integer, Signature> signatures) {

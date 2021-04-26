@@ -1,6 +1,6 @@
 package foundation.identity.keri.demo.protocol;
 
-import foundation.identity.keri.api.event.Event;
+import foundation.identity.keri.api.event.KeyEvent;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.logging.LogLevel;
@@ -92,19 +92,19 @@ public abstract class KeriClient extends ClientTransport<KeriClient, KeriClientC
 		return super.doOnDisconnected(doOnDisconnected);
 	}
 
-	public KeriClient sendEvent(Publisher<? extends Event> events) {
+	public KeriClient sendEvent(Publisher<? extends KeyEvent> events) {
 		requireNonNull(events, "events");
-		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(events).then().subscribe());
+		return this.doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(events).then().subscribe());
 	}
 
-	public KeriClient sendEvent(Event event) {
+	public KeriClient sendEvent(KeyEvent event) {
 		requireNonNull(event, "event");
-		return doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(Mono.just(event)).then().subscribe());
+		return this.doOnConnected(c -> ((KeriChannelOperations) c).sendEvent(Mono.just(event)).then().subscribe());
 	}
 
 	public KeriClient handle(BiFunction<? super EventInbound, ? super EventOutbound, ? extends Publisher<Void>> handler) {
 		requireNonNull(handler, "handler");
-		return doOnConnected(new OnConnectedHandle(handler));
+		return this.doOnConnected(new OnConnectedHandle(handler));
 	}
 
 	@Override

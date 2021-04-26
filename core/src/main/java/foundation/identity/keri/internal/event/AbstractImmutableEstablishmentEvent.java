@@ -1,22 +1,23 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.AttachedEventSignature;
+import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
+import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.Identifier;
 
 import java.security.PublicKey;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmutableKeyEvent implements EstablishmentEvent {
+public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmutableKeyEvent
+    implements EstablishmentEvent {
 
   final SigningThreshold signingThreshold;
 
@@ -37,8 +38,10 @@ public abstract class AbstractImmutableEstablishmentEvent extends AbstractImmuta
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,
       byte[] bytes,
-      Set<AttachedEventSignature> signatures) {
-    super(version, format, identifier, sequenceNumber, previous, bytes, signatures);
+      Map<Integer, Signature> signatures,
+      Map<Integer, Signature> receipts,
+      Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
+    super(version, format, identifier, sequenceNumber, previous, bytes, signatures, receipts, otherReceipts);
 
     this.signingThreshold = signingThreshold;
     this.keys = List.copyOf(requireNonNull(keys, "keys"));

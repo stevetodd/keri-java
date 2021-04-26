@@ -1,6 +1,4 @@
-package foundation.identity.keri.api.crypto;
-
-import foundation.identity.keri.api.event.Format;
+package foundation.identity.keri.api.event;
 
 public enum StandardFormats implements Format {
   JSON,

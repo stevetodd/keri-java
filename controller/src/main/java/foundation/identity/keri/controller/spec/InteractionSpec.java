@@ -1,9 +1,9 @@
 package foundation.identity.keri.controller.spec;
 
 import foundation.identity.keri.api.KeyState;
-import foundation.identity.keri.api.crypto.StandardFormats;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
+import foundation.identity.keri.api.event.StandardFormats;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;

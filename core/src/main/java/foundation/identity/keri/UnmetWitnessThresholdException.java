@@ -1,4 +1,11 @@
 package foundation.identity.keri;
 
-public class UnmetWitnessThresholdException extends RuntimeException {
+import foundation.identity.keri.api.event.KeyEvent;
+
+public class UnmetWitnessThresholdException extends KeyEventProcessingException {
+
+  public UnmetWitnessThresholdException(KeyEvent keyEvent) {
+    super(keyEvent);
+  }
+
 }

@@ -1,6 +1,6 @@
 package foundation.identity.keri.demo.protocol;
 
-import foundation.identity.keri.api.event.Event;
+import foundation.identity.keri.api.event.KeyEvent;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.logging.LoggingHandler;
@@ -26,7 +26,7 @@ public final class KeriClientConfig extends ClientTransportConfig<KeriClientConf
   static final ChannelOperations.OnSetup DEFAULT_OPS = (ch, c, msg) -> new KeriChannelOperations(ch, c);
   static final LoggingHandler LOGGING_HANDLER = new LoggingHandler(KeriClient.class);
 
-  Publisher<Event> eventsToSend = Flux.empty();
+  Publisher<KeyEvent> eventsToSend = Flux.empty();
 
   KeriClientConfig(ConnectionProvider connectionProvider, Map<ChannelOption<?>, ?> options,
                    Supplier<? extends SocketAddress> remoteAddress) {

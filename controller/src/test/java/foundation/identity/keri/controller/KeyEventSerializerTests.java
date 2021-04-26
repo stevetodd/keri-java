@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import static foundation.identity.keri.SigningThresholds.*;
-import static foundation.identity.keri.controller.EventSerializer.signingThreshold;
+import static foundation.identity.keri.controller.KeyEventSerializer.signingThreshold;
 import static org.junit.Assert.assertEquals;
 
-public class EventSerializerTests {
+public class KeyEventSerializerTests {
 
   final ObjectMapper mapper = new ObjectMapper();
 

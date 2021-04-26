@@ -1,5 +1,11 @@
 package foundation.identity.keri;
 
-public class UnmetSigningThresholdException extends RuntimeException {
+import foundation.identity.keri.api.event.KeyEvent;
+
+public class UnmetSigningThresholdException extends KeyEventProcessingException {
+
+  public UnmetSigningThresholdException(KeyEvent keyEvent) {
+    super(keyEvent);
+  }
 
 }
