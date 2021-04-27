@@ -207,7 +207,7 @@ public final class KeyEventProcessor {
       if (event instanceof DelegatedEstablishmentEvent) {
         var dee = (DelegatedEstablishmentEvent) ee;
         var delegatingEvent = this.keyEventStore.getKeyEvent(dee.delegatingEvent())
-            .orElseThrow(() -> new OutOfOrderException(event, dee.delegatingEvent()));
+            .orElseThrow(() -> new MissingDelegatingEventException(event, dee.delegatingEvent()));
 
         this.validate(this.containsSeal(delegatingEvent.seals(), dee),
             "delegated establishment event seal must contain be contained in referenced delegating event");
