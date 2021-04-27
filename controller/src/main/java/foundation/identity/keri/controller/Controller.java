@@ -2,8 +2,8 @@ package foundation.identity.keri.controller;
 
 import foundation.identity.keri.IdentifierKeyStore;
 import foundation.identity.keri.KeyConfigurationDigester;
+import foundation.identity.keri.KeyEventProcessor;
 import foundation.identity.keri.KeyEventStore;
-import foundation.identity.keri.KeyEventValidator;
 import foundation.identity.keri.KeyStateProcessor;
 import foundation.identity.keri.api.KeyState;
 import foundation.identity.keri.api.event.EventSignature;
@@ -40,13 +40,13 @@ public final class Controller {
   private final SecureRandom secureRandom;
 
   private final EventFactory eventFactory = new EventFactory();
-  private final KeyEventValidator keyEventValidator;
+  private final KeyEventProcessor keyEventValidator;
 
   public Controller(KeyEventStore keyEventStore, IdentifierKeyStore keyStore, SecureRandom secureRandom) {
     this.keyEventStore = keyEventStore;
     this.keyStore = keyStore;
     this.secureRandom = secureRandom;
-    this.keyEventValidator = new KeyEventValidator(keyEventStore);
+    this.keyEventValidator = new KeyEventProcessor(keyEventStore);
   }
 
   private KeyPair generateKeyPair(SignatureAlgorithm algorithm) {
@@ -72,8 +72,7 @@ public final class Controller {
         .build();
 
     var event = this.eventFactory.inception(spec);
-    this.keyEventValidator.validate(null, event);
-    this.keyEventStore.append(event);
+    this.keyEventValidator.process(event);
 
     var keyCoordinates = ImmutableKeyCoordinates.of(event, 0);
     this.keyStore.storeKey(keyCoordinates, initialKeyPair);
@@ -97,15 +96,14 @@ public final class Controller {
         .build();
 
     var event = this.eventFactory.inception(spec);
-    this.keyEventValidator.validate(null, event);
-    this.keyEventStore.append(event);
+    var newState = this.keyEventValidator.process(event);
 
     var keyCoordinates = ImmutableKeyCoordinates.of(event, 0);
 
     this.keyStore.storeKey(keyCoordinates, initialKeyPair);
     this.keyStore.storeNextKey(keyCoordinates, nextKeyPair);
 
-    return null;
+    return new DefaultControllableIdentifier(this, newState);
   }
 
   public ControllableIdentifier newDelegatedIdentifier(Identifier delegator) {
@@ -117,7 +115,8 @@ public final class Controller {
   }
 
   public KeyState rotate(Identifier identifier, List<Seal> seals) {
-    var state = this.getIdentifierState(identifier);
+    var state = this.keyEventStore.getKeyState(identifier)
+        .orElseThrow(() -> new IllegalArgumentException("identifier not found in event store"));
 
     if (state == null) {
       throw new IllegalArgumentException("identifier state not found in event store");
@@ -147,8 +146,7 @@ public final class Controller {
 
 
     var event = this.eventFactory.rotation(spec);
-    this.keyEventValidator.validate(state, event);
-    this.keyEventStore.append(event);
+    var newState = this.keyEventValidator.process(event);
 
     var nextKeyCoordinates = ImmutableKeyCoordinates.of(event, 0);
     this.keyStore.storeKey(nextKeyCoordinates, nextKeyPair.get());
@@ -156,11 +154,12 @@ public final class Controller {
     this.keyStore.removeKey(currentKeyCoordinates);
     this.keyStore.removeNextKey(currentKeyCoordinates);
 
-    return KeyStateProcessor.apply(state, event);
+    return newState;
   }
 
   public KeyState seal(Identifier identifier, List<Seal> seals) {
-    var state = this.getIdentifierState(identifier);
+    var state = this.keyEventStore.getKeyState(identifier)
+        .orElseThrow(() -> new IllegalArgumentException("identifier not found in event store"));
 
     if (state == null) {
       throw new IllegalArgumentException("identifier not found in event store");
@@ -179,18 +178,12 @@ public final class Controller {
         .build();
 
     var event = this.eventFactory.interaction(spec);
-    this.keyEventValidator.validate(state, event);
-    this.keyEventStore.append(event);
-
-    return KeyStateProcessor.apply(state, event);
+    return this.keyEventValidator.process(event);
   }
 
   public EventSignature sign(Identifier identifier, KeyEvent event) {
-    var state = this.getIdentifierState(identifier);
-
-    if (state == null) {
-      throw new IllegalArgumentException("identifier not found in event store");
-    }
+    var state = this.keyEventStore.getKeyState(identifier)
+        .orElseThrow(() -> new IllegalArgumentException("identifier not found in event store"));
 
     var keyCoords = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
     var keyPair = this.keyStore.getKey(keyCoords)
@@ -204,25 +197,5 @@ public final class Controller {
         state.lastEstablishmentEvent().coordinates(),
         Map.of(0, signature));
   }
-
-  // TODO should be private
-  public KeyState getIdentifierState(Identifier identifier) {
-    var i = this.keyEventStore.streamKeyEvents(identifier).iterator();
-
-    KeyState state = null;
-    while (i.hasNext()) {
-      state = KeyStateProcessor.apply(state, i.next());
-    }
-
-    return state;
-  }
-
-  // list identifiers
-
-  // get an identifier
-
-  // rotate an identifier
-
-  // interact with an identifier
 
 }

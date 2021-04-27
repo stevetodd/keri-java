@@ -1,7 +1,7 @@
 package foundation.identity.keri;
 
 /**
- * Thrown by {@link KeyEventValidator} to indicate that an event being processed is not valid in
+ * Thrown by {@link KeyEventProcessor} to indicate that an event being processed is not valid in
  * form or configuration.
  */
 public class InvalidKeyEventException extends RuntimeException {

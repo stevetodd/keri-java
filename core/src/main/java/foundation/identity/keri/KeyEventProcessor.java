@@ -48,7 +48,7 @@ public final class KeyEventProcessor {
     return this.keyEventStore;
   }
 
-  public void process(KeyEvent event) throws KeyEventProcessingException {
+  public KeyState process(KeyEvent event) throws KeyEventProcessingException {
     KeyState previousState = null;
 
     if (!(event instanceof InceptionEvent)) {
@@ -66,6 +66,8 @@ public final class KeyEventProcessor {
 
     // TODO remove invalid signatures before appending
     this.keyEventStore.append(event);
+
+    return newState;
   }
 
   public void process(AttachmentEvent attachmentEvent) throws AttachmentEventProcessingException {
