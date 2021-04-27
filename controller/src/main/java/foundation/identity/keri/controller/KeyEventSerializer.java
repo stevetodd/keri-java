@@ -283,9 +283,9 @@ public final class KeyEventSerializer {
     var mapper = this.mapper(StandardFormats.JSON);
     var rootNode = mapper.createObjectNode();
 
-    var vrc = event.signatures().isEmpty()
-        && event.receipts().isEmpty()
-        && event.otherReceipts().size() == 1;
+    var vrc = event.authentication().isEmpty()
+        && event.endorsements().isEmpty()
+        && event.receipts().size() == 1;
 
     rootNode.put(VERSION.label(), version(Version.CURRENT, StandardFormats.JSON, 0));
     rootNode.put(IDENTIFIER.label(), qb64(event.coordinates().identifier()));
@@ -294,7 +294,7 @@ public final class KeyEventSerializer {
     rootNode.put(EVENT_DIGEST.label(), qb64(event.coordinates().digest()));
 
     if (vrc) {
-      var vrcSigs = event.otherReceipts().entrySet().stream().findFirst().get();
+      var vrcSigs = event.receipts().entrySet().stream().findFirst().get();
       var establishmentEvent = vrcSigs.getKey();
       var anchorNode = mapper.createObjectNode();
       anchorNode.put(IDENTIFIER.label(), qb64(establishmentEvent.identifier()));

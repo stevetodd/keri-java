@@ -64,8 +64,8 @@ public final class KeyEvents {
       sb.append("d: ").append(add.coordinates().digest()).append("\n");
     }
 
-    sb.append("--- CONTROLLER SIGNATURES").append("\n");
-    e.signatures()
+    sb.append("--- AUTHENTICATION").append("\n");
+    e.authentication()
         .entrySet()
         .stream()
         .sorted(Map.Entry.comparingByKey())
@@ -76,20 +76,20 @@ public final class KeyEvents {
           sb.append("\n");
         });
 
-    sb.append("--- WITNESS RECEIPTS").append("\n");
+    sb.append("--- ENDORSEMENTS").append("\n");
+    e.endorsements()
+        .entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByKey())
+        .forEachOrdered(kv -> {
+          sb.append(kv.getKey());
+          sb.append(":");
+          sb.append(kv.getValue());
+          sb.append("\n");
+        });
+
+    sb.append("--- RECEIPTS").append("\n");
     e.receipts()
-        .entrySet()
-        .stream()
-        .sorted(Map.Entry.comparingByKey())
-        .forEachOrdered(kv -> {
-          sb.append(kv.getKey());
-          sb.append(":");
-          sb.append(kv.getValue());
-          sb.append("\n");
-        });
-
-    sb.append("--- OTHER RECEIPTS").append("\n");
-    e.otherReceipts()
         .entrySet()
         .stream()
         .map(kv -> Map.entry(kv.getKey().toString(), kv.getValue()))

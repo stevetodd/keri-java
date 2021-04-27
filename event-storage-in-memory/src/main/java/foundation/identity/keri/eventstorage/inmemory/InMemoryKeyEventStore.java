@@ -28,9 +28,9 @@ public class InMemoryKeyEventStore implements KeyEventStore {
 
   private final ArrayList<KeyEvent> events = new ArrayList<>();
   private final Map<KeyEventCoordinates, KeyState> states = new HashMap<>();
-  private final Map<KeyEventCoordinates, Map<Integer, Signature>> controllerSignatures = new HashMap<>();
-  private final Map<KeyEventCoordinates, Map<Integer, Signature>> receipts = new HashMap<>();
-  private final Map<OtherReceiptKey, Map<Integer, Signature>> otherReceipts = new HashMap<>();
+  private final Map<KeyEventCoordinates, Map<Integer, Signature>> authentications = new HashMap<>();
+  private final Map<KeyEventCoordinates, Map<Integer, Signature>> endorsements = new HashMap<>();
+  private final Map<ReceiptKey, Map<Integer, Signature>> receipts = new HashMap<>();
 
   @Override
   public void append(KeyEvent event) {
@@ -41,32 +41,34 @@ public class InMemoryKeyEventStore implements KeyEventStore {
 
     this.appendAttachments(
         event.coordinates(),
-        event.signatures(),
-        event.receipts(),
-        event.otherReceipts());
+        event.authentication(),
+        event.endorsements(),
+        event.receipts());
 
     this.states.put(event.coordinates(), newState);
   }
 
-  private void appendAttachments(KeyEventCoordinates event, Map<Integer, Signature> signatures,
+  private void appendAttachments(
+      KeyEventCoordinates event, Map<Integer,
+      Signature> signatures,
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
-    this.controllerSignatures.computeIfAbsent(event, k -> new HashMap<>())
+    this.authentications.computeIfAbsent(event, k -> new HashMap<>())
         .putAll(signatures);
 
-    this.receipts.computeIfAbsent(event, k -> new HashMap<>())
+    this.endorsements.computeIfAbsent(event, k -> new HashMap<>())
         .putAll(receipts);
 
     for (var otherReceipt : otherReceipts.entrySet()) {
-      var key = new OtherReceiptKey(event, otherReceipt.getKey());
-      this.otherReceipts.computeIfAbsent(key, k -> new HashMap<>())
+      var key = new ReceiptKey(event, otherReceipt.getKey());
+      this.receipts.computeIfAbsent(key, k -> new HashMap<>())
           .putAll(otherReceipt.getValue());
     }
  }
 
   @Override
   public void append(AttachmentEvent event) {
-    this.appendAttachments(event.coordinates(), event.signatures(), event.receipts(), event.otherReceipts());
+    this.appendAttachments(event.coordinates(), event.authentication(), event.endorsements(), event.receipts());
   }
 
   @Override
@@ -120,7 +122,7 @@ public class InMemoryKeyEventStore implements KeyEventStore {
   @Override
   public OptionalLong findLatestReceipt(
       Identifier forIdentifier, Identifier byIdentifier) {
-    return this.otherReceipts.keySet()
+    return this.receipts.keySet()
         .stream()
         .filter(receiptKey -> receiptKey.event().identifier().equals(forIdentifier))
         .filter(receiptKey -> receiptKey.signer().identifier().equals(byIdentifier))
@@ -128,11 +130,11 @@ public class InMemoryKeyEventStore implements KeyEventStore {
         .max();
   }
 
-  private static class OtherReceiptKey {
+  private static class ReceiptKey {
     private final KeyEventCoordinates event;
     private final KeyEventCoordinates signer;
 
-    public OtherReceiptKey(KeyEventCoordinates event, KeyEventCoordinates signer) {
+    public ReceiptKey(KeyEventCoordinates event, KeyEventCoordinates signer) {
       this.event = ImmutableKeyEventCoordinates.convert(event);
       this.signer = ImmutableKeyEventCoordinates.convert(signer);
     }
@@ -150,10 +152,10 @@ public class InMemoryKeyEventStore implements KeyEventStore {
       if (this == o) {
         return true;
       }
-      if (!(o instanceof OtherReceiptKey)) {
+      if (!(o instanceof ReceiptKey)) {
         return false;
       }
-      OtherReceiptKey that = (OtherReceiptKey) o;
+      ReceiptKey that = (ReceiptKey) o;
       return this.event.equals(that.event)
           && this.signer.equals(that.signer);
     }

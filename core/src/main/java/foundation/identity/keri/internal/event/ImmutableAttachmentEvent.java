@@ -41,17 +41,17 @@ public class ImmutableAttachmentEvent implements AttachmentEvent {
   }
 
   @Override
-  public Map<Integer, Signature> signatures() {
+  public Map<Integer, Signature> authentication() {
     return this.signatures;
   }
 
   @Override
-  public Map<Integer, Signature> receipts() {
+  public Map<Integer, Signature> endorsements() {
     return this.receipts;
   }
 
   @Override
-  public Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts() {
+  public Map<KeyEventCoordinates, Map<Integer, Signature>> receipts() {
     return this.otherReceipts;
   }
 }

@@ -60,9 +60,9 @@ public final class KeyEventProcessor {
 
     var newState = KeyStateProcessor.apply(previousState, event);
 
-    var validControllerSignatures = this.verifyControllerSignatures(newState, event, event.signatures());
-    var validWitnessReceipts = this.verifyWitnessReceipts(newState, event, event.receipts());
-    var validOtherReceipts = this.verifyOtherReceipts(event, event.otherReceipts());
+    var validControllerSignatures = this.verifyAuthentication(newState, event, event.authentication());
+    var validWitnessReceipts = this.verifyEndorsements(newState, event, event.endorsements());
+    var validOtherReceipts = this.verifyReceipts(event, event.receipts());
 
     // TODO remove invalid signatures before appending
     this.keyEventStore.append(event);
@@ -74,14 +74,14 @@ public final class KeyEventProcessor {
     var state = this.keyEventStore.getKeyState(attachmentEvent.coordinates())
         .orElseThrow(() -> new MissingReferencedEventException(attachmentEvent, attachmentEvent.coordinates()));
 
-    var validControllerSignatures = this.verifyControllerSignatures(state, event, event.signatures());
-    var validWitnessReceipts = this.verifyWitnessReceipts(state, event, event.receipts());
-    var validOtherReceipts = this.verifyOtherReceipts(event, event.otherReceipts());
+    var validControllerSignatures = this.verifyAuthentication(state, event, event.authentication());
+    var validWitnessReceipts = this.verifyEndorsements(state, event, event.endorsements());
+    var validOtherReceipts = this.verifyReceipts(event, event.receipts());
 
     this.keyEventStore.append(attachmentEvent);
   }
 
-  private HashMap<Integer, Signature> verifyControllerSignatures(KeyState state, KeyEvent event, Map<Integer, Signature> signatures) {
+  private HashMap<Integer, Signature> verifyAuthentication(KeyState state, KeyEvent event, Map<Integer, Signature> signatures) {
     var kee = state.lastEstablishmentEvent();
 
     var verifiedSignatures = new HashMap<Integer, Signature>();
@@ -115,13 +115,13 @@ public final class KeyEventProcessor {
     return verifiedSignatures;
   }
 
-  private Map<Integer, Signature> verifyWitnessReceipts(KeyState state, KeyEvent event, Map<Integer, Signature> receipts) {
+  private Map<Integer, Signature> verifyEndorsements(KeyState state, KeyEvent event, Map<Integer, Signature> receipts) {
     var validReceipts = new HashMap<Integer, Signature>();
     for (var kv : receipts.entrySet()) {
       var witnessIndex = kv.getKey();
 
       if (witnessIndex < 0 || witnessIndex >= state.witnesses().size()) {
-        LOGGER.debug("witness index out of range: {}", witnessIndex);
+        LOGGER.debug("endorsement index out of range: {}", witnessIndex);
         continue;
       }
 
@@ -143,7 +143,7 @@ public final class KeyEventProcessor {
     return validReceipts;
   }
 
-  private Map<KeyEventCoordinates, Map<Integer, Signature>> verifyOtherReceipts(KeyEvent event, Map<KeyEventCoordinates,
+  private Map<KeyEventCoordinates, Map<Integer, Signature>> verifyReceipts(KeyEvent event, Map<KeyEventCoordinates,
       Map<Integer, Signature>> otherReceipts) {
     var verified = new HashMap<KeyEventCoordinates, Map<Integer, Signature>>();
     for (var kv : otherReceipts.entrySet()) {
@@ -154,7 +154,7 @@ public final class KeyEventProcessor {
         continue;
       }
 
-      var verifiedSignatures = this.verifyControllerSignatures(keyState.get(), event, kv.getValue());
+      var verifiedSignatures = this.verifyAuthentication(keyState.get(), event, kv.getValue());
       verified.put(kv.getKey(), verifiedSignatures);
     }
 

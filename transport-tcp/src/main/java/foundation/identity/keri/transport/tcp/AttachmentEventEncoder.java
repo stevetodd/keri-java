@@ -21,7 +21,7 @@ public class AttachmentEventEncoder extends MessageToByteEncoder<AttachmentEvent
     out.writeBytes(SERIALIZER.serialize(event));
 
     // TODO: still a hack
-    var signatures = event.otherReceipts()
+    var signatures = event.receipts()
         .values()
         .stream()
         .findFirst()

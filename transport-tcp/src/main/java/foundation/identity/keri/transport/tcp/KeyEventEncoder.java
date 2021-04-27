@@ -18,12 +18,12 @@ public class KeyEventEncoder extends MessageToByteEncoder<KeyEvent> {
     out.writeBytes(event.bytes());
 
     // this will be replaced when we support new framing. For now, direct mode
-    var eventSignature = event.signatures();
+    var eventSignature = event.authentication();
 
     out.writeCharSequence("-A", UTF_8);
-    out.writeCharSequence(base64(event.signatures().size(), 2), UTF_8);
+    out.writeCharSequence(base64(event.authentication().size(), 2), UTF_8);
 
-    event.signatures()
+    event.authentication()
         .entrySet()
         .stream()
         .sorted(Map.Entry.comparingByKey())

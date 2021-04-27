@@ -8,9 +8,10 @@ public interface AttachmentEvent {
 
   KeyEventCoordinates coordinates();
 
-  Map<Integer, Signature> signatures();
+  Map<Integer, Signature> authentication();
 
-  Map<Integer, Signature> receipts();
+  Map<Integer, Signature> endorsements();
 
-  Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts();
+  Map<KeyEventCoordinates, Map<Integer, Signature>> receipts();
+
 }
