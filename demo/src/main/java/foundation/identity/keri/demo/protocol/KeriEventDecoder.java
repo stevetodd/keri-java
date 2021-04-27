@@ -1,9 +1,9 @@
 package foundation.identity.keri.demo.protocol;
 
 import foundation.identity.keri.KeyEventDeserializer;
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
+import foundation.identity.keri.crypto.Signature;
+import foundation.identity.keri.crypto.SignatureAlgorithm;
 import foundation.identity.keri.crypto.SignatureOperations;
 import foundation.identity.keri.internal.identifier.ImmutableBasicIdentifier;
 import io.netty.buffer.ByteBuf;

@@ -1,6 +1,6 @@
 package foundation.identity.keri.api.identifier;
 
-import foundation.identity.keri.api.crypto.Signature;
+import foundation.identity.keri.crypto.Signature;
 
 import java.util.Objects;
 

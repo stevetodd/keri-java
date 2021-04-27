@@ -1,4 +1,4 @@
-package foundation.identity.keri.api.crypto;
+package foundation.identity.keri.crypto;
 
 import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;

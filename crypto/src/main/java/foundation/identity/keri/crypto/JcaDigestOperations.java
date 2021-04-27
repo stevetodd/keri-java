@@ -1,9 +1,5 @@
 package foundation.identity.keri.crypto;
 
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
-import foundation.identity.keri.internal.crypto.ImmutableDigest;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 

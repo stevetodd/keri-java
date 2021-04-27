@@ -1,7 +1,7 @@
 package foundation.identity.keri.internal.seal;
 
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.seal.MerkleTreeRootSeal;
+import foundation.identity.keri.crypto.Digest;
 
 public class ImmutableMerkleTreeRootSeal implements MerkleTreeRootSeal {
 
@@ -11,6 +11,7 @@ public class ImmutableMerkleTreeRootSeal implements MerkleTreeRootSeal {
     this.digest = digest;
   }
 
+  @Override
   public Digest digest() {
     return this.digest;
   }

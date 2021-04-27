@@ -1,11 +1,11 @@
 package foundation.identity.keri;
 
 
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.Signature;
 
 import java.security.PublicKey;
 

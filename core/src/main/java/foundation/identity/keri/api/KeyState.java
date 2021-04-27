@@ -1,6 +1,5 @@
 package foundation.identity.keri.api;
 
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.EstablishmentEvent;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -9,6 +8,7 @@ import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
+import foundation.identity.keri.crypto.Digest;
 
 import java.security.PublicKey;
 import java.util.List;

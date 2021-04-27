@@ -13,6 +13,7 @@
     <module>controller</module>
     <module>controller-cli</module>
     <module>core</module>
+    <module>crypto</module>
     <module>demo</module>
     <module>event-storage-in-memory</module>
     <module>key-storage-in-memory</module>

@@ -1,7 +1,6 @@
 package foundation.identity.keri;
 
 import foundation.identity.keri.api.KeyState;
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.DelegatedEstablishmentEvent;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.EstablishmentEvent;
@@ -15,6 +14,7 @@ import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
 import foundation.identity.keri.api.seal.KeyEventCoordinatesSeal;
 import foundation.identity.keri.api.seal.Seal;
+import foundation.identity.keri.crypto.Digest;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.crypto.SignatureOperations;
 

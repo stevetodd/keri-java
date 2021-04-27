@@ -1,10 +1,5 @@
 package foundation.identity.keri.crypto;
 
-import foundation.identity.keri.api.crypto.EcDSAParameters;
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
-import foundation.identity.keri.internal.crypto.ImmutableSignature;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.ECPointUtil;
@@ -115,7 +110,7 @@ public class EcDSAOperations implements SignatureOperations {
   public Signature sign(byte[] message, PrivateKey privateKey) {
     try {
       var parameters = (EcDSAParameters) this.signatureAlgorithm.parameters();
-      var sig = java.security.Signature.getInstance(signatureInstanceName(parameters));
+      var sig = java.security.Signature.getInstance(this.signatureInstanceName(parameters));
       sig.initSign(privateKey);
       sig.update(message);
       var bytes = sig.sign();
@@ -131,7 +126,7 @@ public class EcDSAOperations implements SignatureOperations {
   public boolean verify(byte[] message, Signature signature, PublicKey publicKey) {
     try {
       var parameters = (EcDSAParameters) this.signatureAlgorithm.parameters();
-      var sig = java.security.Signature.getInstance(signatureInstanceName(parameters));
+      var sig = java.security.Signature.getInstance(this.signatureInstanceName(parameters));
       sig.initVerify(publicKey);
       sig.update(message);
       return sig.verify(signature.bytes());

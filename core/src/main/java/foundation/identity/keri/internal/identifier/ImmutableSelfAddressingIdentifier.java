@@ -1,8 +1,8 @@
 package foundation.identity.keri.internal.identifier;
 
 import foundation.identity.keri.QualifiedBase64;
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
+import foundation.identity.keri.crypto.Digest;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ public class ImmutableSelfAddressingIdentifier implements SelfAddressingIdentifi
     if (obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if (this.getClass() != obj.getClass()) {
       return false;
     }
     var other = (ImmutableSelfAddressingIdentifier) obj;

@@ -1,12 +1,12 @@
 package foundation.identity.keri;
 
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.DigestAlgorithm;
 import foundation.identity.keri.crypto.DigestOperations;
-import foundation.identity.keri.internal.crypto.ImmutableDigest;
+import foundation.identity.keri.crypto.ImmutableDigest;
 import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
 
 import java.security.PublicKey;

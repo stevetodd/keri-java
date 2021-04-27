@@ -1,7 +1,7 @@
 package foundation.identity.keri;
 
-import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
+import foundation.identity.keri.crypto.StandardDigestAlgorithms;
+import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
 import org.junit.Test;
 
 import java.util.Base64;

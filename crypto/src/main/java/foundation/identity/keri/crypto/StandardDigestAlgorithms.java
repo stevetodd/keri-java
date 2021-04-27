@@ -1,4 +1,4 @@
-package foundation.identity.keri.api.crypto;
+package foundation.identity.keri.crypto;
 
 public enum StandardDigestAlgorithms implements DigestAlgorithm {
   BLAKE2B_256("BLAKE2B-256", 32),

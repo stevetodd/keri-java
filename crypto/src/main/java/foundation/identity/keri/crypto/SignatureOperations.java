@@ -1,9 +1,5 @@
 package foundation.identity.keri.crypto;
 
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
-
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -43,7 +39,7 @@ public interface SignatureOperations {
   PrivateKey privateKey(byte[] bytes);
 
   default KeyPair keyPair(byte[] bytes, byte[] publicKey) {
-    return new KeyPair(publicKey(publicKey), privateKey(bytes));
+    return new KeyPair(this.publicKey(publicKey), this.privateKey(bytes));
   }
 
   Signature signature(byte[] signatureBytes);

@@ -1,7 +1,7 @@
 package foundation.identity.keri.api.event;
 
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.identifier.Identifier;
+import foundation.identity.keri.crypto.Digest;
 
 public interface KeyEventCoordinates {
 

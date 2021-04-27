@@ -1,6 +1,6 @@
 package foundation.identity.keri.api.identifier;
 
-import foundation.identity.keri.api.crypto.Digest;
+import foundation.identity.keri.crypto.Digest;
 
 import java.util.Objects;
 

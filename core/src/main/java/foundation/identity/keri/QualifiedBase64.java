@@ -1,15 +1,15 @@
 package foundation.identity.keri;
 
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
-import foundation.identity.keri.internal.crypto.ImmutableDigest;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.DigestAlgorithm;
+import foundation.identity.keri.crypto.ImmutableDigest;
+import foundation.identity.keri.crypto.Signature;
+import foundation.identity.keri.crypto.SignatureAlgorithm;
+import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
 import foundation.identity.keri.internal.identifier.ImmutableBasicIdentifier;
 import foundation.identity.keri.internal.identifier.ImmutableSelfAddressingIdentifier;
 import foundation.identity.keri.internal.identifier.ImmutableSelfSigningIdentifier;
@@ -18,8 +18,8 @@ import org.bouncycastle.util.Arrays;
 import java.security.PublicKey;
 import java.util.Base64;
 
-import static foundation.identity.keri.api.crypto.StandardDigestAlgorithms.*;
 import static foundation.identity.keri.crypto.SignatureOperations.*;
+import static foundation.identity.keri.crypto.StandardDigestAlgorithms.*;
 
 public final class QualifiedBase64 {
 

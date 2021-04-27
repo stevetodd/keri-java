@@ -1,9 +1,4 @@
-package foundation.identity.keri.internal.crypto;
-
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-
-import static foundation.identity.keri.QualifiedBase64.qb64;
+package foundation.identity.keri.crypto;
 
 public class ImmutableSignature implements Signature {
 
@@ -36,11 +31,6 @@ public class ImmutableSignature implements Signature {
       return false;
     }
     return Signature.equals(this, (Signature) obj);
-  }
-
-  @Override
-  public String toString() {
-    return qb64(this);
   }
 
 }

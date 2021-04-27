@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
 import foundation.identity.keri.api.event.AttachmentEvent;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -25,6 +24,7 @@ import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.InteractionSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
+import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.util.Arrays;

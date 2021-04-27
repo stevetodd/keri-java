@@ -1,12 +1,12 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
+import foundation.identity.keri.crypto.Signature;
 
 import java.util.List;
 import java.util.Map;

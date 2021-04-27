@@ -1,7 +1,7 @@
 package foundation.identity.keri.api.event;
 
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.DigestAlgorithm;
 
 public interface KeyConfigurationDigest extends Digest {
 

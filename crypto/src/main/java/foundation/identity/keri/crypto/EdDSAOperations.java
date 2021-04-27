@@ -1,11 +1,5 @@
 package foundation.identity.keri.crypto;
 
-import foundation.identity.keri.api.crypto.EdDSAParameters;
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
-import foundation.identity.keri.internal.crypto.ImmutableSignature;
-
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
@@ -101,7 +95,7 @@ public class EdDSAOperations implements SignatureOperations {
     var encodedPoint = point.getY().toByteArray();
 
     reverse(encodedPoint);
-    encodedPoint = Arrays.copyOf(encodedPoint, keyLength());
+    encodedPoint = Arrays.copyOf(encodedPoint, this.keyLength());
     var msb = (byte) (point.isXOdd() ? 0x80 : 0);
     encodedPoint[encodedPoint.length - 1] |= msb;
 
@@ -122,9 +116,9 @@ public class EdDSAOperations implements SignatureOperations {
   @Override
   public PublicKey publicKey(byte[] bytes) {
     try {
-      if (bytes.length != keyLength()) {
+      if (bytes.length != this.keyLength()) {
         throw new RuntimeException(new InvalidKeyException("key length is " + bytes.length +
-            ", key length must be " + keyLength()));
+            ", key length must be " + this.keyLength()));
       }
 
       var point = decodeEdPoint(bytes);

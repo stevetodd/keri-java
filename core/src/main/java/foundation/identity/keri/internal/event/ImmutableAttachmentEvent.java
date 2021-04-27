@@ -1,8 +1,8 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.AttachmentEvent;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
+import foundation.identity.keri.crypto.Signature;
 
 import java.util.Map;
 import java.util.stream.Collectors;

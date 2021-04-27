@@ -1,8 +1,8 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.api.crypto.Digest;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
-import foundation.identity.keri.internal.crypto.ImmutableDigest;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.ImmutableDigest;
 
 public class ImmutableKeyConfigurationDigest extends ImmutableDigest implements KeyConfigurationDigest {
 

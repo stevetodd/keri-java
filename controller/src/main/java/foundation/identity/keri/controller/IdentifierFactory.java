@@ -1,12 +1,12 @@
 package foundation.identity.keri.controller;
 
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.Signer;
+import foundation.identity.keri.crypto.DigestAlgorithm;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.internal.identifier.ImmutableBasicIdentifier;
 import foundation.identity.keri.internal.identifier.ImmutableSelfAddressingIdentifier;

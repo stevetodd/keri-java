@@ -1,9 +1,9 @@
 package foundation.identity.keri.api.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.identifier.Identifier;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.Signature;
 
 import java.util.Map;
 

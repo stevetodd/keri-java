@@ -1,8 +1,8 @@
 package foundation.identity.keri.internal.identifier;
 
 import foundation.identity.keri.QualifiedBase64;
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
+import foundation.identity.keri.crypto.Signature;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ public class ImmutableSelfSigningIdentifier implements SelfSigningIdentifier {
     if (obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+    if (this.getClass() != obj.getClass()) {
       return false;
     }
     var other = (ImmutableSelfSigningIdentifier) obj;

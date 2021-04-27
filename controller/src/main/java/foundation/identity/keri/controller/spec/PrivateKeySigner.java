@@ -1,9 +1,9 @@
 package foundation.identity.keri.controller.spec;
 
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
-import foundation.identity.keri.api.crypto.StandardSignatureAlgorithms;
+import foundation.identity.keri.crypto.Signature;
+import foundation.identity.keri.crypto.SignatureAlgorithm;
 import foundation.identity.keri.crypto.SignatureOperations;
+import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
 
 import java.security.PrivateKey;
 

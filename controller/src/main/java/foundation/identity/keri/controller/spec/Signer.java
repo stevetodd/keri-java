@@ -1,7 +1,7 @@
 package foundation.identity.keri.controller.spec;
 
-import foundation.identity.keri.api.crypto.Signature;
-import foundation.identity.keri.api.crypto.SignatureAlgorithm;
+import foundation.identity.keri.crypto.Signature;
+import foundation.identity.keri.crypto.SignatureAlgorithm;
 
 public interface Signer {
 

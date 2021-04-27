@@ -1,13 +1,13 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
-import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.DigestAlgorithm;
 import foundation.identity.keri.crypto.DigestOperations;
+import foundation.identity.keri.crypto.StandardDigestAlgorithms;
 
 import java.util.Objects;
 
@@ -123,7 +123,7 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
 
   @Override
   public String toString() {
-    return this.identifier + ":" + this.sequenceNumber + ":" + qb64(digest());
+    return this.identifier + ":" + this.sequenceNumber + ":" + qb64(this.digest());
   }
 
 }

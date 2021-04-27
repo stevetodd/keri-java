@@ -1,6 +1,6 @@
 package foundation.identity.keri.api.seal;
 
-import foundation.identity.keri.api.crypto.Digest;
+import foundation.identity.keri.crypto.Digest;
 
 public interface MerkleTreeRootSeal extends Seal {
 

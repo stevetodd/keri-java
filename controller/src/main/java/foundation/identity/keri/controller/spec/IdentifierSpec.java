@@ -2,9 +2,6 @@ package foundation.identity.keri.controller.spec;
 
 import foundation.identity.keri.KeyConfigurationDigester;
 import foundation.identity.keri.SigningThresholds;
-import foundation.identity.keri.api.crypto.Digest;
-import foundation.identity.keri.api.crypto.DigestAlgorithm;
-import foundation.identity.keri.api.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.api.event.ConfigurationTrait;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
@@ -14,6 +11,9 @@ import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
 import foundation.identity.keri.api.identifier.SelfSigningIdentifier;
+import foundation.identity.keri.crypto.Digest;
+import foundation.identity.keri.crypto.DigestAlgorithm;
+import foundation.identity.keri.crypto.StandardDigestAlgorithms;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;

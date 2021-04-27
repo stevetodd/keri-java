@@ -1,13 +1,13 @@
 package foundation.identity.keri.controller;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.crypto.Signature;
 import foundation.identity.keri.api.event.InceptionEvent;
 import foundation.identity.keri.api.event.InteractionEvent;
 import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.InteractionSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
+import foundation.identity.keri.crypto.Signature;
 import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
