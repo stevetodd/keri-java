@@ -75,7 +75,6 @@ public class KeyEventDeserializer {
         default -> throw new IllegalArgumentException("Unknown event type: " + type);
       };
     } catch (Exception e) {
-      e.printStackTrace(System.err);
       throw new SerializationException(e);
     }
   }
