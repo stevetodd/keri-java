@@ -21,7 +21,7 @@
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>log</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
