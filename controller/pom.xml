@@ -12,12 +12,6 @@
 
   <artifactId>controller</artifactId>
 
-  <properties>
-    <maven.compiler.target>15</maven.compiler.target>
-    <maven.compiler.source>15</maven.compiler.source>
-    <maven.compiler.release>15</maven.compiler.release>
-  </properties>
-
   <dependencies>
 
     <dependency>
