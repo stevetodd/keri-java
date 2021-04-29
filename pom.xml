@@ -9,6 +9,25 @@
 
   <name>root</name>
 
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <developerConnection>https://github.com/stevetodd/keri-java.git</developerConnection>
+    <url>https://github.com/stevetodd/keri-java.git</url>
+    <connection>git://github.com/stevetodd/keri-java.git</connection>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>http://github.com/stevetodd/keri-java/issues</url>
+  </issueManagement>
+
   <modules>
     <module>controller</module>
     <module>controller-cli</module>
@@ -21,12 +40,137 @@
   </modules>
 
   <properties>
+    <bouncycastle.version>1.66</bouncycastle.version>
+    <commons.math3.version>3.6.1</commons.math3.version>
+    <jackson.version>2.12.3</jackson.version>
+    <junit.version>4.13.1</junit.version>
+    <logback.version>1.2.3</logback.version>
+    <msgpack.jackson.version>0.8.22</msgpack.jackson.version>
+    <netty.version>4.1.60.Final</netty.version>
+    <rctcwyvrn.blake3.version>1.3</rctcwyvrn.blake3.version>
+    <slf4j.version>1.7.30</slf4j.version>
+
+    <java.version>16</java.version>
     <maven.compiler.source>16</maven.compiler.source>
     <maven.compiler.target>16</maven.compiler.target>
     <maven.compiler.release>16</maven.compiler.release>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>controller</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>controller-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>crypto</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>event-storage-in-memory</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>key-storage-in-memory</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>log</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>lookup</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>transport-tcp</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.github.rctcwyvrn</groupId>
+        <artifactId>blake3</artifactId>
+        <version>${rctcwyvrn.blake3.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>${netty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-math3</artifactId>
+        <version>${commons.math3.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${bouncycastle.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.msgpack</groupId>
+        <artifactId>jackson-dataformat-msgpack</artifactId>
+        <version>${msgpack.jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
 
 </project>

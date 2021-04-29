@@ -11,24 +11,11 @@
 
   <artifactId>transport-tcp</artifactId>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-bom</artifactId>
-        <version>4.1.60.Final</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
       <artifactId>controller</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -36,24 +23,23 @@
       <artifactId>netty-all</artifactId>
     </dependency>
 
+    <!-- TEST DEPENDENCIES -->
+
     <dependency>
       <groupId>foundation.identity.keri</groupId>
       <artifactId>event-storage-in-memory</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>foundation.identity.keri</groupId>
       <artifactId>key-storage-in-memory</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
       <scope>test</scope>
     </dependency>
 
