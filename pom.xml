@@ -40,7 +40,7 @@
   </modules>
 
   <properties>
-    <bouncycastle.version>1.66</bouncycastle.version>
+    <bouncycastle.version>1.67</bouncycastle.version>
     <commons.math3.version>3.6.1</commons.math3.version>
     <jackson.version>2.12.3</jackson.version>
     <junit.version>4.13.1</junit.version>
